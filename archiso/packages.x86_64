@@ -531,8 +531,8 @@ arcolinux-zsh-git
 ####                 ARCO ISO SPECIFIC
 ###########################################################################
 
-linux-zen
-linux-zen-headers
+#linux-zen
+#linux-zen-headers
 
 ###########################################################################
 ####                               CALAMARES

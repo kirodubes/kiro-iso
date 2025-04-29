@@ -3,6 +3,8 @@
 
 workdir=$(pwd)
 
+change-version.sh
+
 # Below command will backup everything inside the project folder
 git add --all .
 

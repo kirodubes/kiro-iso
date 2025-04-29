@@ -133,7 +133,7 @@ echo
 
 	desktop="xfce"
 
-	kiroVersion='v25.05.01'
+	kiroVersion='v25.04.29.01'
 
 	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
 
@@ -251,11 +251,6 @@ echo
 		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 		exit 1
 	fi
-
-	archisoVersion=$(pacman -Q archiso)
-
-	# Saving current archiso version to readme
-	sed -i "s/\(^archiso-version=\).*/\1$archisoVersion/" ../archiso.readme
 
 	# overview
 	

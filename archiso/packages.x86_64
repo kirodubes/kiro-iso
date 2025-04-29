@@ -582,12 +582,12 @@ arconet-xfce
 ####                 ARCOLINUX APPS
 ###########################################################################
 
-archlinux-kernel-manager
+#archlinux-kernel-manager
 archlinux-logout-git
-archlinux-tweak-tool-git
-arcolinux-app-glade-git
-arcolinux-desktop-trasher-git
-sofirem-git
+#archlinux-tweak-tool-git
+#arcolinux-app-glade-git
+#arcolinux-desktop-trasher-git
+#sofirem-git
 
 ###########################################################################
 ####                 ARCOLINUX CONFIGS

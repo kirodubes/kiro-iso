@@ -25,4 +25,5 @@ file_permissions=(
   ["/etc/polkit-1/rules.d"]="0:0:750"
   ["/etc/sudoers.d"]="0:0:750"
   ["/etc/grub.d/40_custom"]="0:0:755"
+  ["/usr/local/bin/arcolinux-snapper"]="0:0:755"
 )

@@ -262,26 +262,10 @@ echo
 	echo "Building the desktop                   : "$desktop
 	echo "Building version                       : "$kiroVersion
 	echo "Iso label                              : "$isoLabel
-	echo "Do you have the right archiso version? : "$archisoVersion
-	echo "What is the required archiso version?  : "$archisoRequiredVersion
 	echo "Build folder                           : "$buildFolder
 	echo "Out folder                             : "$outFolder
 	echo "################################################################## "
 	echo
-
-	if [ "$archisoVersion" == "$archisoRequiredVersion" ]; then
-		tput setaf 2
-		echo "##################################################################"
-		echo "Archiso has the correct version. Continuing ..."
-		echo "##################################################################"
-		tput sgr0
-	else
-		tput setaf 1
-		echo "###################################################################################################"
-		echo "It is recommended to always use the latest version of Archiso and update it as needed."
-		echo "###################################################################################################"
-		tput sgr0
-	fi
 
 echo
 echo "################################################################## "

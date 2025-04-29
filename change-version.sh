@@ -11,7 +11,7 @@ echo "New Version: $newversion"
 
 # Detect old versions in each file separately
 old_devrel=$(grep -oP 'v\d{2}\.\d{2}\.\d{2}' archiso/airootfs/etc/dev-rel | head -1)
-old_buildiso=$(grep -oP "kiroVersion='v\d{2}\.\d{2}\.\d{2}'" installation-scripts/40-build-the-iso-local-again.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
+old_buildiso=$(grep -oP "kiroVersion='v\d{2}\.\d{2}\.\d{2}'" installation-scripts/40-build-the-iso.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
 old_profiledef=$(grep -oP 'kiro-v\d{2}\.\d{2}\.\d{2}' archiso/profiledef.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
 
 # (Optional) Debug output

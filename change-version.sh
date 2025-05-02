@@ -4,7 +4,7 @@
 year=$(date +%y)   # last two digits of the year
 month=$(date +%m)  # month number
 day=$(date +%d)    # day of the month
-extra="02"         # You can manually bump this if needed
+extra="01"         # You can manually bump this if needed
 
 newversion="v${year}.${month}.${day}.${extra}"
 echo "New Version: $newversion"

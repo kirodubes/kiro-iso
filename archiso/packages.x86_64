@@ -292,7 +292,7 @@ catfish
 cronie
 dconf-editor
 dex
-discord
+#discord
 duf
 evince
 expac
@@ -318,7 +318,7 @@ polkit-gnome
 qt5ct
 ripgrep
 simple-scan
-telegram-desktop
+#telegram-desktop
 tlp
 tree
 unace

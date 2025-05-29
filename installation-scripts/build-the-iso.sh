@@ -103,30 +103,6 @@ if 	lsblk -f | grep btrfs > /dev/null 2>&1 ; then
     echo
 fi
 
-# any distro without our keys and mirrors
-if pacman -Q arcolinux-keyring &>/dev/null && pacman -Q arcolinux-mirrorlist-git &>/dev/null; then
-
-	
-	echo "################################################################## "
-	tput setaf 2
-	echo "ArcoLinux keyring and ArcoLinux mirrors are both installed"
-	tput sgr0
-	echo "################################################################## "
-	
-else
-	echo
-	echo "################################################################## "
-	tput setaf 3
-	echo "Installing ArcoLinux keyring and mirrors"
-    echo "as we are missing the packages for ArcoLinux keys and mirrors"
-    echo "You can remove them later with pacman -R ..."
-    tput sgr0
-    echo "################################################################## "
-    
-    bash "$installed_dir/get-the-keys-and-mirrors-arcolinux.sh"
-    
-fi
-
 echo
 echo "################################################################## "
 tput setaf 2
@@ -184,8 +160,6 @@ echo
 	    fi
 	fi
 	
-	personalrepo=false
-
 echo
 echo "################################################################## "
 tput setaf 2
@@ -311,7 +285,7 @@ echo
 
 	echo "Getting the last version of bashrc in /etc/skel"
 	echo
-	wget https://raw.githubusercontent.com/arcolinux/arcolinux-root/master/etc/skel/.bashrc-latest -O $buildFolder/archiso/airootfs/etc/skel/.bashrc
+	wget https://raw.githubusercontent.com/erikdubois/edu-shells/refs/heads/main/etc/skel/.bashrc-latest -O $buildFolder/archiso/airootfs/etc/skel/.bashrc
 
 	echo "Removing the old packages.x86_64 file from build folder"
 	rm $buildFolder/archiso/packages.x86_64
@@ -321,53 +295,6 @@ echo
 	echo "Copying the new packages.x86_64 file to the build folder"
 	cp -f ../archiso/packages.x86_64 $buildFolder/archiso/packages.x86_64
 	echo
-
-	if [ $personalrepo == true ]; then
-		echo "Adding packages from your personal repository - packages-personal-repo.x86_64"
-		printf "\n" | sudo tee -a $buildFolder/archiso/packages.x86_64
-		cat ../archiso/packages-personal-repo.x86_64 | sudo tee -a $buildFolder/archiso/packages.x86_64
-	fi
-
-	if [ $personalrepo == true ]; then
-		echo "Adding our own repo to /etc/pacman.conf"
-		printf "\n" | sudo tee -a $buildFolder/archiso/pacman.conf
-		printf "\n" | sudo tee -a $buildFolder/archiso/airootfs/etc/pacman.conf
-		cat personal-repo | sudo tee -a $buildFolder/archiso/pacman.conf
-		cat personal-repo | sudo tee -a $buildFolder/archiso/airootfs/etc/pacman.conf
-	fi
-
-	if [ $chaoticsrepo == true ]; then
-		if ! grep -q "chaotic-aur" $buildFolder/archiso/airootfs/etc/pacman.conf; then
-			echo
-			echo "Adding our chaotics repo to /etc/pacman.conf"
-			printf "\n" | sudo tee -a $buildFolder/archiso/pacman.conf
-			printf "\n" | sudo tee -a $buildFolder/archiso/airootfs/etc/pacman.conf
-			cat chaotics-repo | sudo tee -a $buildFolder/archiso/pacman.conf
-			cat chaotics-repo | sudo tee -a $buildFolder/archiso/airootfs/etc/pacman.conf
-		else
-			echo "Chaotic repo already in /etc/pacman.conf"
-		fi
-	fi
-
-	if [ $chaoticsrepo == false ]; then
-		echo "Adding our chaotics repo to /etc/pacman.conf"
-		printf "\n" | sudo tee -a $buildFolder/archiso/pacman.conf
-		printf "\n" | sudo tee -a $buildFolder/archiso/airootfs/etc/pacman.conf
-		cat no-chaotics-repo | sudo tee -a $buildFolder/archiso/pacman.conf
-		cat no-chaotics-repo | sudo tee -a $buildFolder/archiso/airootfs/etc/pacman.conf
-	fi
-
-	echo
-	echo "Adding the content of the /personal folder"
-	echo
-	cp -rf ../personal/ $buildFolder/archiso/airootfs/
-
-	if test -f $buildFolder/archiso/airootfs/personal/.gitkeep ; then
-		echo
-		rm $buildFolder/archiso/airootfs/personal/.gitkeep
-		# .gitkeep is now removed"
-		echo
-    fi
 
 echo
 echo "################################################################## "

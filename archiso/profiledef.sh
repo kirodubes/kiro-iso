@@ -2,10 +2,10 @@
 # shellcheck disable=SC2034
 
 iso_name="kiro"
-iso_label="kiro-v25.05.28.01"
+iso_label="kiro-v25.05.29.01"
 iso_publisher="kiro"
 iso_application="Kiro Live/Rescue CD"
-iso_version="v25.05.28.01"
+iso_version="v25.05.29.01"
 install_dir="arch"
 buildmodes=('iso')
 bootmodes=('bios.syslinux.mbr' 'bios.syslinux.eltorito'
@@ -25,5 +25,4 @@ file_permissions=(
   ["/etc/polkit-1/rules.d"]="0:0:750"
   ["/etc/sudoers.d"]="0:0:750"
   ["/etc/grub.d/40_custom"]="0:0:755"
-  ["/usr/local/bin/arcolinux-snapper"]="0:0:755"
 )

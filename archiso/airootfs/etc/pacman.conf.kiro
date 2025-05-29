@@ -100,10 +100,6 @@ Include = /etc/pacman.d/mirrorlist
 #SigLevel = Optional TrustAll
 #Server = file:///home/custompkgs
 
-#[kiro_repo]
-#SigLevel = Never
-#Server = https://kirodubes.github.io/$repo/$arch
-
 [nemesis_repo]
 SigLevel = Never
 Server = https://erikdubois.github.io/$repo/$arch

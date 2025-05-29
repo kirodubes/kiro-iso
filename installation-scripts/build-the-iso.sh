@@ -273,8 +273,6 @@ echo "- Deleting any files in /etc/skel"
 echo "- Getting the last version of bashrc in /etc/skel"
 echo "- Removing the old packages.x86_64 file from build folder"
 echo "- Copying the new packages.x86_64 file to the build folder"
-echo "- Add our own personal repo + add your packages to packages-personal-repo.x86_64"
-echo "- Adding chaotics-repo"
 tput sgr0
 echo "################################################################## "
 echo
@@ -289,7 +287,6 @@ echo
 
 	echo "Removing the old packages.x86_64 file from build folder"
 	rm $buildFolder/archiso/packages.x86_64
-	rm $buildFolder/archiso/packages-personal-repo.x86_64
 	echo
 
 	echo "Copying the new packages.x86_64 file to the build folder"

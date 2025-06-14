@@ -97,7 +97,7 @@ pv
 qemu-guest-agent
 refind
 reflector
-rp-pppoe
+#rp-pppoe
 rsync
 #rxvt-unicode-terminfo
 screen
@@ -160,7 +160,7 @@ xf86-input-libinput
 #xf86-video-nouveau
 #xf86-video-openchrome
 #xf86-video-vesa
-xf86-video-vmware
+#xf86-video-vmware
 mesa
 
 ###hardware video support

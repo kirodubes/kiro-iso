@@ -23,7 +23,7 @@ echo "First run the version script"
 tput sgr0
 echo "##################################################################"
 
-read dummy
+sleep 2
 
 clean_cache() {
     if [[ "$1" == "yes" ]]; then

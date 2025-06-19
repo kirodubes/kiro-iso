@@ -2,7 +2,7 @@
 
 ![Kiro Logo](kiro.jpg)
 
-**Kiro** is a customizable Arch Linux ISO builder based on the [KIRO](https://github.com/kirodubes) project. It provides a simple way to build your own Arch-based installation medium with your choice of packages, settings, and scripts. Compare the configs and search for references like ArcoLinux, arcolinux, kiro, arconet and ArcoNet and change them to Buildra in this case. Use tools like rg (from ripgrep) and meld to compare.
+**Kiro** is a customizable Arch Linux ISO builder based on the ArcoLinux project. It provides a simple way to build your own Arch-based installation medium with your choice of packages, settings, and scripts. Compare the configs and search for references like ArcoLinux, arcolinux, kiro, arconet and ArcoNet and change them to Buildra in this case. Use tools like rg (from ripgrep) and meld to compare.
 
 ## 🚀 Features
 

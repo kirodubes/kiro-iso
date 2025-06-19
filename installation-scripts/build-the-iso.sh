@@ -76,6 +76,8 @@ echo "Message"
 echo
 echo "Do not run this file as root or add sudo in front"
 echo "Run this script as a user"
+echo
+echo "You can add a personal local repo to the iso build if you want"
 tput sgr0
 echo "################################################################## "
 echo

@@ -502,3 +502,9 @@ ttf-jetbrains-mono-nerd
 ttf-meslo-nerd-font-powerlevel10k
 volumeicon
 xorg-xsetroot
+
+###########################################################################
+####                               LOCAL REPO
+###########################################################################
+
+kiro-dummy-git

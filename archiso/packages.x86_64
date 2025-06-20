@@ -478,6 +478,14 @@ pamac-aur
 sparklines-git
 ttf-material-design-iconic-font
 wttr
+xcolor
+pacquery
+brave-bin
+devtools
+namcap
+pacmanlogviewer
+python-pylint
+speedtest-cli
 
 
 ###########################################################################

@@ -355,6 +355,7 @@ mkinitcpio-openswap
 alacritty
 appstream
 appstream-qt5
+archlinux-tools
 downgrade
 font-manager
 gitahead

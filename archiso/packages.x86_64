@@ -371,6 +371,7 @@ appstream
 appstream-qt5
 archlinux-tools
 downgrade
+fastfetch-git
 font-manager
 gitahead
 hardcode-fixer-git

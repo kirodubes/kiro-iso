@@ -419,7 +419,9 @@ xfce4-goodies
 ####                       APPS
 ###########################################################################
 
+brave-bin
 btop
+devtools
 fd
 fish
 inetutils
@@ -427,7 +429,11 @@ menulibre
 mkinitcpio-firmware
 most
 mugshot
+namcap
 noto-fonts-emoji
+pacmanlogviewer
+pacquery
+python-pylint
 ripgrep
 ripgrep-all
 sparklines-git
@@ -469,8 +475,6 @@ chaotic-mirrorlist
 arc-gtk-theme
 archlinux-logout-git
 archlinux-tweak-tool-git
-brave-bin
-devtools
 edu-arc-dawn-git
 edu-arc-kde
 edu-dot-files-git
@@ -491,19 +495,14 @@ flameshot-git
 gitahead-git
 hardcode-fixer-git
 lastpass
-namcap
 neo-candy-icons-git
 pacman-hook-kernel-install
-pacmanlogviewer
-pacquery
 pamac-aur
-python-pylint
 sparklines-git
 speedtest-cli
 ttf-material-design-iconic-font
 wttr
 xcolor
-
 
 ###########################################################################
 ####                               NEMESIS REPO CHADWM

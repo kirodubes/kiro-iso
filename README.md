@@ -6,7 +6,8 @@
 
 Kiro is my personal choice:
 
-- systemboot
+- uefi
+- systemd-boot
 - ext4
 - sddm
 - xfce4 and chadwm

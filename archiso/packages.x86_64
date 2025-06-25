@@ -343,6 +343,7 @@ unzip
 xapp
 xdg-desktop-portal-gtk
 yt-dlp
+zenity
 zsh
 zsh-completions
 zsh-syntax-highlighting

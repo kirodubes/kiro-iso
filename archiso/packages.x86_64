@@ -59,6 +59,7 @@ linux-atm
 linux-firmware-amdgpu
 linux-firmware-atheros
 linux-firmware-broadcom
+linux-firmware-cirrus
 linux-firmware-intel
 linux-firmware-liquidio
 linux-firmware-marvell

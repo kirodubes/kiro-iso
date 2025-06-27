@@ -343,7 +343,7 @@ unace
 unrar
 unzip
 xapp
-#xdg-desktop-portal-gtk
+xdg-desktop-portal-gtk
 yt-dlp
 zenity
 zsh

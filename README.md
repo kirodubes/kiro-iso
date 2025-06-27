@@ -1,6 +1,10 @@
-# Kiro calamares config
+# Kiro iso
 
 ![Kiro Logo](kiro.jpg)
+
+![Kiro Logo](kiro-xfce.jpg)
+
+![Kiro Logo](kiro-chadwm.jpg)
 
 **Kiro** is a customizable Arch Linux ISO builder based on the ArcoLinux project. It provides a simple way to build your own Arch-based installation medium with your choice of packages, settings, and scripts.
 

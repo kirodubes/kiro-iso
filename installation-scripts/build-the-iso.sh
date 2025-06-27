@@ -124,7 +124,7 @@ echo
 	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
 
 	# setting of the general parameters
-	archisoRequiredVersion="archiso 83-1"
+	archisoRequiredVersion="archiso 84-1"
 	buildFolder=$HOME"/kiro-build"
 	outFolder=$HOME"/kiro-Out"
 

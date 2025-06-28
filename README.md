@@ -47,3 +47,9 @@ Follow this tuturial and you are already half way there.
 https://youtu.be/3jdKH6bLgUE 
 
 Live long and prosper
+
+# Major changes after the videos on youtube
+
+- Calamares moved from https://github.com/calamares/calamares to https://codeberg.org/Calamares/calamares
+- Kiro-system-installation package is no longer necessary and removed
+- kiro-calamares-config has now several new modules replacing bash scripts

@@ -53,3 +53,11 @@ Live long and prosper
 - Calamares moved from https://github.com/calamares/calamares to https://codeberg.org/Calamares/calamares - new pkgbuild
 - kiro-system-installation package is no longer necessary and removed
 - kiro-calamares-config has now several new modules replacing bash scripts
+
+When studying the Buildra tutorial consider all the changes after the video and more will surely follow. 
+
+Compare, compare and compare.
+
+https://youtu.be/3jdKH6bLgUE
+
+https://youtu.be/mH52To8DvlI

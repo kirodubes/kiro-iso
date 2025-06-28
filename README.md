@@ -50,6 +50,6 @@ Live long and prosper
 
 # Major changes after the videos on youtube
 
-- Calamares moved from https://github.com/calamares/calamares to https://codeberg.org/Calamares/calamares
-- Kiro-system-installation package is no longer necessary and removed
+- Calamares moved from https://github.com/calamares/calamares to https://codeberg.org/Calamares/calamares - new pkgbuild
+- kiro-system-installation package is no longer necessary and removed
 - kiro-calamares-config has now several new modules replacing bash scripts

@@ -5,6 +5,21 @@ workdir=$(pwd)
 
 ./change-version.sh
 
+echo "getting mirrorlist"
+rm $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+touch $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+echo "## Best Arch Linux servers worldwide
+
+Server = http://mirror.rackspace.com/archlinux/\$repo/os/\$arch
+Server = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch
+Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch
+Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch
+" | tee $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+echo
+echo "getting mirrorlist"
+wget "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6" -O ->> $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+sed -i "s/#Server/Server/g" $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+
 # Below command will backup everything inside the project folder
 git add --all .
 

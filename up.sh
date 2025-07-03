@@ -8,7 +8,6 @@ set -eo pipefail
 # Github    : https://github.com/kirodubes
 # Github    : https://github.com/buildra
 # SF        : https://sourceforge.net/projects/kiro/files/
-
 ##################################################################################################################
 #
 #   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
@@ -27,6 +26,8 @@ set -eo pipefail
 
 # variables and functions
 workdir=$(pwd)
+
+##################################################################################################################
 
 ./change-version.sh
 

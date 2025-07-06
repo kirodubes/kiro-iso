@@ -30,6 +30,14 @@ Kiro is my personal choice:
 - Modular structure for easy extension
 - Lightweight and minimal by default
 
+## Kiro repo
+
+```
+[kiro_repo]
+SigLevel = Never
+Server = https://kirodubes.github.io/$repo/$arch
+```
+
 ## 📦 Requirements
 
 - Arch Linux or Arch-based system (for building) - access to necessary repos (keys - mirrors)

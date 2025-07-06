@@ -7,7 +7,7 @@ Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2025-07-05
+## Generated on 2025-07-06
 ##
 
 ## Worldwide
@@ -679,6 +679,8 @@ Server = https://mirror1.sox.rs/archlinux/$repo/os/$arch
 ## Singapore
 Server = http://mirror.aktkn.sg/archlinux/$repo/os/$arch
 Server = https://mirror.aktkn.sg/archlinux/$repo/os/$arch
+Server = http://mirror.sg.cdn-perfprod.com/archlinux/$repo/os/$arch
+Server = https://mirror.sg.cdn-perfprod.com/archlinux/$repo/os/$arch
 Server = http://sg.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://sg.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://download.nus.edu.sg/mirror/archlinux/$repo/os/$arch
@@ -731,6 +733,8 @@ Server = http://mirror.yuki.net.uk/archlinux/$repo/os/$arch
 Server = https://mirror.yuki.net.uk/archlinux/$repo/os/$arch
 
 ## Spain
+Server = http://mirror.es.cdn-perfprod.com/archlinux/$repo/os/$arch
+Server = https://mirror.es.cdn-perfprod.com/archlinux/$repo/os/$arch
 Server = http://es.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://es.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://nox.panibrez.com/archlinux/$repo/os/$arch
@@ -934,6 +938,8 @@ Server = https://iad.mirrors.misaka.one/archlinux/$repo/os/$arch
 Server = http://repo.miserver.it.umich.edu/archlinux/$repo/os/$arch
 Server = http://mirrors.mit.edu/archlinux/$repo/os/$arch
 Server = https://mirrors.mit.edu/archlinux/$repo/os/$arch
+Server = http://mirror.mra.sh/archlinux/$repo/os/$arch
+Server = https://mirror.mra.sh/archlinux/$repo/os/$arch
 Server = http://us.arch.niranjan.co/$repo/os/$arch
 Server = https://us.arch.niranjan.co/$repo/os/$arch
 Server = http://mirrors.ocf.berkeley.edu/archlinux/$repo/os/$arch

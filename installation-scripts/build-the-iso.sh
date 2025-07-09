@@ -120,7 +120,7 @@ echo
 
 	desktop="xfce"
 
-	kiroVersion='v25.07.08.01'
+	kiroVersion='v25.07.09.01'
 
 	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
 

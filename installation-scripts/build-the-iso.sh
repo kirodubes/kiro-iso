@@ -80,7 +80,7 @@ echo
 echo "You can add a personal local repo to the iso build if you want"
 echo "https://www.youtube.com/watch?v=TqFuLknCsUE"
 echo
-echo "You can learn to creat your own iso on the basis of Kiro"
+echo "You can learn to create your own iso on the basis of Kiro"
 echo "That project is called Buildra"
 echo "https://youtu.be/3jdKH6bLgUE"
 echo "https://youtu.be/mH52To8DvlI"

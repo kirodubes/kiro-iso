@@ -43,8 +43,8 @@ Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch
 Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch
 " | tee $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
 echo
-echo "getting mirrorlist"
-wget "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6" -O ->> $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+#echo "getting mirrorlist"
+#wget "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6" -O ->> $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
 sed -i "s/#Server/Server/g" $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
 
 # Below command will backup everything inside the project folder

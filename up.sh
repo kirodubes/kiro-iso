@@ -31,30 +31,42 @@ workdir=$(pwd)
 
 ./change-version.sh
 
-echo "getting mirrorlist"
-rm "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"
-touch $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
-echo "## Best Arch Linux servers worldwide
+##################################################################################################################
+# Toggle mirrorlist fetch
+USE_MIRRORLIST_FETCH=false
+
+get_mirrorlist () {
+    echo "getting mirrorlist (static)"
+    rm -f "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"
+    cat <<EOF > "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"
+## Best Arch Linux servers worldwide
 
 Server = https://mirror.osbeck.com/archlinux/\$repo/os/\$arch
 Server = http://mirror.rackspace.com/archlinux/\$repo/os/\$arch
 Server = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch
 Server = https://mirrors.kernel.org/archlinux/\$repo/os/\$arch
 Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch
-" | tee $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
-echo
-#echo "getting mirrorlist"
-#wget "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6" -O ->> $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
-sed -i "s/#Server/Server/g" $workdir/archiso/airootfs/etc/pacman.d/mirrorlist
+EOF
 
-# Below command will backup everything inside the project folder
+    echo
+    echo "getting mirrorlist (official)"
+    wget -q -O "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist" \
+        "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6"
+    sed -i "s/#Server/Server/g" "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"
+}
+
+##################################################################################################################
+# Run mirrorlist fetch if enabled
+if [ "$USE_MIRRORLIST_FETCH" = true ]; then
+    get_mirrorlist
+else
+    echo "Skipping mirrorlist fetch (USE_MIRRORLIST_FETCH=$USE_MIRRORLIST_FETCH)"
+fi
+
+##################################################################################################################
+# Git workflow
 git add --all .
-
-# Committing to the local repository with a message containing the time details and commit text
-
 git commit -m "update"
-
-# Push the local files to github
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 git push -u origin "$branch"
@@ -62,7 +74,7 @@ git push -u origin "$branch"
 echo
 tput setaf 6
 echo "##############################################################"
-echo "###################  $(basename $0) done"
+echo "###################  $(basename "$0") done"
 echo "##############################################################"
 tput sgr0
 echo

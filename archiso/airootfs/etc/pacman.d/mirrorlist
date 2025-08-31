@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2025-08-30
+## Generated on 2025-08-31
 ##
 
 ## Worldwide
@@ -110,6 +110,7 @@ Server = http://mirror.csclub.uwaterloo.ca/archlinux/$repo/os/$arch
 Server = https://mirror.csclub.uwaterloo.ca/archlinux/$repo/os/$arch
 Server = http://mirror2.evolution-host.com/archlinux/$repo/os/$arch
 Server = https://mirror2.evolution-host.com/archlinux/$repo/os/$arch
+Server = https://stygian.failzero.net/mirror/archlinux/$repo/os/$arch
 Server = https://mirror.franscorack.com/archlinux/$repo/os/$arch
 Server = http://mirror.its.dal.ca/archlinux/$repo/os/$arch
 Server = http://mirror.quantum5.ca/archlinux/$repo/os/$arch
@@ -673,6 +674,8 @@ Server = https://mirror2.sl-chat.ru/archlinux/$repo/os/$arch
 Server = https://mirror3.sl-chat.ru/archlinux/$repo/os/$arch
 Server = http://mirror.truenetwork.ru/archlinux/$repo/os/$arch
 Server = https://mirror.truenetwork.ru/archlinux/$repo/os/$arch
+Server = http://vladivostokst.ru/archlinux/$repo/os/$arch
+Server = https://vladivostokst.ru/archlinux/$repo/os/$arch
 Server = http://mirror.yandex.ru/archlinux/$repo/os/$arch
 Server = https://mirror.yandex.ru/archlinux/$repo/os/$arch
 

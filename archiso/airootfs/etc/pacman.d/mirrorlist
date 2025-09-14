@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2025-09-13
+## Generated on 2025-09-14
 ##
 
 ## Worldwide
@@ -435,7 +435,6 @@ Server = https://mirrors.saswata.cc/archlinux/$repo/os/$arch
 ## Indonesia
 Server = http://mirror.citrahost.com/archlinux/$repo/os/$arch
 Server = https://mirror.citrahost.com/archlinux/$repo/os/$arch
-Server = http://mirror.faizuladib.com/archlinux/$repo/os/$arch
 Server = http://mirror.gi.co.id/archlinux/$repo/os/$arch
 Server = https://mirror.gi.co.id/archlinux/$repo/os/$arch
 Server = http://kebo.pens.ac.id/archlinux/$repo/os/$arch
@@ -813,7 +812,6 @@ Server = https://archlinux.ccns.ncku.edu.tw/archlinux/$repo/os/$arch
 Server = http://tw.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://tw.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://free.nchc.org.tw/arch/$repo/os/$arch
-Server = https://free.nchc.org.tw/arch/$repo/os/$arch
 Server = https://taipei.mirror.pkgbuild.com/$repo/os/$arch
 Server = http://archlinux.cs.nycu.edu.tw/$repo/os/$arch
 Server = https://archlinux.cs.nycu.edu.tw/$repo/os/$arch
@@ -921,7 +919,6 @@ Server = http://nnenix.mm.fcix.net/archlinux/$repo/os/$arch
 Server = http://nocix.mm.fcix.net/archlinux/$repo/os/$arch
 Server = http://ohioix.mm.fcix.net/archlinux/$repo/os/$arch
 Server = http://opencolo.mm.fcix.net/archlinux/$repo/os/$arch
-Server = http://ridgewireless.mm.fcix.net/archlinux/$repo/os/$arch
 Server = http://southfront.mm.fcix.net/archlinux/$repo/os/$arch
 Server = http://volico.mm.fcix.net/archlinux/$repo/os/$arch
 Server = http://ziply.mm.fcix.net/archlinux/$repo/os/$arch
@@ -935,7 +932,6 @@ Server = https://nnenix.mm.fcix.net/archlinux/$repo/os/$arch
 Server = https://nocix.mm.fcix.net/archlinux/$repo/os/$arch
 Server = https://ohioix.mm.fcix.net/archlinux/$repo/os/$arch
 Server = https://opencolo.mm.fcix.net/archlinux/$repo/os/$arch
-Server = https://ridgewireless.mm.fcix.net/archlinux/$repo/os/$arch
 Server = https://southfront.mm.fcix.net/archlinux/$repo/os/$arch
 Server = https://volico.mm.fcix.net/archlinux/$repo/os/$arch
 Server = https://ziply.mm.fcix.net/archlinux/$repo/os/$arch

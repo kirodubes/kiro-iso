@@ -1,8 +1,3 @@
-#####################################################################
-##                            PACKAGES AVAILABLE
-#####################################################################
-
-###archiso
 alsa-utils
 amd-ucode
 arch-install-scripts
@@ -56,23 +51,8 @@ libfido2
 libusb-compat
 linux
 linux-atm
-linux-firmware-amdgpu
-linux-firmware-atheros
-linux-firmware-broadcom
-linux-firmware-cirrus
-linux-firmware-intel
-linux-firmware-liquidio
+linux-firmware
 linux-firmware-marvell
-linux-firmware-mediatek
-linux-firmware-mellanox
-linux-firmware-nfp
-linux-firmware-nvidia
-linux-firmware-other
-linux-firmware-qcom
-linux-firmware-qlogic
-linux-firmware-radeon
-linux-firmware-realtek
-linux-firmware-whence
 #livecd-sounds
 lsscsi
 lvm2
@@ -396,8 +376,8 @@ yay-git
 ####                               CALAMARES
 ###########################################################################
 
-calamares
-kiro-calamares-config
+calamares-next
+kiro-calamares-config-next
 
 adobe-source-han-sans-jp-fonts
 adobe-source-han-sans-kr-fonts

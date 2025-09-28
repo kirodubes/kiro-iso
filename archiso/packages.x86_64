@@ -113,7 +113,6 @@ pv
 qemu-guest-agent
 refind
 reflector
-#rp-pppoe
 rsync
 #rxvt-unicode-terminfo
 screen

@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2025-11-11
+## Generated on 2025-11-13
 ##
 
 ## Worldwide
@@ -733,8 +733,6 @@ Server = https://mirrors.urbanwave.co.za/archlinux/$repo/os/$arch
 ## South Korea
 Server = http://kr.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://kr.mirrors.cicku.me/archlinux/$repo/os/$arch
-Server = http://mirror.techlabs.co.kr/archlinux/$repo/os/$arch
-Server = https://mirror.techlabs.co.kr/archlinux/$repo/os/$arch
 Server = http://mirror.distly.kr/archlinux/$repo/os/$arch
 Server = https://mirror.distly.kr/archlinux/$repo/os/$arch
 Server = http://ftp.kaist.ac.kr/ArchLinux/$repo/os/$arch
@@ -752,6 +750,8 @@ Server = http://ftp.lanet.kr/pub/archlinux/$repo/os/$arch
 Server = https://ftp.lanet.kr/pub/archlinux/$repo/os/$arch
 Server = http://mirror.siwoo.org/archlinux/$repo/os/$arch
 Server = https://mirror.siwoo.org/archlinux/$repo/os/$arch
+Server = http://mirror.techlabs.co.kr/archlinux/$repo/os/$arch
+Server = https://mirror.techlabs.co.kr/archlinux/$repo/os/$arch
 Server = http://mirror.yuki.net.uk/archlinux/$repo/os/$arch
 Server = https://mirror.yuki.net.uk/archlinux/$repo/os/$arch
 
@@ -840,8 +840,6 @@ Server = http://distrohub.kyiv.ua/archlinux/$repo/os/$arch
 Server = https://distrohub.kyiv.ua/archlinux/$repo/os/$arch
 Server = http://repo.hyron.dev/archlinux/$repo/os/$arch
 Server = https://repo.hyron.dev/archlinux/$repo/os/$arch
-Server = http://mirror.hntr.pp.ua/archlinux/$repo/os/$arch
-Server = https://mirror.hntr.pp.ua/archlinux/$repo/os/$arch
 Server = http://mirror.hostiko.network/archlinux/$repo/os/$arch
 Server = https://mirror.hostiko.network/archlinux/$repo/os/$arch
 Server = http://archlinux.ip-connect.vn.ua/$repo/os/$arch
@@ -850,6 +848,8 @@ Server = http://mirror.mirohost.net/archlinux/$repo/os/$arch
 Server = https://mirror.mirohost.net/archlinux/$repo/os/$arch
 Server = http://mirrors.reitarovskyi.com.ua/archlinux/$repo/os/$arch
 Server = https://mirrors.reitarovskyi.com.ua/archlinux/$repo/os/$arch
+Server = http://mirror.trapmaid.org/archlinux/$repo/os/$arch
+Server = https://mirror.trapmaid.org/archlinux/$repo/os/$arch
 
 ## United Arab Emirates
 Server = https://mirror.hafeezh.com/archlinux/$repo/os/$arch

@@ -11,7 +11,7 @@ echo "New Version: $newversion"
 
 # Detect old versions in each file separately
 old_devrel=$(grep -oP 'v\d{2}\.\d{2}\.\d{2}' archiso/airootfs/etc/dev-rel | head -1)
-old_buildiso=$(grep -oP "kiroVersion='v\d{2}\.\d{2}\.\d{2}'" installation-scripts/build-the-iso.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
+old_buildiso=$(grep -oP "kiroVersion='v\d{2}\.\d{2}\.\d{2}'" build-scripts/build-the-iso.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
 old_profiledef=$(grep -oP 'kiro-v\d{2}\.\d{2}\.\d{2}' archiso/profiledef.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
 old_isoversion=$(grep -oP 'iso_version="v\d{2}\.\d{2}\.\d{2}"' archiso/profiledef.sh | grep -oP 'v\d{2}\.\d{2}\.\d{2}' | head -1)
 
@@ -25,7 +25,7 @@ echo "Old version in profiledef  : $old_profiledef"
 sed -i "s|^ISO_RELEASE=.*|ISO_RELEASE=$newversion|" archiso/airootfs/etc/dev-rel
 
 # Replace entire kiroVersion='...' line
-sed -i "s|\(.*kiroVersion='\)[^']*\('.*\)|\1$newversion\2|" installation-scripts/build-the-iso.sh
+sed -i "s|\(.*kiroVersion='\)[^']*\('.*\)|\1$newversion\2|" build-scripts/build-the-iso.sh
 
 # Replace entire iso_label="kiro-..." line
 sed -i "s|^iso_label=\"kiro-.*\"|iso_label=\"kiro-$newversion\"|" archiso/profiledef.sh

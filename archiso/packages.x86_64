@@ -160,7 +160,7 @@ xf86-input-libinput
 mesa
 
 ###hardware video support
-nvidia-dkms
+nvidia-open-dkms
 nvidia-utils
 nvidia-settings
 #mesa-utils

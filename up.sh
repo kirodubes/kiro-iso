@@ -19,8 +19,8 @@ mirrorlist_dir="$(dirname "$mirrorlist_path")"
 USE_MIRRORLIST_FETCH="${USE_MIRRORLIST_FETCH:-true}"
 
 # Network / fetch tuning
-CONNECT_TIMEOUT="${CONNECT_TIMEOUT:-5}"   # seconds
-MAX_TIME="${MAX_TIME:-20}"               # seconds total
+CONNECT_TIMEOUT="${CONNECT_TIMEOUT:-30}"   # seconds
+MAX_TIME="${MAX_TIME:-30}"               # seconds total
 RETRIES="${RETRIES:-3}"
 
 # Prefer IPv4 because your curl(28) indicates connect issues (often IPv6/routing)

@@ -15,26 +15,37 @@ workdir="$(pwd)"
 mirrorlist_path="$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"
 mirrorlist_dir="$(dirname "$mirrorlist_path")"
 
-USE_MIRRORLIST_FETCH=true
+# Allow override: USE_MIRRORLIST_FETCH=false ./script.sh
+USE_MIRRORLIST_FETCH="${USE_MIRRORLIST_FETCH:-true}"
 
 # Network / fetch tuning
-CONNECT_TIMEOUT=5     # seconds
-MAX_TIME=20           # seconds total
-RETRIES=3
+CONNECT_TIMEOUT="${CONNECT_TIMEOUT:-5}"   # seconds
+MAX_TIME="${MAX_TIME:-20}"               # seconds total
+RETRIES="${RETRIES:-3}"
+
+# Prefer IPv4 because your curl(28) indicates connect issues (often IPv6/routing)
+PREFER_IPV4="${PREFER_IPV4:-true}"
+
+# Mirrorlist query (keep it configurable)
+MIRRORLIST_URL="${MIRRORLIST_URL:-https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4}"
+
+tmpfile=""
+official_tmp=""
+
+on_error() {
+  local exit_code=$?
+  echo "ERROR: script failed at line $1 (exit=$exit_code)" >&2
+  exit "$exit_code"
+}
+trap 'on_error $LINENO' ERR
 
 cleanup() {
-  [[ -n "${tmpfile:-}" && -f "${tmpfile:-}" ]] && rm -f "$tmpfile"
+  [[ -n "${tmpfile}" && -f "${tmpfile}" ]] && rm -f "$tmpfile"
+  [[ -n "${official_tmp}" && -f "${official_tmp}" ]] && rm -f "$official_tmp"
 }
 trap cleanup EXIT
 
-die() {
-  echo "ERROR: $*" >&2
-  exit 1
-}
-
-info() {
-  echo "==> $*"
-}
+info() { echo "==> $*"; }
 
 ensure_paths() {
   [[ -d "$mirrorlist_dir" ]] || mkdir -p "$mirrorlist_dir"
@@ -52,20 +63,41 @@ Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 EOF
 }
 
-fetch_official_mirrorlist() {
-  local url="https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6"
-  local out_file="$1"
+curl_flags_common() {
+  # shellcheck disable=SC2046
+  echo -n "--fail --silent --show-error --location --connect-timeout ${CONNECT_TIMEOUT} --max-time ${MAX_TIME} --retry ${RETRIES} --retry-all-errors"
+}
 
-  # Prefer curl (better timeouts); fallback to wget
+curl_ip_flag() {
+  if [[ "$PREFER_IPV4" == "true" ]]; then
+    echo -n "-4"
+  fi
+}
+
+url_reachable() {
+  command -v curl >/dev/null 2>&1 || return 1
+  # quick HEAD ping with small max-time
+  curl $(curl_ip_flag) -I --silent --fail --connect-timeout "${CONNECT_TIMEOUT}" --max-time "${MAX_TIME}" "https://archlinux.org/" >/dev/null
+}
+
+fetch_official_mirrorlist() {
+  local url="$1"
+  local out_file="$2"
+
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL \
-      --connect-timeout "$CONNECT_TIMEOUT" \
-      --max-time "$MAX_TIME" \
-      --retry "$RETRIES" \
-      --retry-all-errors \
-      "$url" > "$out_file"
+    # Fast pre-check avoids hanging on dead routing
+    if ! url_reachable; then
+      return 2
+    fi
+
+    # Fetch
+    curl $(curl_ip_flag) $(curl_flags_common) "$url" > "$out_file"
   elif command -v wget >/dev/null 2>&1; then
-    wget -qO- \
+    # Wget fallback with timeouts
+    local wget_ip=()
+    [[ "$PREFER_IPV4" == "true" ]] && wget_ip=(-4)
+
+    wget "${wget_ip[@]}" -qO- \
       --timeout="$MAX_TIME" \
       --tries="$RETRIES" \
       "$url" > "$out_file"
@@ -73,66 +105,69 @@ fetch_official_mirrorlist() {
     return 127
   fi
 
-  # Uncomment only the Server lines Arch provides (they come as "#Server = ...")
+  # Uncomment only lines that start with "#Server"
   sed -i 's/^#Server/Server/g' "$out_file"
 }
 
 get_mirrorlist() {
   ensure_paths
   tmpfile="$(mktemp)"
+  official_tmp="$(mktemp)"
 
   info "getting mirrorlist (static)"
   write_static_mirrorlist > "$tmpfile"
 
   if [[ "$USE_MIRRORLIST_FETCH" == "true" ]]; then
     info "getting mirrorlist (official)"
-    local official_tmp
-    official_tmp="$(mktemp)"
-
-    if fetch_official_mirrorlist "$official_tmp"; then
+    if fetch_official_mirrorlist "$MIRRORLIST_URL" "$official_tmp"; then
       echo >> "$tmpfile"
       cat "$official_tmp" >> "$tmpfile"
-      rm -f "$official_tmp"
       info "official mirrorlist appended"
     else
-      rm -f "$official_tmp" || true
       info "official mirrorlist fetch failed (keeping static list)"
     fi
   else
     info "Skipping mirrorlist fetch (USE_MIRRORLIST_FETCH=$USE_MIRRORLIST_FETCH)"
   fi
 
-  # Atomically replace
+  # Atomic replace
   mv -f "$tmpfile" "$mirrorlist_path"
-  unset tmpfile
+  tmpfile=""  # so cleanup doesn't delete the new file
   info "mirrorlist written to: $mirrorlist_path"
 }
 
 run_git_workflow() {
   git add --all .
 
-  # Only commit if there are changes
   if git diff --cached --quiet; then
     info "No changes to commit"
   else
     git commit -m "update"
   fi
 
-  local branch
+  local branch upstream
   branch="$(git rev-parse --abbrev-ref HEAD)"
-  git push -u origin "$branch"
+
+  # If upstream exists: normal push. Else set upstream once.
+  if upstream="$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>/dev/null)"; then
+    git push
+  else
+    git push -u origin "$branch"
+  fi
 }
 
-# --- main ---
-./change-version.sh
+main() {
+  ./change-version.sh
+  get_mirrorlist
+  run_git_workflow
 
-get_mirrorlist
-run_git_workflow
+  echo
+  tput setaf 6 || true
+  echo "##############################################################"
+  echo "###################  $(basename "$0") done"
+  echo "##############################################################"
+  tput sgr0 || true
+  echo
+}
 
-echo
-tput setaf 6 || true
-echo "##############################################################"
-echo "###################  $(basename "$0") done"
-echo "##############################################################"
-tput sgr0 || true
-echo
+main "$@"

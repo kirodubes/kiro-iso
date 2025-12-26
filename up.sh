@@ -33,7 +33,7 @@ workdir=$(pwd)
 
 ##################################################################################################################
 # Toggle mirrorlist fetch
-USE_MIRRORLIST_FETCH=true
+USE_MIRRORLIST_FETCH=false
 
 get_mirrorlist () {
     echo "getting mirrorlist (static)"

@@ -50,7 +50,7 @@ EOF
 
     echo
     echo "getting mirrorlist (official)"
-    wget -q -O - "https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6" \
+    wget -q -O - "https://archlinux.org/mirrorlist/?ip_version=6" \
   | tee -a "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist" >/dev/null
     sed -i "s/#Server/Server/g" "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"
 }

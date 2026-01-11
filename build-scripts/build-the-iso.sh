@@ -123,7 +123,7 @@ echo
 	#Let us set the desktop"
 	#First letter of desktop is small letter
 
-	desktop="xfce"
+	desktop="xfce4/chadwm"
 
 	kiroVersion='v26.01.11.01'
 

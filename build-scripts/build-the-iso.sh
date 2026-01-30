@@ -301,6 +301,60 @@ echo
 	cp -f ../archiso/packages.x86_64 $buildFolder/archiso/packages.x86_64
 	echo
 
+	# Nvidia driver selection
+	# open | 580xx
+	nvidia_driver="open"
+
+	##############################################
+	# Nvidia driver selection
+	##############################################
+
+	PACKAGES_FILE="$buildFolder/archiso/packages.x86_64"
+
+	case "$nvidia_driver" in
+
+	    open)
+	        echo "Using NVIDIA open drivers"
+
+	        # Ensure open drivers are present
+	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
+
+	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-settings/d' "$PACKAGES_FILE"
+
+	        echo "nvidia-open-dkms"   >> "$PACKAGES_FILE"
+	        echo "nvidia-utils"       >> "$PACKAGES_FILE"
+	        echo "nvidia-settings"    >> "$PACKAGES_FILE"
+	        ;;
+
+	    580xx)
+	        echo "Using NVIDIA 580xx legacy drivers"
+
+	        # Remove open drivers
+	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-settings/d' "$PACKAGES_FILE"
+
+	        # Remove old 580xx entries if any
+	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
+
+	        # Add legacy drivers
+	        echo "nvidia-580xx-dkms"     >> "$PACKAGES_FILE"
+	        echo "nvidia-580xx-utils"    >> "$PACKAGES_FILE"
+	        echo "nvidia-580xx-settings" >> "$PACKAGES_FILE"
+	        ;;
+
+	    *)
+	        echo "Unknown NVIDIA driver option: $nvidia_driver"
+	        echo "Valid options: open | 580xx"
+	        exit 1
+	        ;;
+
+	esac
+
+
+
 echo
 echo "################################################################## "
 tput setaf 2

@@ -101,7 +101,6 @@ Server = http://mirror.hnd.cl/archlinux/$repo/os/$arch
 Server = https://mirror.hnd.cl/archlinux/$repo/os/$arch
 
 ## China
-Server = http://mirrors.bfsu.edu.cn/archlinux/$repo/os/$arch
 Server = https://mirrors.bfsu.edu.cn/archlinux/$repo/os/$arch
 Server = http://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch
 Server = https://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch

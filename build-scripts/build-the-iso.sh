@@ -302,8 +302,8 @@ echo
 	echo
 
 	# Nvidia driver selection
-	# open | 580xx
-	nvidia_driver="open"
+	# open | 580xx | 390xx
+	nvidia_driver="390xx"
 
 	##############################################
 	# Nvidia driver selection
@@ -325,6 +325,7 @@ echo
 
 	        # Ensure open drivers are present
 	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-390xx/d' "$PACKAGES_FILE"
 
 	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
 	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
@@ -358,9 +359,32 @@ echo
 	        echo "nvidia-580xx-settings" >> "$PACKAGES_FILE"
 	        ;;
 
+	    390xx)
+	    	echo "################################################################## "
+			tput setaf 2
+			echo "Using NVIDIA 390xx legacy drivers"
+			tput sgr0
+			echo "################################################################## "
+			echo  
+	        sleep 2
+
+	        # Remove open drivers
+	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-settings/d' "$PACKAGES_FILE"
+
+	        # Remove old 390xx entries if any
+	        sed -i '/^nvidia-390xx/d' "$PACKAGES_FILE"
+	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
+
+	        # Add legacy drivers
+	        echo "nvidia-390xx-dkms"     >> "$PACKAGES_FILE"
+	        echo "nvidia-390xx-utils"    >> "$PACKAGES_FILE"
+	        echo "nvidia-390xx-settings" >> "$PACKAGES_FILE"
+	        ;;
 	    *)
 	        echo "Unknown NVIDIA driver option: $nvidia_driver"
-	        echo "Valid options: open | 580xx"
+	        echo "Valid options: open | 580xx | 390xx"
 	        exit 1
 	        ;;
 

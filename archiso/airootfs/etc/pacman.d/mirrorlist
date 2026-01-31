@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-01-30
+## Generated on 2026-01-31
 ##
 
 ## Worldwide
@@ -101,6 +101,7 @@ Server = http://mirror.hnd.cl/archlinux/$repo/os/$arch
 Server = https://mirror.hnd.cl/archlinux/$repo/os/$arch
 
 ## China
+Server = http://mirrors.bfsu.edu.cn/archlinux/$repo/os/$arch
 Server = https://mirrors.bfsu.edu.cn/archlinux/$repo/os/$arch
 Server = http://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch
 Server = https://mirrors.cqu.edu.cn/archlinux/$repo/os/$arch
@@ -570,6 +571,7 @@ Server = https://pkg.adfinis-on-exoscale.ch/archlinux-pkgbuild/$repo/os/$arch
 Server = https://pkg.adfinis-on-exoscale.ch/archlinux/$repo/os/$arch
 Server = http://mirror.arch-linux.ch/archlinux/$repo/os/$arch
 Server = https://mirror.arch-linux.ch/archlinux/$repo/os/$arch
+Server = https://archlinux.lan.brgn.ch/archlinux/$repo/os/$arch
 Server = http://ch.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://ch.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://mirror.hb9hil.org/archlinux/$repo/os/$arch

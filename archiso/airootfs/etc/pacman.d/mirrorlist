@@ -407,6 +407,8 @@ Server = https://md.mirrors.hacktegic.com/archlinux/$repo/os/$arch
 ## Netherlands
 Server = http://mirror.bouwhuis.network/archlinux/$repo/os/$arch
 Server = https://mirror.bouwhuis.network/archlinux/$repo/os/$arch
+Server = http://mirror.nl.cdn-perfprod.com/archlinux/$repo/os/$arch
+Server = https://mirror.nl.cdn-perfprod.com/archlinux/$repo/os/$arch
 Server = http://nl.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://nl.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://mirror.cj2.nl/archlinux/$repo/os/$arch

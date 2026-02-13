@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-02-12
+## Generated on 2026-02-13
 ##
 
 ## Worldwide
@@ -378,6 +378,8 @@ Server = http://ftp.jaist.ac.jp/pub/Linux/ArchLinux/$repo/os/$arch
 Server = https://ftp.jaist.ac.jp/pub/Linux/ArchLinux/$repo/os/$arch
 Server = http://www.miraa.jp/archlinux/$repo/os/$arch
 Server = https://www.miraa.jp/archlinux/$repo/os/$arch
+Server = http://ftp.yz.yamagata-u.ac.jp/pub/linux/archlinux/$repo/os/$arch
+Server = https://ftp.yz.yamagata-u.ac.jp/pub/linux/archlinux/$repo/os/$arch
 
 ## Kazakhstan
 Server = http://mirror.ps.kz/archlinux/$repo/os/$arch
@@ -421,6 +423,8 @@ Server = http://mirror.ams1.nl.leaseweb.net/archlinux/$repo/os/$arch
 Server = https://mirror.ams1.nl.leaseweb.net/archlinux/$repo/os/$arch
 Server = http://archlinux.mirror.liteserver.nl/$repo/os/$arch
 Server = https://archlinux.mirror.liteserver.nl/$repo/os/$arch
+Server = http://nl.mirror.cx/archlinux/$repo/os/$arch
+Server = https://nl.mirror.cx/archlinux/$repo/os/$arch
 Server = https://nl.arch.niranjan.co/$repo/os/$arch
 Server = http://ftp.nluug.nl/os/Linux/distr/archlinux/$repo/os/$arch
 Server = http://mirror.nyaa.vc/archlinux/$repo/os/$arch
@@ -442,6 +446,7 @@ Server = https://mirror.2degrees.nz/archlinux/$repo/os/$arch
 Server = http://mirror.fsmg.org.nz/archlinux/$repo/os/$arch
 Server = https://mirror.fsmg.org.nz/archlinux/$repo/os/$arch
 Server = https://nz.arch.niranjan.co/$repo/os/$arch
+Server = https://archlinux.ourhome.kiwi/$repo/os/$arch
 
 ## North Macedonia
 Server = http://mirror.onevip.mk/archlinux/$repo/os/$arch
@@ -450,6 +455,8 @@ Server = http://mirror.onevip.mk/archlinux/$repo/os/$arch
 Server = http://mirror.archlinux.no/$repo/os/$arch
 Server = https://mirror.archlinux.no/$repo/os/$arch
 Server = http://archlinux.uib.no/$repo/os/$arch
+Server = http://no.mirror.cx/archlinux/$repo/os/$arch
+Server = https://no.mirror.cx/archlinux/$repo/os/$arch
 
 ## Paraguay
 Server = http://archlinux.mirror.py/archlinux/$repo/os/$arch
@@ -537,6 +544,8 @@ Server = https://kr.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://ftp.kaist.ac.kr/ArchLinux/$repo/os/$arch
 Server = http://mirror.funami.tech/arch/$repo/os/$arch
 Server = https://mirror.funami.tech/arch/$repo/os/$arch
+Server = http://ftp.io.kr/$repo/os/$arch
+Server = https://ftp.io.kr/$repo/os/$arch
 Server = https://mirror.krfoss.org/archlinux/$repo/os/$arch
 Server = http://ftp.lanet.kr/pub/archlinux/$repo/os/$arch
 Server = https://ftp.lanet.kr/pub/archlinux/$repo/os/$arch

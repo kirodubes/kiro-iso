@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-03-14
+## Generated on 2026-03-16
 ##
 
 ## Worldwide
@@ -77,6 +77,7 @@ Server = http://mirror.sabay.com.kh/archlinux/$repo/os/$arch
 Server = https://mirror.sabay.com.kh/archlinux/$repo/os/$arch
 
 ## Canada
+Server = https://mirror.allthingslinux.org/archlinux/$repo/os/$arch
 Server = https://arch.mirror.winslow.cloud/$repo/os/$arch
 Server = http://ca.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://ca.mirrors.cicku.me/archlinux/$repo/os/$arch
@@ -218,6 +219,7 @@ Server = https://mirror.theo546.fr/archlinux/$repo/os/$arch
 Server = http://mirror.trap.moe/archlinux/$repo/os/$arch
 Server = https://mirror.trap.moe/archlinux/$repo/os/$arch
 Server = http://ftp.u-strasbg.fr/linux/distributions/archlinux/$repo/os/$arch
+Server = https://ftp.u-strasbg.fr/linux/distributions/archlinux/$repo/os/$arch
 Server = https://mirror.wormhole.eu/archlinux/$repo/os/$arch
 
 ## Germany
@@ -284,12 +286,13 @@ Server = http://arch.phinau.de/$repo/os/$arch
 Server = https://arch.phinau.de/$repo/os/$arch
 Server = https://mirror.pseudoform.org/$repo/os/$arch
 Server = https://archlinux.richard-neumann.de/$repo/os/$arch
+Server = http://archlinux.roshak.xyz/$repo/os/$arch
+Server = https://archlinux.roshak.xyz/$repo/os/$arch
 Server = http://ftp.halifax.rwth-aachen.de/archlinux/$repo/os/$arch
 Server = https://ftp.halifax.rwth-aachen.de/archlinux/$repo/os/$arch
 Server = http://linux.rz.rub.de/archlinux/$repo/os/$arch
 Server = http://mirror.selfnet.de/archlinux/$repo/os/$arch
 Server = https://mirror.selfnet.de/archlinux/$repo/os/$arch
-Server = http://de.mirror.shibe.party/archlinux/$repo/os/$arch
 Server = https://de.mirror.shibe.party/archlinux/$repo/os/$arch
 Server = https://de-nue.soulharsh007.dev/archlinux/$repo/os/$arch
 Server = http://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch

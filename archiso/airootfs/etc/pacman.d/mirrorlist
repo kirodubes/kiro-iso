@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-03-16
+## Generated on 2026-03-17
 ##
 
 ## Worldwide
@@ -293,6 +293,7 @@ Server = https://ftp.halifax.rwth-aachen.de/archlinux/$repo/os/$arch
 Server = http://linux.rz.rub.de/archlinux/$repo/os/$arch
 Server = http://mirror.selfnet.de/archlinux/$repo/os/$arch
 Server = https://mirror.selfnet.de/archlinux/$repo/os/$arch
+Server = http://de.mirror.shibe.party/archlinux/$repo/os/$arch
 Server = https://de.mirror.shibe.party/archlinux/$repo/os/$arch
 Server = https://de-nue.soulharsh007.dev/archlinux/$repo/os/$arch
 Server = http://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch
@@ -366,7 +367,6 @@ Server = https://mirror.isoc.org.il/pub/archlinux/$repo/os/$arch
 Server = http://it.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://it.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://archlinux.mirror.garr.it/archlinux/$repo/os/$arch
-Server = https://arch.mirror.hyperbit.it/$repo/os/$arch
 Server = http://archlinux.mirror.server24.net/$repo/os/$arch
 Server = https://archlinux.mirror.server24.net/$repo/os/$arch
 
@@ -585,7 +585,6 @@ Server = https://pkg.adfinis-on-exoscale.ch/archlinux-pkgbuild/$repo/os/$arch
 Server = https://pkg.adfinis-on-exoscale.ch/archlinux/$repo/os/$arch
 Server = http://mirror.arch-linux.ch/archlinux/$repo/os/$arch
 Server = https://mirror.arch-linux.ch/archlinux/$repo/os/$arch
-Server = https://archlinux.lan.brgn.ch/archlinux/$repo/os/$arch
 Server = http://ch.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://ch.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://mirror.hb9hil.org/archlinux/$repo/os/$arch

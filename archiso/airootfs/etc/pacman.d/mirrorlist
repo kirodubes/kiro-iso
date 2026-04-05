@@ -111,7 +111,6 @@ Server = https://mirrors.hit.edu.cn/archlinux/$repo/os/$arch
 Server = http://mirrors.hust.edu.cn/archlinux/$repo/os/$arch
 Server = https://mirrors.hust.edu.cn/archlinux/$repo/os/$arch
 Server = http://mirrors.jcut.edu.cn/archlinux/$repo/os/$arch
-Server = https://mirrors.jcut.edu.cn/archlinux/$repo/os/$arch
 Server = http://mirrors.jlu.edu.cn/archlinux/$repo/os/$arch
 Server = https://mirrors.jlu.edu.cn/archlinux/$repo/os/$arch
 Server = http://mirrors.jxust.edu.cn/archlinux/$repo/os/$arch

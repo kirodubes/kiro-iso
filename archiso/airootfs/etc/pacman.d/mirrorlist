@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-04-08
+## Generated on 2026-04-09
 ##
 
 ## Worldwide
@@ -505,8 +505,6 @@ Server = http://mirror.cachy-arch.ru/archlinux/$repo/os/$arch
 Server = https://mirror.cachy-arch.ru/archlinux/$repo/os/$arch
 Server = http://ru.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://ru.mirrors.cicku.me/archlinux/$repo/os/$arch
-Server = http://mirror.nw-sys.ru/archlinux/$repo/os/$arch
-Server = https://mirror.nw-sys.ru/archlinux/$repo/os/$arch
 Server = http://web.sketserv.ru/archlinux/$repo/os/$arch
 Server = https://web.sketserv.ru/archlinux/$repo/os/$arch
 Server = http://mirror.yandex.ru/archlinux/$repo/os/$arch

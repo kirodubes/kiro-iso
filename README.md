@@ -6,6 +6,8 @@
 
 ![Kiro Logo](kiro-chadwm.jpg)
 
+![Kiro Logo](kiro-ohmychadwm.jpg)
+
 # Download
 
 You can download the latest Kiro ISO from [our SourceForge page](https://sourceforge.net/projects/kiro/files/).

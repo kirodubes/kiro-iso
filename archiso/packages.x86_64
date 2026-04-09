@@ -250,7 +250,9 @@ chromium
 dmenu
 firefox
 galculator
+gcolor3
 gimp
+hwprobe
 imagemagick
 inkscape
 lshw
@@ -416,9 +418,14 @@ noto-fonts-emoji
 pacmanlogviewer
 pacquery
 python-pylint
+resources
 ripgrep
 ripgrep-all
+signal-desktop
+signal-in-tray
+shortwave
 sparklines-git
+spotify
 time
 tldr
 ttf-ms-fonts
@@ -457,7 +464,7 @@ chaotic-mirrorlist
 #edu-surfn-numixs-blue-git
 #edu-vimix-dark-tela-git
 arc-gtk-theme
-archlinux-logout-git
+archlinux-logout-gtk4-git
 archlinux-tweak-tool-git
 edu-arc-dawn-git
 edu-arc-kde

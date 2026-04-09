@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -e
+set -e
 #tput setaf 0 = black 
 #tput setaf 1 = red 
 #tput setaf 2 = green
@@ -67,7 +67,7 @@ remove_buildfolder() {
     fi
 }
 
-installed_dir=$(dirname $(readlink -f $(basename `pwd`)))
+installed_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
 
 echo
 echo "################################################################## "
@@ -148,7 +148,7 @@ echo
 			tput sgr0
 			echo "################################################################## "
 	    else
-	        if [[ -f "$installed_dir/get-the-keys-and-mirrors-chaotic-aur.sh" ]]; then
+	        if [[ -f "$installed_dir/build-scripts/get-pacman-repos-keys-and-mirrors.sh" ]]; then
 	        	echo "################################################################## "
 				tput setaf 3
 				echo "Installing both Chaotic packages as we are missing"
@@ -156,7 +156,7 @@ echo
     			echo "You can remove them later with pacman -R ..."
 				tput sgr0
 				echo "################################################################## "
-	            bash "$installed_dir/get-the-keys-and-mirrors-chaotic-aur.sh"
+	            bash "$installed_dir/build-scripts/get-pacman-repos-keys-and-mirrors.sh"
 	        else
 		        echo "################################################################## "
 				tput setaf 1

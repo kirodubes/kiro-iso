@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-04-09
+## Generated on 2026-04-12
 ##
 
 ## Worldwide
@@ -294,7 +294,6 @@ Server = http://linux.rz.rub.de/archlinux/$repo/os/$arch
 Server = http://mirror.selfnet.de/archlinux/$repo/os/$arch
 Server = https://mirror.selfnet.de/archlinux/$repo/os/$arch
 Server = http://de.mirror.shibe.party/archlinux/$repo/os/$arch
-Server = https://de.mirror.shibe.party/archlinux/$repo/os/$arch
 Server = https://de-nue.soulharsh007.dev/archlinux/$repo/os/$arch
 Server = http://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch
 Server = https://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch
@@ -421,6 +420,7 @@ Server = http://nl.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://nl.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://mirror.cj2.nl/archlinux/$repo/os/$arch
 Server = https://mirror.cj2.nl/archlinux/$repo/os/$arch
+Server = http://mirrors.evoluso.com/archlinux/$repo/os/$arch
 Server = http://nl.mirror.flokinet.net/archlinux/$repo/os/$arch
 Server = https://nl.mirror.flokinet.net/archlinux/$repo/os/$arch
 Server = http://mirror.koddos.net/archlinux/$repo/os/$arch
@@ -589,7 +589,6 @@ Server = https://pkg.adfinis-on-exoscale.ch/archlinux-pkgbuild/$repo/os/$arch
 Server = https://pkg.adfinis-on-exoscale.ch/archlinux/$repo/os/$arch
 Server = http://mirror.arch-linux.ch/archlinux/$repo/os/$arch
 Server = https://mirror.arch-linux.ch/archlinux/$repo/os/$arch
-Server = https://archlinux.lan.brgn.ch/archlinux/$repo/os/$arch
 Server = http://ch.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://ch.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = http://mirror.hb9hil.org/archlinux/$repo/os/$arch

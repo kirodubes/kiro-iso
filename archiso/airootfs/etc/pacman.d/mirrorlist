@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-04-12
+## Generated on 2026-04-13
 ##
 
 ## Worldwide
@@ -216,7 +216,6 @@ Server = http://arch.syxpi.fr/arch/$repo/os/$arch
 Server = https://arch.syxpi.fr/arch/$repo/os/$arch
 Server = http://mirror.theo546.fr/archlinux/$repo/os/$arch
 Server = https://mirror.theo546.fr/archlinux/$repo/os/$arch
-Server = http://mirror.trap.moe/archlinux/$repo/os/$arch
 Server = https://mirror.trap.moe/archlinux/$repo/os/$arch
 Server = http://ftp.u-strasbg.fr/linux/distributions/archlinux/$repo/os/$arch
 Server = https://ftp.u-strasbg.fr/linux/distributions/archlinux/$repo/os/$arch
@@ -294,6 +293,7 @@ Server = http://linux.rz.rub.de/archlinux/$repo/os/$arch
 Server = http://mirror.selfnet.de/archlinux/$repo/os/$arch
 Server = https://mirror.selfnet.de/archlinux/$repo/os/$arch
 Server = http://de.mirror.shibe.party/archlinux/$repo/os/$arch
+Server = https://de.mirror.shibe.party/archlinux/$repo/os/$arch
 Server = https://de-nue.soulharsh007.dev/archlinux/$repo/os/$arch
 Server = http://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch
 Server = https://ftp.spline.inf.fu-berlin.de/mirrors/archlinux/$repo/os/$arch

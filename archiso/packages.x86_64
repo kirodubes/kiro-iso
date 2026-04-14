@@ -318,11 +318,13 @@ qt5ct
 ripgrep
 simple-scan
 #telegram-desktop
-tlp
+#tlp
+tuned
 tree
 unace
 unrar
 unzip
+upower
 xapp
 xdg-desktop-portal-gtk
 yt-dlp

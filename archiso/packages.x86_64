@@ -133,7 +133,7 @@ dnsutils
 libadwaita
 linux-headers
 logrotate
-ntp
+#ntp
 upd72020x-fw
 wd719x-firmware
 wget
@@ -287,6 +287,7 @@ bash-completion
 baobab
 bat
 catfish
+cpupower
 cronie
 dconf-editor
 #dex
@@ -467,7 +468,7 @@ chaotic-mirrorlist
 #edu-vimix-dark-tela-git
 arc-gtk-theme
 archlinux-logout-gtk4-git
-archlinux-tweak-tool-git
+archlinux-tweak-tool-gtk4-git
 edu-arc-dawn-git
 edu-arc-kde
 edu-dot-files-git

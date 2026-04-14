@@ -178,7 +178,6 @@ os-prober
 alsa-firmware
 alsa-plugins
 alsa-lib
-alsa-utils
 gst-libav
 gst-plugins-bad
 gst-plugins-base
@@ -287,7 +286,6 @@ bash-completion
 baobab
 bat
 catfish
-cpupower
 cronie
 dconf-editor
 #dex
@@ -320,7 +318,6 @@ ripgrep
 simple-scan
 #telegram-desktop
 #tlp
-tuned
 tree
 unace
 unrar

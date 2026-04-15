@@ -1,0 +1,18 @@
+[Unit]
+Description=Optimize PCI Latency Timers for Responsiveness
+Documentation=https://wiki.archlinux.org/title/PCI_latency
+After=multi-user.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/pci-latency
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pci-latency
+
+# Continue boot even if script fails (pci-latency changes are non-critical)
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

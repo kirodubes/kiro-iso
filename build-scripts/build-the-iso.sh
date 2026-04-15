@@ -301,6 +301,29 @@ echo
 	cp -f ../archiso/packages.x86_64 $buildFolder/archiso/packages.x86_64
 	echo
 
+echo
+echo "################################################################## "
+tput setaf 2
+echo "Phase 4b :"
+echo "- Prepopulating pacman keyring"
+tput sgr0
+echo "################################################################## "
+echo
+
+	KEYRING_DIR="$buildFolder/archiso/airootfs/etc/pacman.d/gnupg"
+
+	echo "Initializing pacman keyring..."
+	sudo pacman-key --gpgdir "$KEYRING_DIR" --init
+
+	echo "Populating archlinux keyring..."
+	sudo pacman-key --gpgdir "$KEYRING_DIR" --populate archlinux
+
+	echo "Populating chaotic keyring..."
+	sudo pacman-key --gpgdir "$KEYRING_DIR" --populate chaotic
+
+	echo "Keyring prepopulation complete."
+	echo
+
 	# Nvidia driver selection
 	# open | 580xx | 390xx
 	nvidia_driver="open"

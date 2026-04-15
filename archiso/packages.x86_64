@@ -528,6 +528,7 @@ xorg-xsetroot
 
 ananicy-cpp
 cachyos-ananicy-rules-git
+irqbalance
 
 ###########################################################################
 ####                           PERSONAL_REPO aka LOCAL REPO

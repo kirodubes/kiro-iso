@@ -1,0 +1,56 @@
+#!/usr/bin/env sh
+# ============================================================================
+# PCI Latency Timer Optimization
+# ============================================================================
+# PCI latency timers control max data access time for devices
+# Lower values = lower latency, but may cause timeouts on slow devices
+#
+# This script:
+#   - Sets conservative default (20 cycles) for all devices
+#   - Zeros northbridge (chipset) for fastest access
+#   - Optimizes audio devices (80 cycles for minimum latency)
+#
+# Reduces audio crackling, gaming latency, and burst I/O latency
+# Run at boot via systemd service (see pci-latency.service)
+
+# Don't exit on errors - continue even if some commands fail
+set +e
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run with root privileges." >&2
+    exit 1
+fi
+
+# Check if setpci is available
+if ! command -v setpci > /dev/null 2>&1; then
+    echo "Error: setpci not found. Install pciutils package." >&2
+    exit 1
+fi
+
+# ============================================================================
+# Main Latency Optimization
+# ============================================================================
+
+# Reset latency timer for all PCI devices to conservative 20 cycles
+# This is safe and recommended for most systems
+# Suppress verbose output for cleaner systemd logs
+setpci -s '*:*' latency_timer=20 2>/dev/null || true
+
+# Optimize northbridge (chipset) for fastest access
+# Latency timer = 0 allows unlimited access time (chipset internal communication)
+setpci -s '0:0' latency_timer=0 2>/dev/null || true
+
+# ============================================================================
+# Audio Device Optimization
+# ============================================================================
+# Sound cards benefit from 80 cycle latency timer
+# This prevents audio dropouts and crackling during heavy I/O
+# Uses device class 04xx (Multimedia Audio device)
+setpci -s '*:*:04xx' latency_timer=80 2>/dev/null || true
+
+# ============================================================================
+# Completion
+# ============================================================================
+
+# Exit successfully - we use 'set +e' to never fail
+exit 0

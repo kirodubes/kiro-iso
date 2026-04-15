@@ -327,6 +327,7 @@ xapp
 xdg-desktop-portal-gtk
 yt-dlp
 zenity
+zram-generator
 zsh
 zsh-completions
 zsh-syntax-highlighting

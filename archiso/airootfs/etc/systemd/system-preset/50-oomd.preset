@@ -1,0 +1,2 @@
+# Enable systemd-oomd for out-of-memory handling
+enable systemd-oomd.service

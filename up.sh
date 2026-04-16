@@ -64,6 +64,17 @@ else
 fi
 
 ##################################################################################################################
+# Update bashrc from edu-shells repo
+echo "Fetching bashrc from edu-shells repo..."
+curl -L -o "$workdir/archiso/airootfs/etc/skel/.bashrc" \
+    "https://raw.githubusercontent.com/erikdubois/edu-shells/refs/heads/main/etc/skel/.bashrc-latest"
+if [ $? -eq 0 ]; then
+    echo "bashrc updated successfully"
+else
+    echo "Warning: Failed to fetch bashrc"
+fi
+
+##################################################################################################################
 # Git workflow
 git add --all .
 git commit -m "update"

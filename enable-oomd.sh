@@ -82,8 +82,12 @@ cat > /etc/systemd/oomd.conf <<'EOF'
 [OOM]
 # Systemd-oomd memory pressure monitoring and OOM handling
 
+# Threshold: only act when memory pressure exceeds 60% (default)
+DefaultMemoryPressureLimit=60%
+
 # How long to observe memory pressure before taking action
-DefaultMemoryPressureDurationSec=10s
+# 20 seconds = better balance between responsiveness and stability
+DefaultMemoryPressureDurationSec=20s
 EOF
 success "oomd.conf configured"
 
@@ -93,8 +97,10 @@ mkdir -p /etc/systemd/system/system.slice.d
 
 cat > /etc/systemd/system/system.slice.d/oomd.conf <<'EOF'
 [Slice]
+# Monitor system slice memory pressure (responsive)
 ManagedOOMMemoryPressure=kill
-ManagedOOMSwap=kill
+# Disable swap-based killing - let swap handle overflow gracefully
+# ManagedOOMSwap=kill
 EOF
 
 success "system.slice monitoring configured"
@@ -104,8 +110,10 @@ mkdir -p /etc/systemd/system/user.slice.d
 
 cat > /etc/systemd/system/user.slice.d/oomd.conf <<'EOF'
 [Slice]
+# Monitor user slice memory pressure (responsive)
 ManagedOOMMemoryPressure=kill
-ManagedOOMSwap=kill
+# Disable swap-based killing - let swap handle overflow gracefully
+# ManagedOOMSwap=kill
 EOF
 
 success "user.slice monitoring configured"

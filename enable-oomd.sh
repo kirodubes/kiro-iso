@@ -76,34 +76,16 @@ EOF
 
 success "Memory accounting enabled"
 
-# Create oomd.conf if it doesn't exist
-if [ ! -f /etc/systemd/oomd.conf ]; then
-    info "Creating oomd.conf..."
-    cat > /etc/systemd/oomd.conf <<'EOF'
+# Create/update oomd.conf with correct settings
+info "Configuring oomd.conf..."
+cat > /etc/systemd/oomd.conf <<'EOF'
 [OOM]
 # Systemd-oomd memory pressure monitoring and OOM handling
-# Integrated memory management daemon (systemd 248+)
 
 # How long to observe memory pressure before taking action
 DefaultMemoryPressureDurationSec=10s
-
-# Memory pressure limit before triggering intervention
-# 90% PSI (Pressure Stall Information) = act when 90% of time is stalled
-ManagedOOMMemoryPressureLimitPercent=90
-
-# Swap usage threshold
-# 90% = when swap is 90% full, kill lower-priority processes
-ManagedOOMSwapUsedLimitPercent=90
-
-[Service]
-# Reboot system if OOM daemon crashes (safety failsafe)
-WatchdogSec=30s
-RuntimeMaxSec=infinity
 EOF
-    success "oomd.conf created"
-else
-    success "oomd.conf already exists"
-fi
+success "oomd.conf configured"
 
 # Configure system.slice monitoring
 info "Configuring slice monitoring..."

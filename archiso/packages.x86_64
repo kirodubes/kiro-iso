@@ -518,6 +518,7 @@ irqbalance
 glances
 tuned
 pciutils
+sysz
 
 ###########################################################################
 ####                           PERSONAL_REPO aka LOCAL REPO

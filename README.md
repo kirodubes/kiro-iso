@@ -1,12 +1,12 @@
 # KIRO ISO
 
-![Kiro Logo](kiro.jpg)
+![Kiro Logo](images/kiro.jpg)
 
-![Kiro Desktop - XFCE](kiro-xfce.jpg)
+![Kiro Desktop - XFCE](images/kiro-xfce.jpg)
 
-![Kiro Desktop - Chadwm](kiro-chadwm.jpg)
+![Kiro Desktop - Chadwm](images/kiro-chadwm.jpg)
 
-![Kiro Desktop - Ohmychadwm](kiro-ohmychadwm.jpg)
+![Kiro Desktop - Ohmychadwm](images/kiro-ohmychadwm.jpg)
 
 ---
 

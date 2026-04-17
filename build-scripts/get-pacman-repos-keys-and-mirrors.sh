@@ -13,7 +13,7 @@ echo -e "${YELLOW}Updating system and installing required tools...${NC}"
 sudo pacman -Syu --needed --noconfirm wget jq curl
 
 # Base URL for Chaotic-AUR
-BASE_URL="https://builds.garudalinux.org/repos/chaotic-aur/x86_64/"
+BASE_URL="https://geo-mirror.chaotic.cx/chaotic-aur/x86_64/"
 
 # Fetch the latest package URL function
 fetch_package_url() {

@@ -123,9 +123,9 @@ echo
 	#Let us set the desktop"
 	#First letter of desktop is small letter
 
-	desktop="xfce4/chadwm"
+	desktop="xfce4/edu-chadwm/ohmychadwm"
 
-	kiroVersion='v26.04.18.01'
+	kiroVersion='v26.04.19.01'
 
 	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
 

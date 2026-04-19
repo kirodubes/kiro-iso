@@ -469,10 +469,12 @@ edu-neo-candy-arc-mint-red-git
 edu-neo-candy-qogir-git
 edu-neo-candy-tela-git
 edu-polybar-git
+edu-powermenu-git
 edu-rofi-git
 edu-rofi-themes-git
 edu-sddm-simplicity-git
 edu-shells-git
+edu-system-files-git
 edu-variety-config-git
 edu-xfce-git
 flameshot-git
@@ -514,6 +516,7 @@ xorg-xsetroot
 
 ananicy-cpp
 cachyos-ananicy-rules-git
+cpuid
 irqbalance
 glances
 tuned

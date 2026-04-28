@@ -35,6 +35,8 @@ workdir=$(pwd)
 # Toggle mirrorlist fetch
 USE_MIRRORLIST_FETCH=true
 
+chmod 644 archiso/profiledef.sh
+
 get_mirrorlist () {
     echo "getting mirrorlist (static)"
     rm -f "$workdir/archiso/airootfs/etc/pacman.d/mirrorlist"

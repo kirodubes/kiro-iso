@@ -125,7 +125,7 @@ echo
 
 	desktop="xfce4/edu-chadwm/ohmychadwm"
 
-	kiroVersion='v26.04.26.01'
+	kiroVersion='v26.04.28.01'
 
 	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
 

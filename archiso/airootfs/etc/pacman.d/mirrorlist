@@ -7,7 +7,7 @@ Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch
 Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch
 ##
 ## Arch Linux repository mirrorlist
-## Generated on 2026-05-05
+## Generated on 2026-05-06
 ##
 
 ## Worldwide
@@ -77,7 +77,6 @@ Server = http://mirror.sabay.com.kh/archlinux/$repo/os/$arch
 Server = https://mirror.sabay.com.kh/archlinux/$repo/os/$arch
 
 ## Canada
-Server = https://mirror.allthingslinux.org/archlinux/$repo/os/$arch
 Server = https://arch.mirror.winslow.cloud/$repo/os/$arch
 Server = http://ca.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://ca.mirrors.cicku.me/archlinux/$repo/os/$arch
@@ -177,6 +176,7 @@ Server = https://mirrors.xtom.ee/archlinux/$repo/os/$arch
 Server = https://archlinux.doridian.net/$repo/os/$arch
 Server = http://cdnmirror.com/archlinux/$repo/os/$arch
 Server = https://cdnmirror.com/archlinux/$repo/os/$arch
+Server = https://mirror.falcao.org/archlinux/$repo/os/$arch
 Server = http://arch.mirror.far.fi/$repo/os/$arch
 Server = http://mirror.5i.fi/archlinux/$repo/os/$arch
 Server = https://mirror.5i.fi/archlinux/$repo/os/$arch
@@ -190,6 +190,8 @@ Server = https://arch.yhtez.xyz/$repo/os/$arch
 Server = http://mirror.archlinux.ikoula.com/archlinux/$repo/os/$arch
 Server = http://mirror.bakertelekom.fr/Arch/$repo/os/$arch
 Server = https://mirror.bakertelekom.fr/Arch/$repo/os/$arch
+Server = http://mirror.fr.cdn-perfprod.com/archlinux/$repo/os/$arch
+Server = https://mirror.fr.cdn-perfprod.com/archlinux/$repo/os/$arch
 Server = http://fr.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://fr.mirrors.cicku.me/archlinux/$repo/os/$arch
 Server = https://mirror.cosmiclinux.com/archlinux/$repo/os/$arch
@@ -388,6 +390,7 @@ Server = http://ftp.yz.yamagata-u.ac.jp/pub/linux/archlinux/$repo/os/$arch
 Server = https://ftp.yz.yamagata-u.ac.jp/pub/linux/archlinux/$repo/os/$arch
 
 ## Kazakhstan
+Server = http://mirror.linxhost.ru/$repo/os/$arch
 Server = http://mirror.ps.kz/archlinux/$repo/os/$arch
 Server = https://mirror.ps.kz/archlinux/$repo/os/$arch
 
@@ -404,6 +407,8 @@ Server = https://archlinux.koyanet.lv/archlinux/$repo/os/$arch
 ## Luxembourg
 Server = http://arch-lux.spirex.me/$repo/os/$arch
 Server = https://arch-lux.spirex.me/$repo/os/$arch
+Server = http://mirror.lu.stratonexus.net/archlinux/$repo/os/$arch
+Server = https://mirror.lu.stratonexus.net/archlinux/$repo/os/$arch
 
 ## Mexico
 Server = https://arch.jsc.mx/$repo/os/$arch
@@ -728,5 +733,6 @@ Server = https://mirrors.xtom.com/archlinux/$repo/os/$arch
 Server = https://zxcvfdsa.com/arch/$repo/os/$arch
 
 ## Vietnam
+Server = https://mirror.khoinet.dpdns.org/Arch/$repo/os/$arch
 Server = https://mirror.meowsmp.net/arch/$repo/os/$arch
 

@@ -6,6 +6,26 @@
 
 ## 2026-05-18 — `v26.05.18.01`
 
+### edu-chadwm dropped; README accuracy overhaul
+
+**`edu-chadwm` removed going forward.** The package `edu-chadwm-git` was already commented out in `archiso/packages.x86_64`, but references to it persisted in `build-scripts/build-the-iso.sh` (the `desktop` label variable), `CLAUDE.md`, and `README.md`. All forward-facing references have been cleaned up. CHANGELOG historical entries were left intact — they accurately describe what the ISO shipped at the time.
+
+**README rewritten for accuracy.** A full audit revealed several stale or incorrect entries:
+
+- `enable-oomd.sh` and `disable-oomd.sh` were referenced in the project tree and Key Scripts section but do not exist in the repo — removed
+- `personal_repo/` was listed as a root-level directory — it does not exist; the relevant comment is in `archiso/pacman.conf` — removed
+- `packages.bootstrap` was listed with the wrong name; the actual file is `bootstrap_packages` — corrected
+- `setup.sh`, `change-version.sh`, `up.sh`, and `CHANGELOG.md` were missing from the project tree — added
+- The Building KIRO section omitted the required first step (`change-version.sh`) and made no mention of the NVIDIA driver selection knob — both added
+- "Based on the ArcoLinux project" in the Overview — ArcoLinux branding reference removed
+- The stale "Recent Changes" section (listing Calamares migrations from months ago) replaced with a link to `CHANGELOG.md`
+- ArcoLinux tutorial link removed from Resources
+- `✅` emoji bullets and the `🖖` sign-off removed throughout
+
+**Files Modified:** `build-scripts/build-the-iso.sh`, `CLAUDE.md`, `README.md`
+
+---
+
 ### Build script standardization — full template conformance pass
 
 All four build scripts were audited against the project standard template (modelled on `up.sh`) and brought into full conformance. This was a correctness and maintainability pass, not cosmetic cleanup — several of the changes fix real failure modes that were silently swallowed before.

@@ -103,9 +103,13 @@ git_pull() {
 
 ensure_git_remote_configured() {
     local remote_url
+    if ! git -C "${SCRIPT_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        log_error "${SCRIPT_DIR} is not a git repository — up.sh must be run from inside a project repo"
+        exit 1
+    fi
     remote_url="$(git -C "${SCRIPT_DIR}" remote get-url origin 2>/dev/null || true)"
-    if [[ "${remote_url}" != *"github.com"* ]]; then
-        log_section "Git remote not configured — running setup.sh first"
+    if [[ "${remote_url}" != git@* ]]; then
+        log_warn "Git remote is not SSH (${remote_url:-unset}) — running setup.sh to fix"
         bash "${SCRIPT_DIR}/setup.sh"
     fi
 }

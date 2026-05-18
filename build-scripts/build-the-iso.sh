@@ -1,490 +1,308 @@
 #!/bin/bash
-set -e
-#tput setaf 0 = black 
-#tput setaf 1 = red 
-#tput setaf 2 = green
-#tput setaf 3 = yellow 
-#tput setaf 4 = dark blue 
-#tput setaf 5 = purple
-#tput setaf 6 = cyan 
-#tput setaf 7 = gray 
-#tput setaf 8 = light blue
-##################################################################################################################
-##################################################################################################################
+set -euo pipefail
+#####################################################################
+# Author    : Erik Dubois
+# Website   : https://www.erikdubois.be
+#####################################################################
 #
 #   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
 #
-##################################################################################################################
-# Funtions
+#####################################################################
 
-echo "##################################################################"
-tput setaf 2
-echo "First run the version script"
-tput sgr0
-echo "##################################################################"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="${SCRIPT_DIR}/.."
+
+#####################################################################
+# Colors
+#####################################################################
+if command -v tput >/dev/null 2>&1 && [[ -t 1 ]]; then
+    RED="$(tput setaf 1)"
+    GREEN="$(tput setaf 2)"
+    YELLOW="$(tput setaf 3)"
+    BLUE="$(tput setaf 4)"
+    CYAN="$(tput setaf 6)"
+    RESET="$(tput sgr0)"
+else
+    RED="" GREEN="" YELLOW="" BLUE="" CYAN="" RESET=""
+fi
+
+#####################################################################
+# Logging
+#####################################################################
+log_section() {
+    echo
+    echo "${GREEN}############################################################################${RESET}"
+    echo "$1"
+    echo "${GREEN}############################################################################${RESET}"
+    echo
+}
+
+log_info() {
+    echo
+    echo "${BLUE}############################################################################${RESET}"
+    echo "$1"
+    echo "${BLUE}############################################################################${RESET}"
+    echo
+}
+
+log_warn() {
+    echo
+    echo "${YELLOW}############################################################################${RESET}"
+    echo "$1"
+    echo "${YELLOW}############################################################################${RESET}"
+    echo
+}
+
+log_error() {
+    echo
+    echo "${RED}############################################################################${RESET}"
+    echo "$1"
+    echo "${RED}############################################################################${RESET}"
+    echo
+}
+
+log_success() {
+    echo
+    echo "${GREEN}############################################################################${RESET}"
+    echo "$1"
+    echo "${GREEN}############################################################################${RESET}"
+    echo
+}
+
+#####################################################################
+# Error handling
+#####################################################################
+on_error() {
+    local lineno="$1"
+    local cmd="$2"
+    echo
+    echo "${RED}ERROR on line ${lineno}: ${cmd}${RESET}"
+    echo
+    sleep 10
+}
+
+trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
+
+#####################################################################
+# Build configuration — edit these before building
+#####################################################################
+desktop="xfce4/edu-chadwm/ohmychadwm"
+kiroVersion='v26.05.18.01'
+nvidia_driver="open"          # open | 580xx | 390xx
+chaoticsrepo=true
+clean_pacman_cache="no"       # yes | no
+remove_build_folder="no"      # yes | no — set to yes to clean up after build
+
+buildFolder="${HOME}/kiro-build"
+outFolder="${HOME}/kiro-Out"
+isoLabel="kiro-${kiroVersion}-x86_64.iso"
+PACKAGES_FILE="${buildFolder}/archiso/packages.x86_64"
+
+#####################################################################
+# Functions
+#####################################################################
+check_not_root() {
+    if [[ "${EUID}" -eq 0 ]]; then
+        log_error "Do not run this script as root. Run as a normal user — sudo is called internally where needed."
+        exit 1
+    fi
+}
+
+warn_btrfs() {
+    if lsblk -f | grep -q btrfs; then
+        log_warn "Btrfs filesystem detected.
+This script may cause issues on Btrfs. Make backups before continuing.
+Press CTRL+C to stop now."
+        for i in $(seq 10 -1 1); do
+            echo -ne "Continuing in ${i} seconds... \r"
+            sleep 1
+        done
+        echo
+    fi
+}
 
 clean_cache() {
-    if [[ "$1" == "yes" ]]; then
-    	echo "##################################################################"
-    	tput setaf 2
-        echo "Cleaning the cache from /var/cache/pacman/pkg/"
-        tput sgr0
-        echo "##################################################################"
+    if [[ "${clean_pacman_cache}" == "yes" ]]; then
+        log_section "Cleaning pacman package cache"
         yes | sudo pacman -Scc
-    elif [[ "$1" == "no" ]]; then
-        echo "Skipping cache cleaning."
     else
-        echo "Invalid option. Use: clean_cache yes | clean_cache no"
+        log_info "Skipping pacman cache clean (clean_pacman_cache=no)"
     fi
 }
 
 remove_buildfolder() {
-
-    if [[ -z "$buildFolder" ]]; then
-        echo "Error: \$buildFolder is not set. Please define it before using this function."
-        return 1
-    fi
-
-    if [[ "$1" == "yes" ]]; then
-        if [[ -d "$buildFolder" ]]; then
-        	echo "##################################################################"
-    		tput setaf 3
-            echo "Deleting the build folder ($buildFolder) - this may take some time..."
-            tput sgr0
-            sudo rm -rf "$buildFolder"
-            echo "##################################################################"
+    local action="${1:-no}"
+    if [[ "${action}" == "yes" ]]; then
+        if [[ -d "${buildFolder}" ]]; then
+            log_warn "Deleting build folder: ${buildFolder}"
+            sudo rm -rf "${buildFolder}"
         else
-        	echo "##################################################################"
-            echo "No build folder found. Nothing to delete."
-            echo "##################################################################"
+            log_info "No build folder found — nothing to delete"
         fi
-    elif [[ "$1" == "no" ]]; then
-        echo "Skipping build folder removal."
-    else
-        echo "Invalid option. Use: remove_buildfolder yes | remove_buildfolder no"
     fi
 }
 
-installed_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
-
-echo
-echo "################################################################## "
-tput setaf 3
-echo "Message"
-echo
-echo "Do not run this file as root or add sudo in front"
-echo "Run this script as a user"
-echo
-echo "You can add a personal local repo to the iso build if you want"
-echo "https://www.youtube.com/watch?v=TqFuLknCsUE"
-echo
-echo "You can learn to create your own iso on the basis of Kiro"
-echo "That project is called Buildra"
-echo "https://youtu.be/3jdKH6bLgUE"
-echo "https://youtu.be/mH52To8DvlI"
-tput sgr0
-echo "################################################################## "
-echo
-
-# message for BTRFS 
-if 	lsblk -f | grep btrfs > /dev/null 2>&1 ; then
-	echo
-	echo "################################################################## "
-	tput setaf 3
-	echo "Message"
-	echo
-    echo "This script may cause issues on a Btrfs filesystem"
-    echo "Make backups before continuing"
-    echo "Continu at your own risk"
-    echo
-    echo "Press CTRL + C to stop the script now"
-    tput sgr0
-    echo
-    for i in $(seq 10 -1 0); do
-    	echo -ne "Continuing in $i seconds... \r"
-    	sleep 1
-    done
-    echo
-fi
-
-echo
-echo "################################################################## "
-tput setaf 2
-echo "Phase 1 : "
-echo "- Setting General parameters"
-tput sgr0
-echo "################################################################## "
-echo
-
-	#Let us set the desktop"
-	#First letter of desktop is small letter
-
-	desktop="xfce4/edu-chadwm/ohmychadwm"
-
-	kiroVersion='v26.05.18.01'
-
-	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
-
-	# setting of the general parameters
-	archisoRequiredVersion="archiso 84-1"
-	buildFolder=$HOME"/kiro-build"
-	outFolder=$HOME"/kiro-Out"
-
-	# If you want to add packages from the chaotics-aur repo then
-	# change the variable to true and add the package names
-	# that are hosted on chaotics-aur in the packages.x86_64 at the bottom
-
-	chaoticsrepo=true
-
-	if [[ "$chaoticsrepo" == "true" ]]; then
-	    if pacman -Q chaotic-keyring &>/dev/null && pacman -Q chaotic-mirrorlist &>/dev/null; then
-	        echo "################################################################## "
-			tput setaf 2
-			echo "Chaotic keyring and mirrorlist are both installed"
-			tput sgr0
-			echo "################################################################## "
-	    else
-	        if [[ -f "$installed_dir/build-scripts/get-pacman-repos-keys-and-mirrors.sh" ]]; then
-	        	echo "################################################################## "
-				tput setaf 3
-				echo "Installing both Chaotic packages as we are missing"
-				echo "chaotic-keyring and chaotic-mirrorlist"
-    			echo "You can remove them later with pacman -R ..."
-				tput sgr0
-				echo "################################################################## "
-	            bash "$installed_dir/build-scripts/get-pacman-repos-keys-and-mirrors.sh"
-	        else
-		        echo "################################################################## "
-				tput setaf 1
-				echo "Error: Installation script not found at $installed_dir"
-				tput sgr0
-				echo "################################################################## "          
-	            exit 1
-	        fi
-	    fi
-	fi
-	
-echo
-echo "################################################################## "
-tput setaf 2
-echo "Phase 2 :"
-echo "- Checking if archiso/grub is installed"
-echo "- Saving current archiso version to readme"
-tput sgr0
-echo "################################################################## "
-echo
-
-	package="archiso"
-
-	#----------------------------------------------------------------------------------
-
-	#checking if application is already installed or else install
-	if pacman -Qi $package &> /dev/null; then
-
-			echo "$package is already installed"
-
-	else
-
-		echo "################################################################"
-		echo "######### Installing $package with pacman"
-		echo "################################################################"
-
-		sudo pacman -S --noconfirm $package
-
-	fi
-
-	# Just checking if installation was successful
-	if pacman -Qi $package &> /dev/null; then
-
-		echo 
-
-	else
-
-		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-		echo "!!!!!!!!!  "$package" has NOT been installed"
-		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-		exit 1
-	fi
-
-	package="grub"
-
-	#----------------------------------------------------------------------------------
-
-	#checking if application is already installed or else install
-	if pacman -Qi $package &> /dev/null; then
-
-			echo "$package is already installed"
-
-	else
-
-		echo "################################################################"
-		echo "######### Installing $package with pacman"
-		echo "################################################################"
-
-		sudo pacman -S --noconfirm $package
-
-	fi
-
-	# Just checking if installation was successful
-	if pacman -Qi $package &> /dev/null; then
-
-		echo
-
-	else
-
-		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-		echo "!!!!!!!!!  "$package" has NOT been installed"
-		echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-		exit 1
-	fi
-
-	# overview
-	
-	echo "################################################################## "
-	tput setaf 2
-	echo "Overview"
-	tput sgr0
-	echo "################################################################## "
-	echo "Building the desktop                   : "$desktop
-	echo "Building version                       : "$kiroVersion
-	echo "Iso label                              : "$isoLabel
-	echo "Build folder                           : "$buildFolder
-	echo "Out folder                             : "$outFolder
-	echo "################################################################## "
-	echo
-
-echo
-echo "################################################################## "
-tput setaf 2
-echo "Phase 3 :"
-echo "- Deleting the build folder if one exists"
-echo "- Copying the Archiso folder to build folder"
-tput sgr0
-echo "################################################################## "
-echo
-
-	remove_buildfolder yes
-	echo
-	echo "Copying the Archiso folder to build work"
-	echo
-	mkdir $buildFolder
-	cp -r ../archiso $buildFolder/archiso
-
-echo "################################################################## "
-tput setaf 2
-echo "Phase 4 :"
-echo "- Deleting any files in /etc/skel"
-echo "- Getting the last version of bashrc in /etc/skel"
-echo "- Removing the old packages.x86_64 file from build folder"
-echo "- Copying the new packages.x86_64 file to the build folder"
-tput sgr0
-echo "################################################################## "
-echo
-
-	echo "Deleting any files in /etc/skel"
-	rm -rf $buildFolder/archiso/airootfs/etc/skel/.* 2> /dev/null
-	echo
-
-	echo "Getting the last version of bashrc in /etc/skel"
-	echo
-	wget https://raw.githubusercontent.com/erikdubois/edu-shells/refs/heads/main/etc/skel/.bashrc-latest -O $buildFolder/archiso/airootfs/etc/skel/.bashrc
-
-	echo "Removing the old packages.x86_64 file from build folder"
-	rm $buildFolder/archiso/packages.x86_64
-	echo
-
-	echo "Copying the new packages.x86_64 file to the build folder"
-	cp -f ../archiso/packages.x86_64 $buildFolder/archiso/packages.x86_64
-	echo
-
-echo
-echo "################################################################## "
-tput setaf 2
-echo "Phase 4b :"
-echo "- Prepopulating pacman keyring"
-tput sgr0
-echo "################################################################## "
-echo
-
-	KEYRING_DIR="$buildFolder/archiso/airootfs/etc/pacman.d/gnupg"
-
-	echo "Initializing pacman keyring..."
-	sudo pacman-key --gpgdir "$KEYRING_DIR" --init
-
-	echo "Populating archlinux keyring..."
-	sudo pacman-key --gpgdir "$KEYRING_DIR" --populate archlinux
-
-	echo "Populating chaotic keyring..."
-	sudo pacman-key --gpgdir "$KEYRING_DIR" --populate chaotic
-
-	echo "Keyring prepopulation complete."
-	echo
-
-	# Nvidia driver selection
-	# open | 580xx | 390xx
-	nvidia_driver="open"
-
-	##############################################
-	# Nvidia driver selection
-	##############################################
-
-	PACKAGES_FILE="$buildFolder/archiso/packages.x86_64"
-
-	case "$nvidia_driver" in
-
-	    open)
-	    	echo
-			echo "################################################################## "
-			tput setaf 2
-			echo "Using NVIDIA open drivers"
-			tput sgr0
-			echo "################################################################## "
-			echo
-
-	        # Ensure open drivers are present
-	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-390xx/d' "$PACKAGES_FILE"
-
-	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-settings/d' "$PACKAGES_FILE"
-
-	        echo "nvidia-open-dkms"   >> "$PACKAGES_FILE"
-	        echo "nvidia-utils"       >> "$PACKAGES_FILE"
-	        echo "nvidia-settings"    >> "$PACKAGES_FILE"
-	        ;;
-
-	    580xx)
-	    	echo "################################################################## "
-			tput setaf 2
-			echo "Using NVIDIA 580xx legacy drivers"
-			tput sgr0
-			echo "################################################################## "
-			echo
-
-	        # Remove open drivers
-	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-settings/d' "$PACKAGES_FILE"
-
-	        # Remove old 580xx entries if any
-	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
-
-	        # Add legacy drivers
-	        echo "nvidia-580xx-dkms"     >> "$PACKAGES_FILE"
-	        echo "nvidia-580xx-utils"    >> "$PACKAGES_FILE"
-	        echo "nvidia-580xx-settings" >> "$PACKAGES_FILE"
-	        ;;
-
-	    390xx)
-	    	echo "################################################################## "
-			tput setaf 2
-			echo "Using NVIDIA 390xx legacy drivers"
-			tput sgr0
-			echo "################################################################## "
-			echo
-
-	        # Remove open drivers
-	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-utils/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-settings/d' "$PACKAGES_FILE"
-
-	        # Remove old 390xx entries if any
-	        sed -i '/^nvidia-390xx/d' "$PACKAGES_FILE"
-	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
-
-	        # Add legacy drivers
-	        echo "nvidia-390xx-dkms"     >> "$PACKAGES_FILE"
-	        echo "nvidia-390xx-utils"    >> "$PACKAGES_FILE"
-	        echo "nvidia-390xx-settings" >> "$PACKAGES_FILE"
-	        ;;
-	    *)
-	        echo "Unknown NVIDIA driver option: $nvidia_driver"
-	        echo "Valid options: open | 580xx | 390xx"
-	        exit 1
-	        ;;
-
-	esac
-
-
-echo
-echo "################################################################## "
-tput setaf 2
-echo "Phase 5 : "
-echo "- Adding time to /etc/dev-rel"
-echo "- Clean cache"
-tput sgr0
-echo "################################################################## "
-echo
-
-	echo "Adding time to /etc/dev-rel"
-	date_build=$(date -d now)
-	echo "Iso build on : "$date_build
-	sudo sed -i "s/\(^ISO_BUILD=\).*/\1$date_build/" $buildFolder/archiso/airootfs/etc/dev-rel
-
-	# cleaning cache yes or no
-	echo
-	clean_cache no
-
-echo
-echo "################################################################## "
-tput setaf 2
-echo "Phase 7 :"
-echo "- Building the iso - this can take a while - be patient"
-tput sgr0
-echo "################################################################## "
-echo
-
-	[ -d $outFolder ] || mkdir $outFolder
-	cd $buildFolder/archiso/
-	sudo mkarchiso -v -w $buildFolder -o $outFolder $buildFolder/archiso/
-
-echo
-echo "###################################################################"
-tput setaf 2
-echo "Phase 8 :"
-echo "- Creating checksums"
-echo "- Copying pgklist"
-tput sgr0
-echo "###################################################################"
-echo
-
-	cd $outFolder
-
-	echo "Creating checksums for : "$isoLabel
-	echo "##################################################################"
-	echo
-	echo "Building sha1sum"
-	echo "########################"
-	sha1sum $isoLabel | tee $isoLabel.sha1
-	echo "Building sha256sum"
-	echo "########################"
-	sha256sum $isoLabel | tee $isoLabel.sha256
-	echo "Building md5sum"
-	echo "########################"
-	md5sum $isoLabel | tee $isoLabel.md5
-	echo
-	echo "Moving pkglist.x86_64.txt"
-	echo "########################"
-	cp $buildFolder/iso/arch/pkglist.x86_64.txt  $outFolder/$isoLabel".pkglist.txt"
-
-echo
-echo "##################################################################"
-tput setaf 2
-echo "Phase 9 :"
-echo "- Removing the buildfolder or not"
-tput sgr0
-echo "################################################################## "
-echo
-
-	echo "Deleting the build folder if one exists - takes some time"
-	remove_buildfolder no
-
-echo
-echo "##################################################################"
-tput setaf 2
-echo "DONE"
-echo "- Check your out folder :"$outFolder
-tput sgr0
-echo "################################################################## "
-echo
+ensure_package() {
+    local pkg="$1"
+    if ! pacman -Qi "${pkg}" &>/dev/null; then
+        log_warn "${pkg} not installed — installing now"
+        sudo pacman -S --noconfirm "${pkg}"
+    fi
+    if ! pacman -Qi "${pkg}" &>/dev/null; then
+        log_error "${pkg} could not be installed — aborting"
+        exit 1
+    fi
+}
+
+setup_chaotic() {
+    [[ "${chaoticsrepo}" == "true" ]] || return 0
+
+    if pacman -Q chaotic-keyring &>/dev/null && pacman -Q chaotic-mirrorlist &>/dev/null; then
+        log_info "Chaotic keyring and mirrorlist are both installed"
+    else
+        local setup_script="${SCRIPT_DIR}/get-pacman-repos-keys-and-mirrors.sh"
+        if [[ -f "${setup_script}" ]]; then
+            log_warn "Installing chaotic-keyring and chaotic-mirrorlist"
+            bash "${setup_script}"
+        else
+            log_error "Setup script not found: ${setup_script}"
+            exit 1
+        fi
+    fi
+}
+
+show_overview() {
+    log_section "Build overview"
+    echo "  Desktop      : ${desktop}"
+    echo "  Version      : ${kiroVersion}"
+    echo "  ISO label    : ${isoLabel}"
+    echo "  NVIDIA driver: ${nvidia_driver}"
+    echo "  Build folder : ${buildFolder}"
+    echo "  Out folder   : ${outFolder}"
+}
+
+prepare_build_tree() {
+    log_section "Phase 3 — Preparing build tree"
+
+    remove_buildfolder yes
+    mkdir -p "${buildFolder}"
+    cp -r "${REPO_DIR}/archiso" "${buildFolder}/archiso"
+
+    log_section "Phase 4 — Refreshing skel and package list"
+
+    local skel_dir="${buildFolder}/archiso/airootfs/etc/skel"
+    echo "Clearing skel..."
+    find "${skel_dir}" -mindepth 1 -delete 2>/dev/null || true
+
+    echo "Fetching latest .bashrc..."
+    wget -q "https://raw.githubusercontent.com/erikdubois/edu-shells/refs/heads/main/etc/skel/.bashrc-latest" \
+        -O "${skel_dir}/.bashrc" \
+        || { log_error "Failed to download .bashrc from edu-shells"; exit 1; }
+
+    echo "Refreshing packages.x86_64..."
+    cp -f "${REPO_DIR}/archiso/packages.x86_64" "${PACKAGES_FILE}"
+}
+
+prepopulate_keyring() {
+    log_section "Phase 5 — Prepopulating pacman keyring"
+
+    local keyring_dir="${buildFolder}/archiso/airootfs/etc/pacman.d/gnupg"
+    sudo pacman-key --gpgdir "${keyring_dir}" --init
+    sudo pacman-key --gpgdir "${keyring_dir}" --populate archlinux
+    sudo pacman-key --gpgdir "${keyring_dir}" --populate chaotic
+    log_info "Keyring prepopulation complete"
+}
+
+inject_nvidia_packages() {
+    log_section "Phase 6 — Injecting NVIDIA driver: ${nvidia_driver}"
+
+    case "${nvidia_driver}" in
+        open)
+            sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
+            printf 'nvidia-open-dkms\nnvidia-utils\nnvidia-settings\n' >> "${PACKAGES_FILE}"
+            ;;
+        580xx)
+            sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            printf 'nvidia-580xx-dkms\nnvidia-580xx-utils\nnvidia-580xx-settings\n' >> "${PACKAGES_FILE}"
+            ;;
+        390xx)
+            sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            printf 'nvidia-390xx-dkms\nnvidia-390xx-utils\nnvidia-390xx-settings\n' >> "${PACKAGES_FILE}"
+            ;;
+        *)
+            log_error "Unknown NVIDIA driver option: ${nvidia_driver}\nValid options: open | 580xx | 390xx"
+            exit 1
+            ;;
+    esac
+}
+
+stamp_build_date() {
+    log_section "Phase 7 — Stamping build date"
+    local date_build
+    date_build=$(date -d now)
+    echo "ISO build on: ${date_build}"
+    sudo sed -i "s/\(^ISO_BUILD=\).*/\1${date_build}/" "${buildFolder}/archiso/airootfs/etc/dev-rel"
+    clean_cache
+}
+
+build_iso() {
+    log_section "Phase 8 — Running mkarchiso (this takes a while)"
+    mkdir -p "${outFolder}"
+    cd "${buildFolder}/archiso/"
+    sudo mkarchiso -v -w "${buildFolder}" -o "${outFolder}" "${buildFolder}/archiso/"
+}
+
+create_checksums() {
+    log_section "Phase 9 — Creating checksums and pkglist"
+    cd "${outFolder}"
+
+    echo "sha1sum..."
+    sha1sum "${isoLabel}" | tee "${isoLabel}.sha1"
+    echo "sha256sum..."
+    sha256sum "${isoLabel}" | tee "${isoLabel}.sha256"
+    echo "md5sum..."
+    md5sum "${isoLabel}" | tee "${isoLabel}.md5"
+
+    echo "Copying pkglist..."
+    cp "${buildFolder}/iso/arch/pkglist.x86_64.txt" "${outFolder}/${isoLabel}.pkglist.txt"
+}
+
+#####################################################################
+# Main
+#####################################################################
+main() {
+    log_section "First run change-version.sh if you haven't already"
+
+    check_not_root
+    warn_btrfs
+    setup_chaotic
+
+    log_section "Phase 1 — Checking required packages"
+    ensure_package archiso
+    ensure_package grub
+    show_overview
+
+    prepare_build_tree
+    prepopulate_keyring
+    inject_nvidia_packages
+    stamp_build_date
+    build_iso
+    create_checksums
+
+    remove_buildfolder "${remove_build_folder}"
+
+    log_success "$(basename "$0") done — ISO is in ${outFolder}"
+}
+
+main "$@"

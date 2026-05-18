@@ -299,6 +299,7 @@ main() {
     stamp_build_date
     build_iso
     create_checksums
+    publish_github_release
 
     remove_buildfolder "${remove_build_folder}"
 

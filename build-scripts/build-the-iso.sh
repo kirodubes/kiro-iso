@@ -23,8 +23,6 @@ echo "First run the version script"
 tput sgr0
 echo "##################################################################"
 
-sleep 2
-
 clean_cache() {
     if [[ "$1" == "yes" ]]; then
     	echo "##################################################################"
@@ -88,8 +86,6 @@ tput sgr0
 echo "################################################################## "
 echo
 
-sleep 3
-
 # message for BTRFS 
 if 	lsblk -f | grep btrfs > /dev/null 2>&1 ; then
 	echo
@@ -125,7 +121,7 @@ echo
 
 	desktop="xfce4/edu-chadwm/ohmychadwm"
 
-	kiroVersion='v26.05.17.01'
+	kiroVersion='v26.05.18.01'
 
 	isoLabel='kiro-'$kiroVersion'-x86_64.iso'
 
@@ -344,7 +340,6 @@ echo
 			tput sgr0
 			echo "################################################################## "
 			echo
-			sleep 2
 
 	        # Ensure open drivers are present
 	        sed -i '/^nvidia-580xx/d' "$PACKAGES_FILE"
@@ -365,8 +360,7 @@ echo
 			echo "Using NVIDIA 580xx legacy drivers"
 			tput sgr0
 			echo "################################################################## "
-			echo  
-	        sleep 2
+			echo
 
 	        # Remove open drivers
 	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"
@@ -388,8 +382,7 @@ echo
 			echo "Using NVIDIA 390xx legacy drivers"
 			tput sgr0
 			echo "################################################################## "
-			echo  
-	        sleep 2
+			echo
 
 	        # Remove open drivers
 	        sed -i '/^nvidia-open-dkms/d' "$PACKAGES_FILE"

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Custom Arch Linux ISO builder based on ArchISO. Produces a live/installable ISO with XFCE4 + ohmychadwm/edu-chadwm desktop, pre-configured packages, and systemd optimizations.
+Custom Arch Linux ISO builder based on ArchISO. Produces a live/installable ISO with XFCE4 + ohmychadwm desktop, pre-configured packages, and systemd optimizations.
 
 ## Build Workflow
 
@@ -118,6 +118,6 @@ Semantic commit messages are in use:
 ## Branding Notes
 
 - Project was originally based on ArcoLinux — references to `arcolinux-*` are being replaced with `edu-*` or `kiro-*` equivalents
-- Desktop environments: XFCE4 (primary), ohmychadwm, edu-chadwm
+- Desktop environments: XFCE4 (primary), ohmychadwm
 - Package repos: Chaotic-AUR + optional local `personal_repo`
 - Git remote uses SSH alias `github.com-edu` (configured by `setup.sh`)

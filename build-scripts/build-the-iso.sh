@@ -86,7 +86,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #####################################################################
 # Build configuration — edit these before building
 #####################################################################
-desktop="xfce4/edu-chadwm/ohmychadwm"
+desktop="xfce4/ohmychadwm"
 kiroVersion='v26.05.18.01'
 nvidia_driver="open"          # open | 580xx | 390xx
 chaoticsrepo=true

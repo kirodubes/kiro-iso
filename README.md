@@ -12,14 +12,14 @@
 
 ## Overview
 
-**KIRO** is a personal, offline Arch Linux ISO builder that creates fully customized installation media. Based on official ArchISO tools and the ArcoLinux project, KIRO enables reproducible builds with pre-configured packages, desktop environments, system optimizations, and custom configurations.
+**KIRO** is a personal Arch Linux ISO builder that creates fully customized installation media using the official ArchISO toolchain. KIRO produces reproducible builds with pre-configured packages, desktop environments, system optimizations, and custom configurations baked in.
 
 KIRO is designed with specific preferences in mind:
 
 - **Boot Method**: UEFI with systemd-boot
 - **Filesystem**: ext4
 - **Display Manager**: SDDM with custom theming
-- **Desktop Environments**: XFCE4 + Ohmychadwm (tiling window manager)
+- **Desktop Environments**: XFCE4 + Ohmychadwm
 - **Philosophy**: Free and open-source software
 
 ---
@@ -34,14 +34,14 @@ Want to build your own? See [Building KIRO](#building-kiro) below.
 
 ## Features
 
-✅ **Reproducible Builds** — Script-driven, consistent ISO creation  
-✅ **Highly Customizable** — Easy to add/remove packages and modify configurations  
-✅ **Modern Defaults** — UEFI, systemd, systemd-oomd, performance optimizations  
-✅ **Multiple Desktop Environments** — XFCE4 + Ohmychadwm (modern tiling window manager)  
-✅ **Pre-configured** — Ready-to-use after installation with Calamares  
-✅ **Performance Tuned** — Intelligent task scheduling, memory optimization, system monitoring  
-✅ **Educational Foundation** — Comprehensive customization examples and best practices  
-✅ **Custom Repository Support** — Chaotic AUR and personal repositories  
+- **Reproducible Builds** — Script-driven, consistent ISO creation
+- **Highly Customizable** — Easy to add/remove packages and modify configurations
+- **Modern Defaults** — UEFI, systemd, systemd-oomd, performance optimizations
+- **Multiple Desktop Environments** — XFCE4 + Ohmychadwm
+- **Pre-configured** — Ready-to-use after installation with Calamares
+- **Performance Tuned** — Intelligent task scheduling, memory optimization, system monitoring
+- **Educational Foundation** — Comprehensive customization examples and best practices
+- **Custom Repository Support** — Chaotic AUR and personal repositories
 
 ---
 
@@ -64,24 +64,36 @@ KIRO comes pre-loaded with:
 ### Requirements
 
 - **Host System**: Arch Linux or Arch-based distribution
-- **Packages**: `archiso` (for mkarchiso)
-- **Permissions**: Root access for chroot operations
-- **Disk Space**: ~10-15 GB for build environment
-- **Knowledge**: Familiarity with Bash scripting and package management
+- **Packages**: `archiso`, `grub` (installed automatically if missing)
+- **Permissions**: Do not run as root — the script calls `sudo` internally
+- **Disk Space**: ~10–15 GB for build environment
 
-### Getting Started
+### Build Workflow
 
-1. Clone or download this repository
-2. Configure packages in `archiso/packages.x86_64`
-3. Run the build script from `build-scripts/`
-4. Boot the resulting ISO in a VM or on hardware
-5. Use Calamares installer to set up your system
+```bash
+# 1. Bump the version string across all version files
+bash change-version.sh
 
-For detailed guidance, follow these tutorials:
+# 2. Build the ISO (run as normal user from build-scripts/)
+cd build-scripts && bash build-the-iso.sh
+```
 
-- **Main Tutorial**: [ArcoLinux ISO Building Guide](https://www.arcolinuxiso.com/a-comprehensive-guide-to-iso-building/)
-- **KIRO Video Series**: [KIRO Build Playlist](https://www.youtube.com/watch?v=3jdKH6bLgUE&list=PLlloYVGq5pS71UubmlKjjw131PjixMIjW)
-- **Companion Project**: [BUILDRA (based on KIRO)](https://github.com/buildra)
+Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.
+
+### NVIDIA Driver Selection
+
+Before building, open `build-scripts/build-the-iso.sh` and set `nvidia_driver` in the config block at the top:
+
+```bash
+nvidia_driver="open"    # nvidia-open-dkms  — modern GPUs (default)
+nvidia_driver="580xx"   # nvidia-580xx-dkms — legacy
+nvidia_driver="390xx"   # nvidia-390xx-dkms — older legacy
+```
+
+### Adding a Personal Local Repo
+
+See the commented `[personal_repo]` block in `archiso/pacman.conf` and the tutorial:
+[Adding a personal local repo to the ISO build](https://www.youtube.com/watch?v=TqFuLknCsUE)
 
 ---
 
@@ -89,25 +101,28 @@ For detailed guidance, follow these tutorials:
 
 ```
 kiro-iso/
-├── archiso/                        # Core ISO build configuration
-│   ├── airootfs/                   # Root filesystem overlay
-│   │   ├── etc/                    # System configuration files
-│   │   ├── usr/                    # User-space binaries and data
-│   │   └── root/                   # Root user scripts and configs
-│   ├── packages.x86_64             # Package list for x86_64 architecture
-│   ├── packages.bootstrap          # Minimal bootstrap package set
-│   ├── profiledef.sh               # ISO profile definition and metadata
-│   ├── pacman.conf                 # Package manager and repository config
-│   └── boot/                       # Boot loader configurations
-│       ├── grub/                   # GRUB (legacy BIOS)
-│       ├── syslinux/               # Syslinux boot
-│       └── efiboot/                # EFI boot files
-├── build-scripts/                  # Automated build processes
-├── enable-oomd.sh                  # Post-installation OOM daemon setup
-├── disable-oomd.sh                 # Disable OOM daemon
-├── change-version.sh               # Version management utility
-├── up.sh                           # Update and maintenance script
-└── personal_repo/                  # Local package repository
+├── archiso/                    # Core ISO build configuration
+│   ├── airootfs/               # Root filesystem overlay (lands at / on live ISO)
+│   │   ├── etc/                # System config (pacman, NM, locale, polkit, modprobe)
+│   │   ├── usr/                # Additional binaries and configs
+│   │   └── root/               # Root user's home on the live system
+│   ├── bootstrap_packages      # Minimal bootstrap package set
+│   ├── efiboot/                # EFI boot files
+│   ├── grub/                   # GRUB boot configuration
+│   ├── syslinux/               # Syslinux boot configuration
+│   ├── packages.x86_64         # Full package list (one package per line)
+│   ├── profiledef.sh           # ISO profile: name, label, version, compression
+│   └── pacman.conf             # Repos used during the ISO build
+├── build-scripts/
+│   ├── build-the-iso.sh        # Main build pipeline
+│   ├── get-pacman-repos-keys-and-mirrors.sh  # Installs chaotic-keyring/mirrorlist
+│   ├── install-yay-or-paru.sh  # AUR helper installer (yay or paru)
+│   └── pacman.conf             # pacman config installed on the build host
+├── images/                     # Screenshots and branding assets
+├── CHANGELOG.md                # Full project history
+├── change-version.sh           # Bumps version across all version files
+├── setup.sh                    # Git remote and identity setup
+└── up.sh                       # Pull → commit → push helper
 ```
 
 ---
@@ -137,7 +152,7 @@ kiro-iso/
 
 - **Display Manager**: SDDM with custom themes (multiple variants)
 - **Primary DE**: XFCE4 with extensive customization
-- **Window Manager**: Ohmychadwm (modern tiling WM with integrated menu system)
+- **Window Manager**: Ohmychadwm (tiling WM with integrated menu system)
 - **Themes**: Arc GTK (with Dawn/Mint variants), Neo-Candy collection
 - **Icons**: Numix, Sardi, Surfn, Candy Icons
 - **Cursors**: Bibata, Vimix, Beautyline
@@ -197,38 +212,14 @@ kiro-iso/
   - `edu-shells-git`: Custom shell configurations
   - `edu-rofi-git` + `edu-rofi-themes-git`: Application launcher with themes
   - `edu-polybar-git`: Custom status bar
-  - `ohmychadwm-git`: Modern tiling window manager with integrated menu
+  - `ohmychadwm-git`: Tiling window manager with integrated menu
   - `edu-variety-config-git`: Wallpaper manager presets
 - **AUR Helpers**: `paru-git`, `yay-git`
 - **Utilities**: `downgrade` (package downgrading)
 
-### Build System
-
-#### Build Process
-
-1. **Configuration Phase**: Define packages in `archiso/packages.x86_64`
-2. **Build Phase**: Execute build scripts using mkarchiso
-3. **Customization Phase**: Apply overlays from `airootfs/`
-4. **Finalization**: Create bootable ISO with boot loader configurations
-5. **Testing Phase**: Verify ISO in VM or on hardware
-
-#### Key Scripts
-
-- **build-scripts/**: Automated build orchestration
-- **up.sh**: Update and rebuild utilities
-- **enable-oomd.sh**: Post-installation systemd-oomd setup with tuned parameters
-- **disable-oomd.sh**: Disable systemd-oomd if needed
-- **change-version.sh**: Version string management
-
-#### Configuration Files
-
-- **archiso/profiledef.sh**: ISO metadata, label, architecture definition
-- **archiso/pacman.conf**: Repository sources and package signing
-- **archiso/airootfs/etc/**: System configuration overlays
-
 ### Custom Repository
 
-KIRO packages can be accessed via:
+KIRO packages are available via:
 
 ```ini
 [kiro_repo]
@@ -238,23 +229,15 @@ Server = https://kirodubes.github.io/$repo/$arch
 
 ---
 
-## Recent Changes
+## Changelog
 
-- **Calamares**: Migrated from GitHub to Codeberg (new pkgbuild)
-- **Deprecation**: `kiro-system-installation` package removed (functionality moved to Calamares modules)
-- **Enhancement**: `kiro-calamares-config` refactored with modular approach
-- **Optimization**: systemd-oomd configuration improved for stability and performance
-
-For detailed video tutorials on these changes and build processes, see:
-- [KIRO Build Basics](https://youtu.be/3jdKH6bLgUE)
-- [Advanced Customization](https://youtu.be/mH52To8DvlI)
+See [CHANGELOG.md](CHANGELOG.md) for the full project history.
 
 ---
 
 ## Resources
 
-- **Official Arch Wiki**: [ArchISO](https://wiki.archlinux.org/title/Archiso)
-- **ISO Building Guide**: [ArcoLinux Comprehensive Guide](https://www.arcolinuxiso.com/a-comprehensive-guide-to-iso-building/)
+- **Arch Wiki**: [ArchISO](https://wiki.archlinux.org/title/Archiso)
 - **KIRO Video Series**: [YouTube Playlist](https://www.youtube.com/watch?v=3jdKH6bLgUE&list=PLlloYVGq5pS71UubmlKjjw131PjixMIjW)
 - **Related Project**: [BUILDRA](https://github.com/buildra) — A derivative project based on KIRO
 
@@ -263,9 +246,3 @@ For detailed video tutorials on these changes and build processes, see:
 ## License
 
 KIRO is built on open-source tools and components. Refer to individual package licenses for details.
-
----
-
-**For questions or contributions**, refer to the video tutorials and official Arch Linux documentation.
-
-*Live long and prosper.* 🖖

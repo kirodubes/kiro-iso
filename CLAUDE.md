@@ -38,7 +38,7 @@ To bump the `.01` suffix for same-day rebuilds, edit `extra="01"` in `change-ver
 
 ## Nvidia Driver Selection
 
-In `build-scripts/build-the-iso.sh`, set the `nvidia_driver` variable (line ~329) before building:
+In `build-scripts/build-the-iso.sh`, set the `nvidia_driver` variable in the **config block at the top of the file** before building:
 
 - `open` — nvidia-open-dkms (default, modern GPUs)
 - `580xx` — nvidia-580xx-dkms (legacy)
@@ -86,14 +86,29 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 When updating `CHANGELOG.md`:
 - **Newest commits first**
 - **Group pure daily rebuilds** (version bump + mirrorlist only) into a single line: `## YYYY-MM-DD — vXX.XX.XX.XX` with bullet `- **Version bump** + mirrorlist refresh`
-- **Separate substantive changes** into their own dated section with categorized bullets
+- **Separate substantive changes** into their own dated section with prose paragraphs explaining what changed, why it was done, and what benefit it brings — not just a list of file names
 - Use **bold** for file names, package names, and key actions
 - Use sub-headers (`###`) for multi-commit days with distinct themes
-- Be concise — one bullet per logical change, not per file
+- **Elaborate, not concise** — each entry should read like a developer-facing narrative, not a dry diff summary
+
+## Script Template
+
+All bash scripts in this repo follow the standard template:
+1. `#!/bin/bash` + `set -euo pipefail`
+2. Header block (Author / Website / DO NOT JUST RUN banner)
+3. `SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"`
+4. TTY-safe colors block (`tput` with `[[ -t 1 ]]` guard, fallback to empty strings)
+5. Log functions: `log_section` (green), `log_info` (blue), `log_warn` (yellow), `log_error` (red), `log_success` (green)
+6. `on_error()` + `trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR`
+7. Functions
+8. `main()` ending with `log_success "$(basename "$0") done"`
+9. `main "$@"`
+
+All four build scripts (`build-the-iso.sh`, `get-pacman-repos-keys-and-mirrors.sh`, `install-yay-or-paru.sh`, `change-version.sh`) conform to this template as of 2026-05-18.
 
 ## Commit Conventions
 
-All commits currently use generic `update` messages. When asked to commit, use semantic messages:
+Semantic commit messages are in use:
 - `feat: add <package/feature>`
 - `fix: <what was broken>`
 - `chore: version bump vXX.XX.XX.XX`

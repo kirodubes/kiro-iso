@@ -4,6 +4,51 @@
 
 ---
 
+## 2026-05-18 — `v26.05.18.01`
+
+### Build script standardization — full template conformance pass
+
+All four build scripts were audited against the project standard template (modelled on `up.sh`) and brought into full conformance. This was a correctness and maintainability pass, not cosmetic cleanup — several of the changes fix real failure modes that were silently swallowed before.
+
+#### `build-scripts/build-the-iso.sh`
+
+The most significant rewrite. The old script had `set -e` only, meaning unset variable references and failed pipe segments would silently continue and corrupt the build in hard-to-diagnose ways. It also had no error trap, so a failing phase gave no indication of *where* it failed.
+
+The new version adds `set -euo pipefail` and the standard `on_error` trap that prints the failing line number and command. Beyond that:
+
+- **`SCRIPT_DIR` / `REPO_DIR`** replace the hand-rolled `installed_dir="$(dirname)/.."` pattern. All file paths are now anchored to the script's location, so the build works correctly regardless of which directory you call it from.
+- **`check_not_root()`** hard-aborts if run as root. The old version only printed a warning and continued — a user who missed the message would proceed to build as root, which `mkarchiso` handles poorly.
+- **`wget` failure guard** — the old code fetched `.bashrc` from edu-shells with no failure check. If the download failed (network blip, GitHub down), the build would continue with whatever stale content was in skel. Now a failed download aborts with a clear error.
+- **Safe skel cleanup** — `rm -rf skel/.*` was replaced with `find -mindepth 1 -delete`. The `.*` glob can expand to include `.` or `..` on some systems, which would be catastrophic.
+- **Config block at the top** — `nvidia_driver`, `clean_pacman_cache`, and `remove_build_folder` are now gathered at the top of the file before any functions. Previously these knobs were scattered through 490 lines; now they're the first thing you see when you open the file.
+- **Named phase functions** — each build phase is now a function (`prepare_build_tree`, `prepopulate_keyring`, `inject_nvidia_packages`, etc.) called from `main()`. This makes the high-level flow immediately readable and allows individual phases to be tested in isolation.
+- **Removed dead code** — `archisoRequiredVersion="archiso 84-1"` was declared but never checked anywhere in the script. Removed.
+- **TTY-safe colors** — raw `tput setaf` calls had no `[[ -t 1 ]]` guard. If the script was ever piped or redirected, the escape codes would corrupt the output. The new colors block falls back to empty strings when stdout is not a terminal.
+- **Startup `sleep` calls removed** — there were `sleep 2` and `sleep 3` calls at startup that served no purpose. The BTRFS countdown (10 seconds with CTRL+C prompt) was intentionally kept — that one gives the user a real chance to abort.
+- **Phase numbering fixed** — the old script had phases 1, 2, 3, 4, 4b, 5, 7, 8, 9 (Phase 6 missing entirely, 4b awkward). Phases are now sequential 1–9.
+
+#### `change-version.sh`
+
+Added `set -euo pipefail`, the standard header, `SCRIPT_DIR`, TTY-safe colors, log functions, and `on_error` trap. Previously, if any `sed` call silently failed (e.g. a regex didn't match because a file format changed), the version bump would partially update some files and leave others stale — and the script would exit 0. Now any failure aborts immediately and reports the line. All paths anchored to `SCRIPT_DIR` so the script works from any working directory. Dead commented-out debug lines removed. Logic wrapped in `bump_version()` inside `main()`.
+
+#### `build-scripts/get-pacman-repos-keys-and-mirrors.sh`
+
+**Critical fix:** the `pacman.conf` copy used `new_conf="pacman.conf"` — a bare filename resolved against `$PWD`. If `build-the-iso.sh` called this script (which it does, via `bash "$SCRIPT_DIR/get-pacman-repos-keys-and-mirrors.sh"`), the working directory at call time is the repo root, not `build-scripts/`. The copy would fail or source the wrong file. Fixed to `"${SCRIPT_DIR}/pacman.conf"`. Also brought into full template conformance with standard header, colors, log functions, and `on_error` trap.
+
+#### `build-scripts/install-yay-or-paru.sh`
+
+The yay and paru install branches were identical except for the package name and URL — a straight copy-paste. Collapsed into a single `install_aur_helper name url` function. Added `/tmp` cleanup after `makepkg` (the original left the tarball and source directory behind). Full template conformance.
+
+#### `archiso/airootfs/etc/dev-rel`
+
+`ISO_CODENAME` was still set to `arconet - kiro` — a leftover ArcoLinux branding reference. Changed to `kiro`.
+
+---
+
+**Files Modified:** `build-scripts/build-the-iso.sh`, `build-scripts/get-pacman-repos-keys-and-mirrors.sh`, `build-scripts/install-yay-or-paru.sh`, `change-version.sh`, `archiso/airootfs/etc/dev-rel`, `TODO.md` (created stub)
+
+---
+
 ## 2026-05-01 — `v26.05.01.01`
 - **Version bump** + mirrorlist refresh
 

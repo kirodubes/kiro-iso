@@ -86,13 +86,12 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Functions
 #####################################################################
 bump_version() {
-    local year month day extra newversion
+    local year month day newversion
     year=$(date +%y)
     month=$(date +%m)
     day=$(date +%d)
-    extra="01"  # bump manually for same-day rebuilds
 
-    newversion="v${year}.${month}.${day}.${extra}"
+    newversion="v${year}.${month}.${day}"
 
     log_section "Bumping version to ${newversion}"
 

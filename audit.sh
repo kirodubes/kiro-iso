@@ -171,11 +171,11 @@ check_calamares_cleanup() {
     pkg_missing calamares              && pass "calamares binary removed"              || fail "calamares still installed"
     pkg_missing mkinitcpio-archiso     && pass "mkinitcpio-archiso removed"            || fail "mkinitcpio-archiso still installed"
     pkg_missing memtest86+             && pass "memtest86+ removed"                    || warn "memtest86+ still installed"
-    if pkg_missing kiro-calamares-config-next; then
-        pass "kiro-calamares-config-next removed"
+    if pkg_missing kiro-calamares-config; then
+        pass "kiro-calamares-config removed"
         [[ -d /etc/calamares ]] && warn "/etc/calamares config dir still present after package removal" || pass "/etc/calamares directory removed"
     else
-        fail "kiro-calamares-config-next still installed (kiro_final removal step failed)"
+        fail "kiro-calamares-config still installed (kiro_final removal step failed)"
     fi
 
     # kiro_final live-only artifact cleanup

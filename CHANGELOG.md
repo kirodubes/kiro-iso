@@ -4,6 +4,41 @@
 
 ---
 
+## 2026-05-19 — Security audit: Arch vs Kiro comparison + fixes
+
+### SSH tooling for VirtualBox VMs
+
+Two new scripts were written in `~/DATA/arcolinux-nemesis/scripts/`:
+
+- **`ssh-into-kiro-vb.sh`** — fully automated SSH setup for the Kiro VirtualBox VM. The script detects VM state and uses `VBoxManage modifyvm --natpf1` (VM off) or `VBoxManage controlvm natpf1` (VM running) to set up NAT port forwarding idempotently, clears stale `known_hosts` entries, checks for `sshpass`, and connects. On first-attempt failure it prints a guest-setup guide (openssh + sshd + user creation) and retries. Port `2022`.
+- **`ssh-into-arch-vb.sh`** — identical structure for a virgin Arch VM used as a comparison baseline. Port `2023`.
+
+Both follow the standard bash template (colors, log functions, error trap, main). A grep bug in the original script was fixed: `rule_exists()` was matching `"ssh-kiro"` (name + closing quote) but VBoxManage's machinereadable format is `"ssh-kiro,tcp,...` (name + comma), causing false "rule missing" errors even when the rule was present.
+
+### Security comparison: Arch vs Kiro
+
+A full 10-phase security and permissions audit was run across both live VMs via SSH. Results written to **`ARCH-VS-KIRO-SECURITY.md`**. Phases covered: users/groups/sudo, SUID/SGID binaries, world-writable files, SSH config, listening ports and firewall, enabled systemd units, key `/etc` files and sysctl, package delta, `/etc` directory permissions, and home/root directories.
+
+**Key finding — Kiro is substantially more hardened than vanilla Arch at the kernel level.** The `99-kiro-optimizations.conf` sysctl profile tightens `kptr_restrict`, `dmesg_restrict`, `ptrace_scope`, `unprivileged_bpf_disabled`, `perf_event_paranoid`, `suid_dumpable`, `sysrq`, and `send_redirects` — all set to safer values than Arch defaults. No unexpected SUID binaries, no world-writable surprises.
+
+Three issues were identified and resolved:
+
+### Fix 1 — Remove archiso SSH override (`PermitRootLogin yes`)
+
+`archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` was shipping with the ISO and surviving into installed systems. It explicitly set `PermitRootLogin yes` and `PasswordAuthentication yes` — intended for the archiso build environment, not for user machines. Neither Kiro's live environment nor its install workflow requires root SSH with password. The file was deleted; OpenSSH's safe default (`prohibit-password`) now applies everywhere. Password login for user `erik` is unaffected (default sshd behaviour allows it).
+
+### Fix 2 — CUPS config file permissions
+
+`/etc/cups/classes.conf` and `/etc/cups/printers.conf` were world-readable (`644`) on Kiro, compared to `600 root:cups` on a vanilla Arch install. These files can contain printer device URIs and credentials. A `tmpfiles.d` rule was added at `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` using the `z` directive to enforce `600 root:cups` on both files at every boot via `systemd-tmpfiles-setup.service`.
+
+### Fix 3 — rlogin/rsh (inetutils) — accepted as-is
+
+`inetutils` ships `rlogin`/`rsh` PAM configs as a side effect of providing `ifconfig`, which Kiro needs. No systemd units for those legacy daemons are enabled; no daemon is running. Risk is theoretical only — accepted.
+
+**Files Modified:** `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` (deleted), `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` (new), `ARCH-VS-KIRO-SECURITY.md` (new)
+
+---
+
 ## 2026-05-18 — TODO housekeeping
 
 Short session. No code changed — this was a pure status-tracking pass after earlier build and boot testing.

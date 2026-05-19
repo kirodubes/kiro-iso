@@ -1,6 +1,6 @@
 # Claude Best Practices
 
-## 2026-05-18 (session end — kiro-iso-next TODO housekeeping)
+## 2026-05-18 (session end — kiro-iso TODO housekeeping)
 
 **Tip: Display any list Claude will be asked to reference by number — use sequential numbers top to bottom, across all sections**
 When a list will be referenced conversationally ("3 done", "move 2 to backlog"), number every item sequentially from 1 regardless of section boundaries. Section headers reset context but not numbering. The user says "1" and means item 1 — they do not say "first item in Backlog". A numbered display costs nothing to produce and eliminates all "which one do you mean?" clarification. Apply this everywhere: TODO lists, package lists, audit findings, any multi-item display the user will act on by reference.
@@ -8,7 +8,7 @@ When a list will be referenced conversationally ("3 done", "move 2 to backlog"),
 **Tip: Mark TODO items with explicit "Verified working" — never leave "Needs test" notes in Done**
 A Done item that still says "Needs build + audio test" is not done. Before moving any item to Done, either verify it yourself or get explicit confirmation from the user. Then replace the pending-test note with "Verified working." in the item text. A Done section with lingering caveats creates false confidence and forces future sessions to re-investigate whether the item was actually closed. If the text still has a conditional, the item stays in Backlog.
 
-## 2026-05-18 (session end — kiro-iso-next audit)
+## 2026-05-18 (session end — kiro-iso audit)
 
 **Tip: In bash with `set -euo pipefail`, use `counter=$((counter + 1))` not `((counter++))` — the latter exits the script when the counter is zero**
 `((expression))` is an arithmetic command that exits with status 1 when the expression evaluates to 0. With `set -e` active, `((counter++))` when `counter=0` exits the entire script at that line — silently, with no error message. The fix is `counter=$((counter + 1))`, which is a variable assignment and always exits 0. This pattern bites especially in audit/counter scripts where all counters start at zero. Always use the assignment form for increment-style arithmetic in `set -e` scripts.

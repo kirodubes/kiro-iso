@@ -76,6 +76,12 @@ Sysctl and scheduler settings are directly comparable.
 
 ### Worth Adopting into Kiro
 
+**`kernel.unprivileged_userns_clone = 1`** — lqx-specific. The Liquorix kernel can
+default this to 0, which silently breaks Chrome, Discord, VSCode, Flatpak,
+Bubblewrap, and Wine/Proton sandboxing. Prism sets it explicitly in
+`70-prismlinux-settings.conf`. Was already 1 on Kiro at the time of this check
+but not set in our config — now explicit in `99-kiro-optimizations.conf`.
+
 **`vm.swappiness = 150`** — Prism (and CachyOS, EndeavourOS) use 150 with ZRAM active.
 With ZRAM as the primary swap, a higher swappiness keeps more anonymous memory
 compressed in RAM rather than thrashing. Current Kiro value of 100 is conservative;
@@ -101,6 +107,7 @@ compressed in RAM rather than thrashing. Current Kiro value of 100 is conservati
 
 ## Improvements Applied to Kiro
 
-| Setting        | Old Kiro value | New value | Source |
-|----------------|----------------|-----------|--------|
-| `vm.swappiness` | 100           | 150       | Prism  |
+| Setting                             | Old Kiro value | New value | Source |
+|-------------------------------------|----------------|-----------|--------|
+| `vm.swappiness`                     | 100            | 150       | Prism  |
+| `kernel.unprivileged_userns_clone`  | (unset)        | 1         | Prism  |

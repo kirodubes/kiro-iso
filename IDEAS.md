@@ -18,5 +18,9 @@ Add a `--fix` flag to `kiro-audit` that automatically corrects the issues it fin
 
 Add a security section to `audit.sh` that reads the live sysctl values and compares them against the expected baseline from `99-kiro-optimizations.conf`. If `kernel.kptr_restrict` is `0` instead of `2`, or `fs.suid_dumpable` is `2` instead of `0`, the audit prints a FAIL. Rationale: the sysctl file being present doesn't guarantee the values are active — a conflicting drop-in, a kernel that ignores the key, or a sysctl applied before the file loads could silently undo hardening. A live-value check confirms the security profile is actually in effect, not just on disk.
 
+### Release announcement generator
+
+After `/kiro-ready` returns GO, auto-generate a paste-ready release announcement: version, build date, ISO size and SHA256, kiro-audit score, and a three-bullet "what's new" summary drawn from the CHANGELOG entry for that date. One command produces a forum/GitHub release post template — no copy-pasting from three different files. Rationale: every release currently requires manually assembling the same information from CHANGELOG, the checksum files, and the audit output; a generator closes that gap and ensures the announcement is always accurate.
+
 ### Build health dashboard — post-build HTML report
 After `mkarchiso` completes, generate a simple static HTML file in `~/kiro-Out/` alongside the ISO that lists: build date, kiro version, NVIDIA driver selected, total package count, ISO size, and all three checksums in one place. A single `xdg-open` command opens it in the browser. Rationale: right now the build information is scattered across terminal output, the pkglist file, and three separate checksum files. A single report page makes it easy to screenshot and share when posting a new release, and gives a quick sanity check that the right driver was injected before uploading.

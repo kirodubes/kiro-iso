@@ -100,7 +100,7 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 
 A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARCH-VS-KIRO-SECURITY.md`**. All action items resolved:
 
-- `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` — **deleted**. Was enabling `PermitRootLogin yes` on installed systems. Default OpenSSH behaviour (`prohibit-password`) is correct.
+- `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` — **kept intentionally**. The `sshd_config.d/` directory must have at least one file or archiso won't create it on the live ISO, causing errors. The file enables root SSH for the live session; `kiro_final` removes it from the installed system. Confirmed absent post-install.
 - `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` — **added**. Enforces `600 root:cups` on CUPS config files at boot via `systemd-tmpfiles`.
 - No firewall — **by design**. `iptables` is installed but intentionally has no rules.
 - `virtualbox-guest-utils` / `vboxservice` — **kept intentionally** for testing convenience, despite modules not loading on `linux-lqx` without DKMS.
@@ -121,9 +121,18 @@ VirtualBox scripts auto-configure NAT port forwarding (`VBoxManage controlvm nat
 
 Current checks (as of 2026-05-19): kernel, microcode, mkinitcpio, audio stack, Calamares cleanup, SSH override absent, kiro_final config, MAKEFLAGS CPU count, pacman repos, desktop environments, SDDM, user groups, systemd services, ZRAM, key file permissions, CUPS permissions, sysctl security baseline (8 values), failed units, ISO version, NVIDIA, bootloader, boot time/updates, package integrity.
 
+## Release Workflow Commands
+
+Two Claude Code slash commands formalise the release and verification workflows:
+
+- **`/kiro-ready`** — GO/NO-GO release check (git state, TODO, DISTRO_TESTING, kiro-audit via SSH, ISO recency)
+- **`/kiro-check`** — Deep source-vs-VM comparison (security files, live-env survivors, deprecated config warnings, sysctl, udev, scripts, git re-add detection)
+
+Run `/kiro-check` after any build session. Run `/kiro-ready` before publishing.
+
 ## Known Issues
 
-- **`kiro-calamares-config` not removed post-install** — `kiro_final`'s final cleanup step runs `pacman -R --noconfirm kiro-calamares-config` inside a `try/except` that swallows failures silently. The package is removable manually (`sudo pacman -R kiro-calamares-config`) but the root cause (likely a pacman lock race during Calamares) needs investigation.
+- No open known issues as of 2026-05-19. `kiro-calamares-config` removal (previously failing) now passes in kiro-audit at 93/0/0.
 
 ## pacman.conf — Installed System vs Build Time
 

@@ -4,6 +4,30 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-19 — v26.05.19 — VirtualBox (UEFI, Intel, NAT)
+
+**Environment:** VirtualBox 7.x, UEFI firmware, Intel CPU (6 cores), NAT networking with SSH port forwarding host:2022→guest:22
+
+**Boot:** PASS — UEFI boot via systemd-boot, linux-lqx 7.0.9-lqx1-1-lqx kernel loaded
+
+**Install:** Calamares install completed. Post-install audit via `kiro-audit` (SSH):
+
+**Score: 93 PASS / 0 WARN / 0 FAIL**
+
+Notable passing checks vs previous build:
+- `kiro-calamares-config-next` removed — previously FAIL, now PASS
+- SSH override (`10-archiso.conf`) absent on installed system — PASS
+- CUPS permissions (`classes.conf`, `printers.conf`) 600 — PASS
+- All 8 sysctl security values correct — PASS
+- ZRAM: zstd, 4G, active — PASS
+- No failed systemd units — PASS
+- Package integrity (`pacman -Qk`) — PASS
+
+**Boot time:** 10.9s (kernel 3.0s + userspace 7.8s)
+**Pending updates at test time:** 0
+
+---
+
 ## 2026-05-18 — v26.05.18.01 — VirtualBox (UEFI, Intel, NAT)
 
 **Environment:** VirtualBox 7.x, UEFI firmware, Intel CPU (amd-ucode correctly absent), NAT networking with SSH port forwarding 2222→22

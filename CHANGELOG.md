@@ -4,6 +4,39 @@
 
 ---
 
+## 2026-05-19 — Deep source-vs-VM verification + duplicate config cleanup
+
+### Source-to-VM integrity check
+
+A full deep comparison was run between the airootfs overlay (kiro-iso), the edu-system-files package overlay, and the actual installed state on the Kiro VirtualBox VM (v26.05.19). Every file in both overlays was traced to its destination on the installed system and verified.
+
+**kiro-audit result: 93 PASS / 0 WARN / 0 FAIL** — the cleanest audit result to date. All checks from the morning security session are confirmed active on the running system.
+
+**Clarification — `10-archiso.conf` is intentional in source.** The file `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` must remain in the source tree because archiso only creates a directory on the live ISO if at least one file lands in it. Removing the file causes `sshd_config.d/` to be absent, which produces errors. The live ISO needs the override for remote access during the install session; `kiro_final` removes the file from the installed system. Confirmed absent on the VM post-install.
+
+**`do-not-suspend.conf` confirmed intentional.** `archiso/airootfs/etc/systemd/logind.conf.d/do-not-suspend.conf` (disables suspend/hibernate/lid-close) survives to the installed system. This is correct behaviour for a desktop distro — no laptop lid-close events apply.
+
+### Fix — Remove duplicate `memory-accounting.conf` from airootfs
+
+`archiso/airootfs/etc/systemd/system.conf.d/memory-accounting.conf` was a leftover from before `edu-system-files` took over memory accounting configuration. The edu-system-files package already ships `90-memory-accounting.conf` with `DefaultMemoryAccounting=true`. The airootfs copy duplicated this and also set `DefaultSwapAccounting=true`, which is deprecated in modern systemd and produced a warning in the journal on every boot:
+
+```
+Unknown key 'DefaultSwapAccounting' in section [Manager], ignoring.
+```
+
+The airootfs file was deleted. The edu-system-files package version is now the sole source of truth.
+
+### Claude Code commands added
+
+Two new Claude Code slash commands were created in `~/.claude/commands/` to formalize the release and verification workflows:
+
+- **`/kiro-ready`** — GO/NO-GO release check: verifies git state of all 5 source repos (kiro-iso, kiro-iso-next, kiro-calamares-config, kiro-calamares-config-next, edu-system-files), reads TODO.md for blockers, reads DISTRO_TESTING.md for the last test result, SSHes into the Kiro VirtualBox to run kiro-audit, and checks ISO build recency. Renders a verdict table.
+- **`/kiro-check`** — Deep source-vs-VM comparison: checks every security-sensitive file, detects live-environment survivors, finds journal warnings from deprecated config, verifies sysctl values, udev rules, script inventory, and catches git re-add accidents (files deleted and silently re-added by `up.sh`).
+
+**Files Modified:** `archiso/airootfs/etc/systemd/system.conf.d/memory-accounting.conf` (deleted), `~/.claude/commands/kiro-ready.md` (new), `~/.claude/commands/kiro-check.md` (new)
+
+---
+
 ## 2026-05-19 — Security audit: Arch vs Kiro comparison + fixes
 
 ### SSH tooling for VirtualBox VMs

@@ -49,7 +49,7 @@ less
 #lftp
 libfido2
 libusb-compat
-linux
+linux-lqx
 linux-atm
 linux-firmware
 linux-firmware-marvell
@@ -131,7 +131,7 @@ aic94xx-firmware
 dialog
 dnsutils
 libadwaita
-linux-headers
+linux-lqx-headers
 logrotate
 #ntp
 upd72020x-fw
@@ -183,10 +183,15 @@ gst-plugins-bad
 gst-plugins-base
 gst-plugins-good
 gst-plugins-ugly
+gst-plugin-pipewire
 gstreamer
 libdvdcss
-pulseaudio
-pulseaudio-alsa
+pipewire
+pipewire-alsa
+pipewire-audio
+pipewire-pulse
+wireplumber
+pamixer
 pavucontrol
 
 ###bluetooth
@@ -194,7 +199,6 @@ blueberry
 bluez
 bluez-libs
 bluez-utils
-pulseaudio-bluetooth
 
 ###network
 avahi

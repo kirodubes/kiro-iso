@@ -1,7 +1,7 @@
 # mkinitcpio preset file for the kernel
-ALL_kver='/boot/vmlinuz-linux'
+ALL_kver='/boot/vmlinuz-linux-lqx'
 #PRESETS=('default' 'fallback')
 PRESETS=('default')
-default_image="/boot/initramfs-linux.img"
+default_image="/boot/initramfs-linux-lqx.img"
 #fallback_image="/boot/initramfs-linux-fallback.img"
 #fallback_options="-S autodetect"

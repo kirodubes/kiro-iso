@@ -31,6 +31,29 @@ Three issues were identified and resolved:
 
 `/etc/cups/classes.conf` and `/etc/cups/printers.conf` were world-readable (`644`) on Kiro, compared to `600 root:cups` on a vanilla Arch install. These files can contain printer device URIs and credentials. A `tmpfiles.d` rule was added at `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` using the `z` directive to enforce `600 root:cups` on both files at every boot via `systemd-tmpfiles-setup.service`.
 
+### kiro-audit expanded (edu-system-files-git)
+
+`audit.sh` was removed from both `kiro-iso` and `kiro-iso-next` — it was a stale copy superseded by `kiro-audit` in `edu-system-files-git` (which ships to every installed Kiro system at `/usr/local/bin/kiro-audit`). The edu-system-files version was already 40 lines ahead with `--help`, `--version`, and a root check.
+
+`kiro-audit` was then expanded significantly with checks that reflect this session's security work and general system health:
+
+- **`check_sysctl_security()`** — verifies all 8 hardening values from `99-kiro-optimizations.conf` are live on the running system: `kptr_restrict`, `dmesg_restrict`, `ptrace_scope`, `unprivileged_bpf_disabled`, `perf_event_paranoid`, `suid_dumpable`, `send_redirects`, `tcp_syncookies`. Catches any regression where the sysctl file exists but values aren't applied.
+- **`check_zram()`** — verifies `zram-generator` is installed, config is present, `/dev/zram0` is active as swap, and compression is `zstd`.
+- **`check_failed_units()`** — fails if any systemd units are in failed state.
+- **`check_boot_and_updates()`** — INFO-only: prints boot time (`systemd-analyze`) and pending update count. No PASS/FAIL threshold.
+- **`check_permissions()` expanded** — now also checks that `10-archiso.conf` SSH override is absent, `tmpfiles.d/cups-permissions.conf` is present, and CUPS config files are `600` if they exist.
+- **MAKEFLAGS CPU check** — replaced the basic `-j exists` check with a `nproc` comparison: PASS if MAKEFLAGS `-j` matches actual CPU count, WARN if fewer, FAIL if missing.
+
+The audit was run on **riker** (real metal, `192.168.1.43:22`) and produced 79 PASS / 0 WARN / 4 FAIL — the 4 FAILs are all expected pre-fix issues from riker's older ISO install (archiso SSH override, missing tmpfiles.d, CUPS permissions). All new checks behaved correctly on real hardware.
+
+### Real metal SSH script
+
+`ssh-into-riker.sh` added to `~/DATA/arcolinux-nemesis/scripts/`. Simpler than the VirtualBox scripts — no NAT forwarding needed, just a reachability ping check before connecting with `sshpass`. Host `192.168.1.43`, port `22`, user `erik`.
+
+### Security fixes synced to kiro-iso-next
+
+All three security fixes (SSH override removal, CUPS tmpfiles.d, ARCH-VS-KIRO-SECURITY.md) were applied to `kiro-iso-next` as well — both production and beta repos are now in sync.
+
 ### Fix 3 — rlogin/rsh (inetutils) — accepted as-is
 
 `inetutils` ships `rlogin`/`rsh` PAM configs as a side effect of providing `ifconfig`, which Kiro needs. No systemd units for those legacy daemons are enabled; no daemon is running. Risk is theoretical only — accepted.

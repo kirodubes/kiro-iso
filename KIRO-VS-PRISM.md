@@ -1,5 +1,8 @@
 # KIRO VS PRISM — Config Research
 
+**Last checked:** 2026-05-19
+**Next check:** 2026-08-19 (quarterly)
+
 **Purpose:** Inspect PrismLinux's system configuration to identify settings or
 approaches that could improve Kiro's `edu-system-files`. PrismLinux is a
 reference only — no changes are made to it.

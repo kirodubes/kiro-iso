@@ -274,4 +274,4 @@ Kiro populates root's home the same way as the user's home. This means root has 
 | **Low** | `inetutils` rlogin/rsh — no daemons running, kept for `ifconfig` | ✓ Accepted | 7 |
 | **Low** | `virtualbox-guest-utils` / `vboxservice` — no-op on real hardware, modules won't load on `linux-lqx` without DKMS | ✓ Kept intentionally (testing convenience) | 6 |
 | **Info** | `vm.overcommit_memory = 1` requires ZRAM — confirmed active via `zram-generator` + `edu-system-files-git` config (`zstd`, `min(ram/2, 4GB)`, priority 100) | ✓ Safe | 7 |
-| **Info** | `iptables` installed but empty rules — no active firewall | Open | 5 |
+| **Info** | `iptables` installed but empty rules — no firewall by design | ✓ Accepted | 5 |

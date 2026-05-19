@@ -1,6 +1,6 @@
 # Distro Testing Log
 
-Results of boot and install testing for kiro-iso-next builds. Newest first.
+Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
@@ -21,7 +21,7 @@ Results of boot and install testing for kiro-iso-next builds. Newest first.
 | linux-lqx.preset exists, linux.preset removed | PASS |
 | PipeWire stack complete, pulseaudio absent | PASS |
 | calamares + mkinitcpio-archiso removed | PASS |
-| kiro-calamares-config-next removed | **FAIL** |
+| kiro-calamares-config removed | **FAIL** |
 | Calamares live-only artifacts cleaned up | PASS |
 | /root permissions 700, sudoers.d 750, polkit 750 | PASS |
 | EDITOR=nano, Bluetooth AutoEnable=true | PASS |
@@ -38,6 +38,6 @@ Results of boot and install testing for kiro-iso-next builds. Newest first.
 
 **Score:** 63 PASS, 1 WARN (/etc/calamares dir leftover — caused by FAIL below), 1 FAIL
 
-**Known issue:** `kiro-calamares-config-next` not removed post-install — `kiro_final` removal step fails silently (pacman lock race suspected). Package is manually removable. Does not affect system functionality.
+**Known issue:** `kiro-calamares-config` not removed post-install — `kiro_final` removal step fails silently (pacman lock race suspected). Package is manually removable. Does not affect system functionality.
 
 **BIOS/syslinux boot path:** Not tested (VirtualBox uses UEFI). See TODO.md.

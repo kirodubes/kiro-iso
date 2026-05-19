@@ -41,6 +41,14 @@ In Plymouth's script language, `Image.Scale(w, h)` creates a scaled copy once at
 Rebooting to check every Plymouth script change wastes minutes per iteration. Instead: `sudo plymouthd --no-daemon --debug` starts the daemon in the foreground (Ctrl-C to stop); then in a second terminal `sudo plymouth --show-splash` renders the theme. Script errors appear in the first terminal's output. `sudo plymouth quit` tears it down cleanly. This loop — edit script, show-splash, inspect, quit — cuts Plymouth development time dramatically.
 
 
+## 2026-05-19 (session end — kiro-iso audit expansion + riker)
+
+**Tip: Use `declare -A` associative arrays in bash audit scripts for key/expected-value checks — one loop replaces N identical if-blocks**
+Instead of writing a separate `sysctl -n key` + compare block for each security parameter, declare `declare -A expected=([kernel.kptr_restrict]=2 [fs.suid_dumpable]=0 ...)` and loop: `for key in "${!expected[@]}"; do actual=$(sysctl -n "$key"); [[ "$actual" == "${expected[$key]}" ]] && pass ... || fail ...; done`. Adding a new check costs one line in the array, not 4 lines of new code. The same pattern applies to any audit script that checks multiple key/value pairs — file permissions, config values, systemd unit states.
+
+**Tip: When a `-git` AUR package doesn't pick up your latest commit via `paru -S`, copy the binary directly for immediate testing — rebuild the package separately**
+`paru -S pkg-git` reinstalls from the cached `.pkg.tar.zst` if the pkgver hasn't changed, even after a new upstream commit. For rapid iteration during a session (edit → test → edit), use `scp localfile remote:/tmp/file && ssh remote "sudo cp /tmp/file /usr/local/bin/file"` to deploy instantly, then let the package rebuild happen on its own schedule (next `paru -Syu`, or force with `paru -S --rebuild pkg-git`). Never leave the manually copied version in place permanently — it will be overwritten by the next package upgrade.
+
 ## 2026-05-19 (session end — kiro-iso security audit)
 
 **Tip: Use `tmpfiles.d` with the `z` directive to enforce file permissions idempotently at every boot — not a one-time chmod**
@@ -1317,3 +1325,11 @@ When copying files from a `-next` repo to its production sibling, package names,
 
 **Tip: Pair the config repo to its matching ISO repo — never cross them when suggesting a build command**
 In a project with parallel stable/beta tracks (e.g. `kiro-calamares-config` + `kiro-iso`, `kiro-calamares-config-next` + `kiro-iso-next`), always trigger the ISO build in the repo that matches the config repo you just pushed to. The ISO build pulls the Calamares package from GitHub Pages, which was published by the config repo's CI. Crossing them (building `kiro-iso` after pushing to `kiro-calamares-config-next`) results in the wrong Calamares package being bundled and a confusing mismatch between what was tested and what ships.
+
+## 2026-05-19 (edu-system-files session)
+
+**Tip: In kiro-common.sh, `log_error` is the ERR trap handler — never pass it a plain message string**
+`log_error lineno cmd` is wired to `trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR`. Calling it as `log_error "must be root"` treats the string as the line number and wraps it in the full `⚠️ ERROR DETECTED` banner — confusing to users and semantically wrong. For any user-facing error message (root checks, bad arguments, missing dependencies), use `echo "${RED}message${RESET}" >&2; exit 1` instead. `log_error` is only for the trap.
+
+**Tip: `mandb` runs on a daily systemd timer, not at boot — run it manually after deploying new man pages**
+`man-db.timer` fires once daily with up to 12 hours of random delay. A freshly copied `.8` file won't appear in `man kiro<Tab>` completion until the timer fires or you run `sudo mandb` yourself. Any deploy script that installs man pages to `/usr/share/man/` should call `mandb` as its last step, or the user will hit a confusing "no completions" gap that fixes itself overnight.

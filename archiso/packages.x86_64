@@ -467,7 +467,6 @@ alacritty-tweak-tool-git
 edu-arc-dawn-git
 edu-arc-kde
 edu-dot-files-git
-edu-hblock-git
 edu-neo-candy-arc-git
 edu-neo-candy-arc-mint-grey-git
 edu-neo-candy-arc-mint-red-git
@@ -525,6 +524,8 @@ capitaine-cursors
 cpuid
 irqbalance
 glances
+hblock
+libgepub
 tuned
 vte4
 pciutils

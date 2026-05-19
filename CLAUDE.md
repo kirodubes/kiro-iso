@@ -108,11 +108,18 @@ A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARC
 
 ## VirtualBox SSH Scripts
 
-Two helper scripts live in `~/DATA/arcolinux-nemesis/scripts/`:
+Three helper scripts live in `~/DATA/arcolinux-nemesis/scripts/`:
 - `ssh-into-kiro-vb.sh` — connects to the Kiro VM (`127.0.0.1:2022`, user `erik`)
 - `ssh-into-arch-vb.sh` — connects to a virgin Arch VM (`127.0.0.1:2023`, user `erik`)
+- `ssh-into-riker.sh` — connects to riker, real metal Kiro machine (`192.168.1.43:22`, user `erik`)
 
-Both auto-configure NAT port forwarding (`VBoxManage controlvm natpf1` for running VMs, `modifyvm --natpf1` for stopped VMs) and handle `sshpass` + `known_hosts` cleanup automatically.
+VirtualBox scripts auto-configure NAT port forwarding (`VBoxManage controlvm natpf1` for running VMs, `modifyvm --natpf1` for stopped VMs) and handle `sshpass` + `known_hosts` cleanup automatically. The riker script just pings first then connects.
+
+## kiro-audit (edu-system-files-git)
+
+`audit.sh` was removed from this repo — the canonical version is `kiro-audit` in `edu-system-files-git`, installed to `/usr/local/bin/kiro-audit` on every Kiro system. Run with `sudo kiro-audit`.
+
+Current checks (as of 2026-05-19): kernel, microcode, mkinitcpio, audio stack, Calamares cleanup, SSH override absent, kiro_final config, MAKEFLAGS CPU count, pacman repos, desktop environments, SDDM, user groups, systemd services, ZRAM, key file permissions, CUPS permissions, sysctl security baseline (8 values), failed units, ISO version, NVIDIA, bootloader, boot time/updates, package integrity.
 
 ## Known Issues
 

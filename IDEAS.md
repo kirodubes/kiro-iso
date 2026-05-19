@@ -10,6 +10,10 @@ After each monthly `audit.sh` run, save the output to `~/kiro-audit-YYYY-MM-DD.t
 
 After each build, compare the new `pkglist.txt` against the previous one and print three sections: packages added, packages removed, packages with a version change. A 10-line bash script using `comm` on sorted files is all it takes. Rationale: right now there is no quick way to see "what actually changed in this build vs the last one?" — you have to diff two raw pkglist files by hand. A diff summary at the end of `build-the-iso.sh` (or as a standalone `diff-pkglists.sh`) gives an instant audit trail and catches accidental package additions or removals before the ISO is uploaded.
 
+### kiro-audit --fix mode — auto-remediate known failures
+
+Add a `--fix` flag to `kiro-audit` that automatically corrects the issues it finds: delete `10-archiso.conf` if present, run `systemd-tmpfiles --create` to enforce CUPS permissions, mask legacy daemons. Each fix is printed before execution and gated behind the flag — the default run stays read-only. Rationale: running the audit on a machine installed from an older ISO currently produces actionable FAILs with no way to resolve them except copying commands from the output manually. A `--fix` mode closes the loop.
+
 ### Security sysctl regression check in audit.sh
 
 Add a security section to `audit.sh` that reads the live sysctl values and compares them against the expected baseline from `99-kiro-optimizations.conf`. If `kernel.kptr_restrict` is `0` instead of `2`, or `fs.suid_dumpable` is `2` instead of `0`, the audit prints a FAIL. Rationale: the sysctl file being present doesn't guarantee the values are active — a conflicting drop-in, a kernel that ignores the key, or a sysctl applied before the file loads could silently undo hardening. A live-value check confirms the security profile is actually in effect, not just on disk.

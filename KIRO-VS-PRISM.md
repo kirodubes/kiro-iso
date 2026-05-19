@@ -48,14 +48,16 @@ Sysctl and scheduler settings are directly comparable.
 
 | Setting                           | Kiro value | Prism value | Verdict                                    |
 |-----------------------------------|------------|-------------|--------------------------------------------|
-| `vm.swappiness`                   | 100        | 150         | adopt 150 — standard for ZRAM-first setups |
+| `vm.swappiness`                   | 150        | 150         | adopted from Prism (was 100)               |
 | `vm.vfs_cache_pressure`           | 50         | 50          | same                                       |
 | `vm.dirty_bytes`                  | 268435456  | 268435456   | same                                       |
 | `net.ipv4.tcp_congestion_control` | bbr        | bbr         | same                                       |
 | `net.core.default_qdisc`          | fq         | fq_codel    | different — fq better with BBR, keep       |
-| `kernel.sched_autogroup_enabled`  | 0          | n/a         | key absent on 7.0.7-lqx                    |
-| `kernel.sched_rt_runtime_us`      | 950000     | n/a         | key absent on 7.0.7-lqx                    |
-| I/O scheduler (SSD/VBox disk)     | bfq        | bfq         | same                                       |
+| `kernel.sched_autogroup_enabled`  | set in config, ignored by lqx | n/a  | key absent on both lqx 7.0.7 and 7.0.9    |
+| `kernel.sched_rt_runtime_us`      | set in config, ignored by lqx | n/a  | key absent on both lqx 7.0.7 and 7.0.9    |
+| I/O scheduler: SSD                | mq-deadline | bfq         | kiro corrected (2026-05-19) — mq-deadline better for flash |
+| I/O scheduler: HDD                | bfq         | bfq         | same                                       |
+| I/O scheduler: NVMe               | none        | bfq         | kiro uses none (zero overhead on NVMe)     |
 
 ### Stability
 
@@ -67,7 +69,7 @@ Sysctl and scheduler settings are directly comparable.
 | `vm.min_free_kbytes`        | 262144     | 67584       | review — kiro reserves 4x more RAM           |
 | `vm.watermark_scale_factor` | 200        | 125         | different — both tuned for ZRAM              |
 | ZRAM algorithm              | zstd       | zstd        | same                                         |
-| ZRAM size                   | min(RAM/2, 4GB) dynamic | 4GB fixed  | kiro more flexible               |
+| ZRAM size                   | `min(ram / 2, 4096)` (4GB cap) | 4GB fixed | kiro more flexible; note: config had `4096M` syntax bug — fixed 2026-05-19 |
 | Journal storage             | persistent | default (auto/volatile) | kiro better — survives crashes  |
 
 ---
@@ -107,7 +109,10 @@ compressed in RAM rather than thrashing. Current Kiro value of 100 is conservati
 
 ## Improvements Applied to Kiro
 
-| Setting                             | Old Kiro value | New value | Source |
-|-------------------------------------|----------------|-----------|--------|
-| `vm.swappiness`                     | 100            | 150       | Prism  |
-| `kernel.unprivileged_userns_clone`  | (unset)        | 1         | Prism  |
+| Setting                             | Old Kiro value | New value   | Source          |
+|-------------------------------------|----------------|-------------|-----------------|
+| `vm.swappiness`                     | 100            | 150         | Prism           |
+| `kernel.unprivileged_userns_clone`  | (unset)        | 1           | Prism           |
+| IO scheduler: SSD                   | bfq            | mq-deadline | CachyOS research (2026-05-19) |
+| IO scheduler: HDD                   | mq-deadline    | bfq         | CachyOS research (2026-05-19) |
+| `zram-size` formula                 | `min(ram/2, 4096M)` (broken) | `min(ram / 2, 4096)` | bug fix (2026-05-19) |

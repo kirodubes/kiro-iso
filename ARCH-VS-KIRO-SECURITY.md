@@ -267,10 +267,11 @@ Kiro populates root's home the same way as the user's home. This means root has 
 
 ## Action Items
 
-| Priority | Item | Phase |
-|---|---|---|
-| **High** | Remove `/etc/ssh/sshd_config.d/10-archiso.conf` in Calamares post-install (`PermitRootLogin yes`) | 4 |
-| **Medium** | Fix CUPS config permissions: `chmod 600 /etc/cups/classes.conf /etc/cups/printers.conf` | 9 |
-| **Low** | Consider removing `inetutils` or at least ensuring `rlogin`/`rsh` daemons are masked | 7 |
-| **Info** | Document ZRAM dependency for `vm.overcommit_memory = 1` in release notes | 7 |
-| **Info** | `iptables` is installed but has empty rules — clarify if a firewall profile is planned | 5 |
+| Priority | Item | Status | Phase |
+|---|---|---|---|
+| **High** | Remove `/etc/ssh/sshd_config.d/10-archiso.conf` (`PermitRootLogin yes`) | ✓ Done 2026-05-19 | 4 |
+| **Medium** | Fix CUPS config permissions via tmpfiles.d | ✓ Done 2026-05-19 | 9 |
+| **Low** | `inetutils` rlogin/rsh — no daemons running, kept for `ifconfig` | ✓ Accepted | 7 |
+| **Low** | `virtualbox-guest-utils` / `vboxservice` — no-op on real hardware, modules won't load on `linux-lqx` without DKMS | ✓ Kept intentionally (testing convenience) | 6 |
+| **Info** | Document ZRAM dependency for `vm.overcommit_memory = 1` in release notes | Open | 7 |
+| **Info** | `iptables` installed but empty rules — no active firewall | Open | 5 |

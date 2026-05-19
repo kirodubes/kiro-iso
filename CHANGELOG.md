@@ -4,7 +4,38 @@
 
 ---
 
+## 2026-05-18 — TODO housekeeping
+
+Short session. No code changed — this was a pure status-tracking pass after earlier build and boot testing.
+
+**BIOS/syslinux boot path verified.** The syslinux configs had been updated for `linux-lqx` in a previous session but only UEFI (GRUB + systemd-boot in VirtualBox) had been confirmed working. BIOS boot was tested and confirmed good. Moved from Backlog to Done.
+
+**PipeWire status confirmed.** The PipeWire stack was marked "Needs build + audio test" — now confirmed verified working.
+
+**Remaining open item:** NVIDIA `driver=nonfree` boot + DKMS compile against `linux-lqx-headers` on real NVIDIA hardware. Only remaining Backlog item.
+
+**Files Modified:** `TODO.md`
+
+---
+
 ## 2026-05-18 — `v26.05.18.01`
+
+### ISO audit: VirtualBox installed-system verification + audit.sh
+
+**Build script fix — `isoLabel` missing `next`.** The checksum phase at the end of `build-the-iso.sh` was constructing `isoLabel="kiro-${kiroVersion}-x86_64.iso"` but `mkarchiso` produces filenames from `iso_name` in `profiledef.sh`, which is `kiro-next`. The mismatch caused sha1sum/sha256sum/md5sum to fail with "No such file or directory" on every build. Fixed to `isoLabel="kiro-next-${kiroVersion}-x86_64.iso"`.
+
+**`audit.sh` — installed system health checker.** A comprehensive `audit.sh` script was written and committed to the repo root (also synced to `edu-system-files/usr/local/bin/`). It SSHes into or runs locally on an installed Kiro system and checks 63+ conditions across: kernel (`linux-lqx`), microcode (correct vendor, wrong one removed), mkinitcpio hooks (no archiso hook, microcode/kms present), audio stack (PipeWire complete, pulseaudio absent), all 4 Calamares module results (`kiro_before`, `kiro_final`, `kiro_remove_nvidia`, `kiro_ucode`), pacman repos, desktop session files, SDDM theme, user groups, systemd services, key file permissions, NVIDIA handling, bootloader, and `pacman -Qk` package integrity. Results are grouped as PASS / WARN / FAIL with a summary count. Designed to be extended month-by-month.
+
+**VirtualBox audit findings (v26.05.18.01, UEFI, Intel VirtualBox):**
+- 63 PASS — all core functionality verified working
+- 1 WARN — `/etc/calamares/` config dir left on system (explained by the FAIL below)
+- 1 FAIL — `kiro-calamares-config-next` still installed; `kiro_final`'s final removal step ran `pacman -R --noconfirm kiro-calamares-config-next` inside a `try/except` that swallows the failure — the package has no dependencies and is manually removable, but the silent failure means it wasn't cleaned up at install time
+- Firmware warnings during build (`softing_cs`, `lantiq_gswip`, `adf7242`) are benign — ultra-niche hardware with no firmware in any Arch package; harmless and unfixable without blacklisting modules
+- `pacman -Qk` exceptions: `ohmychadwm-git` (makepkg cleans build artifacts), `bind`/`cups`/`nfs-utils` (config files created only when services are first used) — all whitelisted in audit.sh
+
+**Files Modified:** `build-scripts/build-the-iso.sh`, `audit.sh` (new)
+
+---
 
 ### edu-chadwm dropped; README accuracy overhaul
 

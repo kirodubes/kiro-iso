@@ -96,6 +96,24 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 
 `isoLabel` in `build-the-iso.sh` is constructed as `kiro-${kiroVersion}-x86_64.iso`. It must start with `iso_name` from `profiledef.sh` (`kiro`) — mismatch causes the checksum phase to fail with "No such file or directory".
 
+## Security Baseline
+
+A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARCH-VS-KIRO-SECURITY.md`**. All action items resolved:
+
+- `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` — **deleted**. Was enabling `PermitRootLogin yes` on installed systems. Default OpenSSH behaviour (`prohibit-password`) is correct.
+- `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` — **added**. Enforces `600 root:cups` on CUPS config files at boot via `systemd-tmpfiles`.
+- No firewall — **by design**. `iptables` is installed but intentionally has no rules.
+- `virtualbox-guest-utils` / `vboxservice` — **kept intentionally** for testing convenience, despite modules not loading on `linux-lqx` without DKMS.
+- `vm.overcommit_memory = 1` — **safe**: ZRAM is always active via `zram-generator` + config from `edu-system-files-git` (`zstd`, `min(ram/2, 4GB)`, priority 100).
+
+## VirtualBox SSH Scripts
+
+Two helper scripts live in `~/DATA/arcolinux-nemesis/scripts/`:
+- `ssh-into-kiro-vb.sh` — connects to the Kiro VM (`127.0.0.1:2022`, user `erik`)
+- `ssh-into-arch-vb.sh` — connects to a virgin Arch VM (`127.0.0.1:2023`, user `erik`)
+
+Both auto-configure NAT port forwarding (`VBoxManage controlvm natpf1` for running VMs, `modifyvm --natpf1` for stopped VMs) and handle `sshpass` + `known_hosts` cleanup automatically.
+
 ## Known Issues
 
 - **`kiro-calamares-config` not removed post-install** — `kiro_final`'s final cleanup step runs `pacman -R --noconfirm kiro-calamares-config` inside a `try/except` that swallows failures silently. The package is removable manually (`sudo pacman -R kiro-calamares-config`) but the root cause (likely a pacman lock race during Calamares) needs investigation.

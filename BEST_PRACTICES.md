@@ -1,6 +1,6 @@
 # Claude Best Practices
 
-## 2026-05-18 (session end — kiro-iso TODO housekeeping)
+## 2026-05-18 (session end — kiro-iso-next TODO housekeeping)
 
 **Tip: Display any list Claude will be asked to reference by number — use sequential numbers top to bottom, across all sections**
 When a list will be referenced conversationally ("3 done", "move 2 to backlog"), number every item sequentially from 1 regardless of section boundaries. Section headers reset context but not numbering. The user says "1" and means item 1 — they do not say "first item in Backlog". A numbered display costs nothing to produce and eliminates all "which one do you mean?" clarification. Apply this everywhere: TODO lists, package lists, audit findings, any multi-item display the user will act on by reference.
@@ -8,7 +8,7 @@ When a list will be referenced conversationally ("3 done", "move 2 to backlog"),
 **Tip: Mark TODO items with explicit "Verified working" — never leave "Needs test" notes in Done**
 A Done item that still says "Needs build + audio test" is not done. Before moving any item to Done, either verify it yourself or get explicit confirmation from the user. Then replace the pending-test note with "Verified working." in the item text. A Done section with lingering caveats creates false confidence and forces future sessions to re-investigate whether the item was actually closed. If the text still has a conditional, the item stays in Backlog.
 
-## 2026-05-18 (session end — kiro-iso audit)
+## 2026-05-18 (session end — kiro-iso-next audit)
 
 **Tip: In bash with `set -euo pipefail`, use `counter=$((counter + 1))` not `((counter++))` — the latter exits the script when the counter is zero**
 `((expression))` is an arithmetic command that exits with status 1 when the expression evaluates to 0. With `set -e` active, `((counter++))` when `counter=0` exits the entire script at that line — silently, with no error message. The fix is `counter=$((counter + 1))`, which is a variable assignment and always exits 0. This pattern bites especially in audit/counter scripts where all counters start at zero. Always use the assignment form for increment-style arithmetic in `set -e` scripts.
@@ -40,6 +40,14 @@ In Plymouth's script language, `Image.Scale(w, h)` creates a scaled copy once at
 **Tip: Test Plymouth themes without rebooting — `plymouthd --no-daemon --debug` in one terminal, `plymouth --show-splash` in another**
 Rebooting to check every Plymouth script change wastes minutes per iteration. Instead: `sudo plymouthd --no-daemon --debug` starts the daemon in the foreground (Ctrl-C to stop); then in a second terminal `sudo plymouth --show-splash` renders the theme. Script errors appear in the first terminal's output. `sudo plymouth quit` tears it down cleanly. This loop — edit script, show-splash, inspect, quit — cuts Plymouth development time dramatically.
 
+
+## 2026-05-19 (session end — kiro-iso security audit)
+
+**Tip: Use `tmpfiles.d` with the `z` directive to enforce file permissions idempotently at every boot — not a one-time chmod**
+`chmod` in a post-install script runs once and can be undone by package updates or upgrades. A `tmpfiles.d` entry like `z /etc/cups/classes.conf 0600 root cups - -` is applied by `systemd-tmpfiles-setup.service` at every boot, making the permission sticky. The `z` type sets ownership and mode only if the path exists — it never creates the file. Use this for any config file whose package ships it world-readable but which contains sensitive data (CUPS printer URIs, credentials, API keys). One file in `/etc/tmpfiles.d/` beats patching the package or scripting around it.
+
+**Tip: `VBoxManage modifyvm --natpf1` only works when the VM is stopped — use `VBoxManage controlvm natpf1` for live VMs**
+`VBoxManage modifyvm "Name" --natpf1 "rule,tcp,,2022,,22"` requires the VM to be in `poweroff`, `saved`, or `aborted` state — running it against a live VM returns an error. For a running VM, use `VBoxManage controlvm "Name" natpf1 "rule,tcp,,2022,,22"` (no `--` prefix, no `modifyvm`). When scripting VM setup, detect state first with `VBoxManage showvminfo --machinereadable | grep '^VMState='` and dispatch to the correct command. Also: when grepping machinereadable output for an existing NAT rule, match `"rulename,` (name + comma) not `"rulename"` — the format is `natpf1="rulename,tcp,,port,,22"` so the closing quote never follows the name directly.
 
 ## 2026-05-19 (session end — Startup-HQ)
 
@@ -1301,3 +1309,11 @@ Before removing a package name, variable, or DE reference, run `grep -rn "term" 
 
 **Tip: Audit README file references with ls before committing — stale paths erode trust faster than missing docs**
 A README that lists files which don't exist (enable-oomd.sh, personal_repo/, packages.bootstrap) is worse than a shorter README, because it tells readers the project is poorly maintained. Before finalising any docs change, run `ls <each-file-or-dir-mentioned>` to verify they exist. For project trees in particular, generate the list from the actual filesystem rather than writing it from memory — `find . -maxdepth 2 -not -path './.git/*'` gives you the ground truth in seconds.
+
+## 2026-05-19 (session end kiro-calamares-config-next promotion)
+
+**Tip: After promoting beta config to production, grep the production repo for the beta suffix before committing**
+When copying files from a `-next` repo to its production sibling, package names, self-removal commands, and debug strings often still reference `-next`. Run `grep -rn "next" --include="*.conf" --include="*.py" --include="*.sh" --include="*.md" --include="PKGBUILD" <production-repo>/ | grep -v "\.git/"` immediately after the file copies and before staging anything. Review every hit: fix stale repo/package name references; leave Python `__next__`/`.next()`, Calamares config keys, and `provides=('<package>-next')` virtual package entries untouched. One missed string (like a `pacman -R <package>-next` in post-install cleanup) will silently fail to remove the installer package on every production install.
+
+**Tip: Pair the config repo to its matching ISO repo — never cross them when suggesting a build command**
+In a project with parallel stable/beta tracks (e.g. `kiro-calamares-config` + `kiro-iso`, `kiro-calamares-config-next` + `kiro-iso-next`), always trigger the ISO build in the repo that matches the config repo you just pushed to. The ISO build pulls the Calamares package from GitHub Pages, which was published by the config repo's CI. Crossing them (building `kiro-iso` after pushing to `kiro-calamares-config-next`) results in the wrong Calamares package being bundled and a confusing mismatch between what was tested and what ships.

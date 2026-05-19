@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Repository Role
+
+**PRODUCTION** — this is the stable, release-quality ISO.
+
+| Repo | Role | Calamares config |
+|---|---|---|
+| `kiro-iso` | **Production** — stable kernel, tested packages, released to users | `kiro-calamares-config` |
+| `kiro-iso-next` | **Beta/Testing** — experimental features, kernel changes, new packages under evaluation | `kiro-calamares-config-next` |
+
+Do not merge untested changes from `kiro-iso-next` into `kiro-iso` without a successful ISO build and boot test.
+The current experiment in `kiro-iso-next`: **Liquorix kernel** (`linux-lqx` from Chaotic-AUR) replacing the stock `linux` kernel.
+
 ## Project
 
 Custom Arch Linux ISO builder based on ArchISO. Produces a live/installable ISO with XFCE4 + ohmychadwm desktop, pre-configured packages, and systemd optimizations.
@@ -80,6 +92,14 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 - `build-scripts/get-pacman-repos-keys-and-mirrors.sh` — installs chaotic-keyring/mirrorlist if missing
 - `change-version.sh` — version bump script
 - `up.sh` — git pull → commit → push helper
+
+## pacman.conf — Installed System vs Build Time
+
+There are three pacman.conf files with different roles:
+
+- `archiso/pacman.conf` — used by `mkarchiso` during the ISO build; includes `kiro_repo`
+- `archiso/airootfs/etc/pacman.conf` — ends up on the installed system; does NOT include `kiro_repo` (intentional — kiro_repo is used by Calamares at install time only)
+- `build-scripts/pacman.conf` — host-side reference for setting up Chaotic-AUR on the build machine
 
 ## Changelog Style
 

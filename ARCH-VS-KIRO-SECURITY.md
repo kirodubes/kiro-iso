@@ -273,5 +273,5 @@ Kiro populates root's home the same way as the user's home. This means root has 
 | **Medium** | Fix CUPS config permissions via tmpfiles.d | ✓ Done 2026-05-19 | 9 |
 | **Low** | `inetutils` rlogin/rsh — no daemons running, kept for `ifconfig` | ✓ Accepted | 7 |
 | **Low** | `virtualbox-guest-utils` / `vboxservice` — no-op on real hardware, modules won't load on `linux-lqx` without DKMS | ✓ Kept intentionally (testing convenience) | 6 |
-| **Info** | Document ZRAM dependency for `vm.overcommit_memory = 1` in release notes | Open | 7 |
+| **Info** | `vm.overcommit_memory = 1` requires ZRAM — confirmed active via `zram-generator` + `edu-system-files-git` config (`zstd`, `min(ram/2, 4GB)`, priority 100) | ✓ Safe | 7 |
 | **Info** | `iptables` installed but empty rules — no active firewall | Open | 5 |

@@ -15,15 +15,15 @@ and record findings here. Any improvement goes into `edu-system-files` on Kiro.
 
 ## Machine Details
 
-| Detail           | Kiro (HQ)                                       | CachyOS (reference)                     |
-|------------------|-------------------------------------------------|-----------------------------------------|
-| Distro           | Kiro (Arch-based)                               | CachyOS                                 |
-| Kernel           | linux-lqx 7.0.9-lqx1-1-lqx                     | linux-cachyos 7.0.5-2-cachyos (BORE)    |
-| RAM              | 32 GB                                           | 10 GB (VM)                              |
-| Machine type     | Bare metal                                      | VirtualBox VM                           |
-| SSH              | local                                           | `ssh-into-cachyos-vb.sh` host:2023→22  |
-| edu-system-files | installed                                       | not installed / not our concern         |
-| Desktop          | XFCE4 + ohmychadwm                              | KDE Plasma 6.6.5                        |
+| Detail           | Kiro (HQ)                  | CachyOS (reference)                   |
+|------------------|----------------------------|---------------------------------------|
+| Distro           | Kiro (Arch-based)          | CachyOS                               |
+| Kernel           | linux-lqx 7.0.9-lqx1-1-lqx | linux-cachyos 7.0.5-2-cachyos (BORE)  |
+| RAM              | 32 GB                      | 10 GB (VM)                            |
+| Machine type     | Bare metal                 | VirtualBox VM                         |
+| SSH              | local                      | `ssh-into-cachyos-vb.sh` host:2023→22 |
+| edu-system-files | installed                  | not installed / not our concern       |
+| Desktop          | XFCE4 + ohmychadwm         | KDE Plasma 6.6.5                      |
 
 Kiro uses **linux-lqx** (Liquorix), CachyOS uses **linux-cachyos** (BORE/EEVDF).
 Different kernel families — scheduler tuning parameters are not directly comparable,
@@ -41,97 +41,97 @@ CachyOS ships all its tuning in one package: `cachyos-settings`. Key config file
 
 ### Memory / ZRAM
 
-| Setting                       | Kiro value              | CachyOS value    | Verdict                                               |
-|-------------------------------|-------------------------|------------------|-------------------------------------------------------|
-| `vm.swappiness`               | 150                     | 100              | kiro more aggressive; 150 is the Arch-ZRAM standard   |
-| `vm.vfs_cache_pressure`       | 50                      | 50               | same                                                  |
-| `vm.dirty_bytes`              | 268435456 (256MB)       | 268435456        | same                                                  |
-| `vm.dirty_background_bytes`   | 67108864 (64MB)         | 67108864         | same                                                  |
-| `vm.dirty_writeback_centisecs`| 1500                    | 1500             | same                                                  |
-| `vm.dirty_expire_centisecs`   | 1500                    | not set          | kiro explicit                                         |
-| `vm.page-cluster`             | 0                       | 0                | same — both optimal for ZRAM                          |
-| `vm.watermark_scale_factor`   | 200                     | not set          | kiro more aggressive reclaim trigger                  |
-| `vm.min_free_kbytes`          | 262144 (256MB)          | not set          | kiro reserves 256MB; review on 8GB systems            |
-| `vm.overcommit_memory`        | 1                       | not set          | kiro explicit (required for ZRAM)                     |
-| `vm.max_map_count`            | 2147483642              | 1048576 (arch)   | kiro much higher — needed for some dev tools/games    |
-| ZRAM size                     | `min(ram / 2, 4096)` (≈15.6GB on 32GB) | `ram` (≈9.8GB on 10GB) | effectively similar — both ~RAM/2 or more; see Findings |
-| ZRAM algorithm                | zstd                    | zstd             | same                                                  |
-| ZRAM priority                 | 100                     | 100              | same                                                  |
+| Setting                        | Kiro value                             | CachyOS value          | Verdict                                                 |
+|--------------------------------|----------------------------------------|------------------------|---------------------------------------------------------|
+| `vm.swappiness`                | 150                                    | 100                    | kiro more aggressive; 150 is the Arch-ZRAM standard     |
+| `vm.vfs_cache_pressure`        | 50                                     | 50                     | same                                                    |
+| `vm.dirty_bytes`               | 268435456 (256MB)                      | 268435456              | same                                                    |
+| `vm.dirty_background_bytes`    | 67108864 (64MB)                        | 67108864               | same                                                    |
+| `vm.dirty_writeback_centisecs` | 1500                                   | 1500                   | same                                                    |
+| `vm.dirty_expire_centisecs`    | 1500                                   | not set                | kiro explicit                                           |
+| `vm.page-cluster`              | 0                                      | 0                      | same — both optimal for ZRAM                            |
+| `vm.watermark_scale_factor`    | 200                                    | not set                | kiro more aggressive reclaim trigger                    |
+| `vm.min_free_kbytes`           | 262144 (256MB)                         | not set                | kiro reserves 256MB; review on 8GB systems              |
+| `vm.overcommit_memory`         | 1                                      | not set                | kiro explicit (required for ZRAM)                       |
+| `vm.max_map_count`             | 2147483642                             | 1048576 (arch)         | kiro much higher — needed for some dev tools/games      |
+| ZRAM size                      | `min(ram / 2, 4096)` (≈15.6GB on 32GB) | `ram` (≈9.8GB on 10GB) | effectively similar — both ~RAM/2 or more; see Findings |
+| ZRAM algorithm                 | zstd                                   | zstd                   | same                                                    |
+| ZRAM priority                  | 100                                    | 100                    | same                                                    |
 
 ### I/O Scheduler
 
-| Device type    | Kiro        | CachyOS      | Verdict                                              |
-|----------------|-------------|--------------|------------------------------------------------------|
-| NVMe           | `none`      | `kyber`      | different — `none` has less overhead; kyber adds QoS |
-| SSD (sd/mmcblk)| `bfq` (live) → `mq-deadline` (fixed in edu-system-files) | `mq-deadline` | fix pending deployment |
-| HDD            | `mq-deadline` (live) → `bfq` (fixed in edu-system-files) | `bfq`        | fix pending deployment |
-| Virtual (vd)   | `none`      | not set      | kiro explicit                                        |
-| USB            | `mq-deadline`| not set     | kiro explicit                                        |
+| Device type     | Kiro                                                     | CachyOS       | Verdict                                              |
+|-----------------|----------------------------------------------------------|---------------|------------------------------------------------------|
+| NVMe            | `none`                                                   | `kyber`       | different — `none` has less overhead; kyber adds QoS |
+| SSD (sd/mmcblk) | `bfq` (live) → `mq-deadline` (fixed in edu-system-files) | `mq-deadline` | fix pending deployment                               |
+| HDD             | `mq-deadline` (live) → `bfq` (fixed in edu-system-files) | `bfq`         | fix pending deployment                               |
+| Virtual (vd)    | `none`                                                   | not set       | kiro explicit                                        |
+| USB             | `mq-deadline`                                            | not set       | kiro explicit                                        |
 
 ### Networking
 
-| Setting                               | Kiro value   | CachyOS value          | Verdict                                  |
-|---------------------------------------|--------------|------------------------|------------------------------------------|
-| `net.ipv4.tcp_congestion_control`     | bbr          | cubic (default)        | kiro better for desktop/WiFi             |
-| `net.core.default_qdisc`             | fq           | fq_codel (arch default)| kiro better with BBR                     |
-| `net.core.netdev_max_backlog`        | 5000         | 4096                   | kiro slightly higher                     |
-| `net.ipv4.tcp_fastopen`              | 3            | not set                | kiro enables (client + server)           |
-| `net.ipv6.conf.all.use_tempaddr`     | 2            | not set (0)            | kiro better (IPv6 privacy addresses)     |
-| `net.ipv4.tcp_keepalive_time`        | 600          | 120 (arch default)     | different — arch 120s is more aggressive |
+| Setting                           | Kiro value | CachyOS value           | Verdict                                  |
+|-----------------------------------|------------|-------------------------|------------------------------------------|
+| `net.ipv4.tcp_congestion_control` | bbr        | cubic (default)         | kiro better for desktop/WiFi             |
+| `net.core.default_qdisc`          | fq         | fq_codel (arch default) | kiro better with BBR                     |
+| `net.core.netdev_max_backlog`     | 5000       | 4096                    | kiro slightly higher                     |
+| `net.ipv4.tcp_fastopen`           | 3          | not set                 | kiro enables (client + server)           |
+| `net.ipv6.conf.all.use_tempaddr`  | 2          | not set (0)             | kiro better (IPv6 privacy addresses)     |
+| `net.ipv4.tcp_keepalive_time`     | 600        | 120 (arch default)      | different — arch 120s is more aggressive |
 
 ### Security
 
-| Setting                            | Kiro value   | CachyOS value         | Verdict                                  |
-|------------------------------------|--------------|-----------------------|------------------------------------------|
-| `kernel.sysrq`                     | 244          | 16 (arch default)     | kiro: REISUB only; cachyos: SYNC only    |
-| `kernel.kptr_restrict`             | 2            | 2                     | same                                     |
-| `kernel.dmesg_restrict`            | 1            | not set (0)           | kiro stricter                            |
-| `kernel.yama.ptrace_scope`         | 1            | not set (0)           | kiro stricter                            |
-| `kernel.unprivileged_bpf_disabled` | 1            | not set               | kiro stricter                            |
-| `kernel.perf_event_paranoid`       | 3            | not set (2 default)   | kiro stricter                            |
-| `fs.suid_dumpable`                 | 0            | not set (0 default)   | same in practice                         |
-| `kernel.core_pattern`              | `/bin/false` | not set (systemd)     | kiro disables coredumps entirely         |
-| `kernel.unprivileged_userns_clone` | 1            | 1                     | same                                     |
-| `kernel.nmi_watchdog`              | 0            | 0                     | same                                     |
-| `kernel.printk`                    | 3 3 3 3      | 3 3 3 3               | same                                     |
+| Setting                            | Kiro value   | CachyOS value       | Verdict                               |
+|------------------------------------|--------------|---------------------|---------------------------------------|
+| `kernel.sysrq`                     | 244          | 16 (arch default)   | kiro: REISUB only; cachyos: SYNC only |
+| `kernel.kptr_restrict`             | 2            | 2                   | same                                  |
+| `kernel.dmesg_restrict`            | 1            | not set (0)         | kiro stricter                         |
+| `kernel.yama.ptrace_scope`         | 1            | not set (0)         | kiro stricter                         |
+| `kernel.unprivileged_bpf_disabled` | 1            | not set             | kiro stricter                         |
+| `kernel.perf_event_paranoid`       | 3            | not set (2 default) | kiro stricter                         |
+| `fs.suid_dumpable`                 | 0            | not set (0 default) | same in practice                      |
+| `kernel.core_pattern`              | `/bin/false` | not set (systemd)   | kiro disables coredumps entirely      |
+| `kernel.unprivileged_userns_clone` | 1            | 1                   | same                                  |
+| `kernel.nmi_watchdog`              | 0            | 0                   | same                                  |
+| `kernel.printk`                    | 3 3 3 3      | 3 3 3 3             | same                                  |
 
 ### Scheduler / CPU
 
-| Setting                          | Kiro value                    | CachyOS value | Verdict                                               |
-|----------------------------------|-------------------------------|---------------|-------------------------------------------------------|
-| `kernel.sched_autogroup_enabled` | not supported (lqx kernel)    | not set (1)   | lqx kernel does not expose this sysctl               |
-| `kernel.sched_rt_runtime_us`     | not supported (lqx kernel)    | not set       | lqx kernel does not expose this sysctl               |
-| `kernel.panic`                   | 10                            | not set (0)   | kiro auto-reboots on panic                           |
+| Setting                          | Kiro value                 | CachyOS value | Verdict                                |
+|----------------------------------|----------------------------|---------------|----------------------------------------|
+| `kernel.sched_autogroup_enabled` | not supported (lqx kernel) | not set (1)   | lqx kernel does not expose this sysctl |
+| `kernel.sched_rt_runtime_us`     | not supported (lqx kernel) | not set       | lqx kernel does not expose this sysctl |
+| `kernel.panic`                   | 10                         | not set (0)   | kiro auto-reboots on panic             |
 
 ### Systemd
 
-| Setting                    | Kiro value          | CachyOS value    | Verdict                                        |
-|----------------------------|---------------------|------------------|------------------------------------------------|
-| `DefaultTimeoutStartSec`   | 30s                 | 15s              | cachyos more aggressive — may kill slow services|
-| `DefaultTimeoutStopSec`    | 15s                 | 10s              | cachyos more aggressive                        |
-| `DefaultLimitNOFILE`       | 1048576 (soft/hard) | 2048:2097152     | different split; kiro is simpler               |
-| Journal `Storage`          | persistent          | not set (auto)   | kiro better — logs survive crashes             |
-| Journal `SystemMaxUse`     | 100M                | 50M              | kiro keeps more logs                           |
+| Setting                  | Kiro value          | CachyOS value  | Verdict                                          |
+|--------------------------|---------------------|----------------|--------------------------------------------------|
+| `DefaultTimeoutStartSec` | 30s                 | 15s            | cachyos more aggressive — may kill slow services |
+| `DefaultTimeoutStopSec`  | 15s                 | 10s            | cachyos more aggressive                          |
+| `DefaultLimitNOFILE`     | 1048576 (soft/hard) | 2048:2097152   | different split; kiro is simpler                 |
+| Journal `Storage`        | persistent          | not set (auto) | kiro better — logs survive crashes               |
+| Journal `SystemMaxUse`   | 100M                | 50M            | kiro keeps more logs                             |
 
 ### Audio
 
-| Item                                 | Kiro                       | CachyOS                                  | Verdict                                     |
-|--------------------------------------|----------------------------|------------------------------------------|---------------------------------------------|
-| Audio stack                          | PipeWire + PulseAudio compat| PipeWire + PulseAudio compat            | same                                        |
-| `@audio - rtprio`                    | 99 (`99-kiro.conf`)        | 99 (`20-audio.conf`)                     | same                                        |
-| snd_hda_intel power save (AC)        | not set                    | disabled on AC, enabled on battery       | cachyos better — prevents audio cracks      |
-| Audio PM udev rule                   | `68-sound-power.rules`     | `20-audio-pm.rules` (battery-aware)      | cachyos rule is more sophisticated; see Findings |
+| Item                          | Kiro                         | CachyOS                             | Verdict                                          |
+|-------------------------------|------------------------------|-------------------------------------|--------------------------------------------------|
+| Audio stack                   | PipeWire + PulseAudio compat | PipeWire + PulseAudio compat        | same                                             |
+| `@audio - rtprio`             | 99 (`99-kiro.conf`)          | 99 (`20-audio.conf`)                | same                                             |
+| snd_hda_intel power save (AC) | not set                      | disabled on AC, enabled on battery  | cachyos better — prevents audio cracks           |
+| Audio PM udev rule            | `68-sound-power.rules`       | `20-audio-pm.rules` (battery-aware) | cachyos rule is more sophisticated; see Findings |
 
 ### Notable CachyOS Services/Tools
 
-| Package / Service    | CachyOS | Kiro   | Notes                                               |
-|----------------------|---------|--------|-----------------------------------------------------|
-| `ananicy-cpp`        | active  | no     | Auto-adjusts process nice/ionice — improves desktop responsiveness |
-| `preload`            | active  | no     | Adaptive readahead — marginal benefit on SSD/NVMe  |
-| `power-profiles-daemon` | enabled | no  | Power profiles (balanced/performance/power-saver)  |
-| `chwd`               | yes     | no     | Hardware detection (like mhwd from Manjaro)        |
-| `cachyos-kernel-manager` | yes | no   | GUI kernel switcher                                |
-| `ananicy-cpp`        | yes     | no     | Worth evaluating for Kiro                          |
+| Package / Service        | CachyOS | Kiro | Notes                                                              |
+|--------------------------|---------|------|--------------------------------------------------------------------|
+| `ananicy-cpp`            | active  | no   | Auto-adjusts process nice/ionice — improves desktop responsiveness |
+| `preload`                | active  | no   | Adaptive readahead — marginal benefit on SSD/NVMe                  |
+| `power-profiles-daemon`  | enabled | no   | Power profiles (balanced/performance/power-saver)                  |
+| `chwd`                   | yes     | no   | Hardware detection (like mhwd from Manjaro)                        |
+| `cachyos-kernel-manager` | yes     | no   | GUI kernel switcher                                                |
+| `ananicy-cpp`            | yes     | no   | Worth evaluating for Kiro                                          |
 
 ---
 
@@ -187,10 +187,10 @@ None of these need changing — document them as intentional Kiro hardening.
 
 ## Improvements to Apply to Kiro
 
-| Item                              | Current Kiro          | Change to              | Source   |
-|-----------------------------------|-----------------------|------------------------|----------|
-| IO scheduler: SSD                 | bfq                   | mq-deadline            | CachyOS  |
-| IO scheduler: HDD                 | mq-deadline           | bfq                    | CachyOS  |
-| snd_hda_intel udev rule           | static off            | battery-aware AC/DC    | CachyOS  |
-| ZRAM size (evaluate)              | min(ram/2, 4096M)     | `ram` (test on metal)  | CachyOS  |
-| `ananicy-cpp` package             | not included          | add to package list    | CachyOS  |
+| Item                    | Current Kiro      | Change to             | Source  |
+|-------------------------|-------------------|-----------------------|---------|
+| IO scheduler: SSD       | bfq               | mq-deadline           | CachyOS |
+| IO scheduler: HDD       | mq-deadline       | bfq                   | CachyOS |
+| snd_hda_intel udev rule | static off        | battery-aware AC/DC   | CachyOS |
+| ZRAM size (evaluate)    | min(ram/2, 4096M) | `ram` (test on metal) | CachyOS |
+| `ananicy-cpp` package   | not included      | add to package list   | CachyOS |

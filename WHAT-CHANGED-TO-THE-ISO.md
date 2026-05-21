@@ -16,15 +16,15 @@ Headline: kernel swap, audio-stack swap, brand-new diagnostic toolchain, securit
 
 ### Headline diffs
 
-| Area                | Previous ISO                      | Current ISO                                                                                |
-|---------------------|-----------------------------------|--------------------------------------------------------------------------------------------|
-| Kernel              | `linux` (stock Arch)              | `linux-lqx` (Liquorix — desktop-tuned, BFQ-friendly)                                       |
-| Audio (live+inst)   | `pulseaudio` + `pulseaudio-alsa`  | `pipewire` + `wireplumber` + `pipewire-pulse`                                              |
-| Volume keys (WM)    | `amixer`                          | `pamixer`                                                                                  |
-| Diagnostic tools    | none                              | `kiro-audit`, `kiro-verify`, `kiro-diag`, `kiro-lint`, `kiro-enable-ssh` (each with `--help` / `--version` / `--dry-run` + man pages) |
-| Live-ISO SSH        | `PermitRootLogin yes` (archiso)   | archiso override removed                                                                   |
-| CUPS config perms   | world-readable                    | `0600` enforced via `tmpfiles.d`                                                           |
-| Version scheme      | `vYY.MM.DD.01`                    | `vYY.MM.DD`                                                                                |
+| Area              | Previous ISO                     | Current ISO                                                                                                                           |
+|-------------------|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| Kernel            | `linux` (stock Arch)             | `linux-lqx` (Liquorix — desktop-tuned, BFQ-friendly)                                                                                  |
+| Audio (live+inst) | `pulseaudio` + `pulseaudio-alsa` | `pipewire` + `wireplumber` + `pipewire-pulse`                                                                                         |
+| Volume keys (WM)  | `amixer`                         | `pamixer`                                                                                                                             |
+| Diagnostic tools  | none                             | `kiro-audit`, `kiro-verify`, `kiro-diag`, `kiro-lint`, `kiro-enable-ssh` (each with `--help` / `--version` / `--dry-run` + man pages) |
+| Live-ISO SSH      | `PermitRootLogin yes` (archiso)  | archiso override removed                                                                                                              |
+| CUPS config perms | world-readable                   | `0600` enforced via `tmpfiles.d`                                                                                                      |
+| Version scheme    | `vYY.MM.DD.01`                   | `vYY.MM.DD`                                                                                                                           |
 
 ### Kernel & boot
 
@@ -45,13 +45,13 @@ Headline: kernel swap, audio-stack swap, brand-new diagnostic toolchain, securit
 
 Five new commands installed by default. All share a common flag set (`--help`, `--version`, `--dry-run`) and ship man pages.
 
-| Tool                | What it does                                                                                                                                                                            |
-|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `kiro-diag`         | Structured system inventory: ISO release/codename/build, bootloader, CPU governor, kernel cmdline, packages, uptime, virt, locale, disk usage, swap, audio, bluetooth, temps, GPU (Intel detection), WM (ohmychadwm), paru/yay status. |
-| `kiro-audit`        | Health checker — sysctl security, ZRAM, failed units, boot/update info, MAKEFLAGS, package integrity. `--fix` mode auto-remediates known failures. `--version` reads from the owning pacman package. |
-| `kiro-verify`       | Post-install configuration checker — presence of deployed config files, IO scheduler expectations for SSDs.                                                                              |
-| `kiro-lint`         | Static config analyser.                                                                                                                                                                  |
-| `kiro-enable-ssh`   | One-shot SSH enabler with man page.                                                                                                                                                      |
+| Tool              | What it does                                                                                                                                                                                                                           |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `kiro-diag`       | Structured system inventory: ISO release/codename/build, bootloader, CPU governor, kernel cmdline, packages, uptime, virt, locale, disk usage, swap, audio, bluetooth, temps, GPU (Intel detection), WM (ohmychadwm), paru/yay status. |
+| `kiro-audit`      | Health checker — sysctl security, ZRAM, failed units, boot/update info, MAKEFLAGS, package integrity. `--fix` mode auto-remediates known failures. `--version` reads from the owning pacman package.                                   |
+| `kiro-verify`     | Post-install configuration checker — presence of deployed config files, IO scheduler expectations for SSDs.                                                                                                                            |
+| `kiro-lint`       | Static config analyser.                                                                                                                                                                                                                |
+| `kiro-enable-ssh` | One-shot SSH enabler with man page.                                                                                                                                                                                                    |
 
 In-tree `audit.sh` scripts in both `kiro-iso` and `kiro-iso-next` were removed once `kiro-audit` superseded them.
 

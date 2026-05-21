@@ -8,15 +8,15 @@ The change was first trialled on the `kiro-iso-next` experimental track, then pr
 
 ## TL;DR
 
-|                      | Before (stock `linux`)          | After (`linux-lqx`)              |
-|----------------------|---------------------------------|----------------------------------|
-| Kernel source        | Arch core repo                  | Chaotic-AUR (Liquorix patchset)  |
-| CPU scheduler        | CFS (throughput-biased)         | PDS/BMQ (latency-biased)         |
-| Tick rate            | 300 Hz                          | 1000 Hz                          |
-| Preemption           | Voluntary                       | Full (`PREEMPT`)                 |
-| Page replacement     | Standard                        | MG-LRU                           |
-| Security mitigations | All defaults on                 | Identical — nothing disabled     |
-| Best for             | General-purpose, servers, batch | Desktop, gaming, audio, UI       |
+|                      | Before (stock `linux`)          | After (`linux-lqx`)             |
+|----------------------|---------------------------------|---------------------------------|
+| Kernel source        | Arch core repo                  | Chaotic-AUR (Liquorix patchset) |
+| CPU scheduler        | CFS (throughput-biased)         | PDS/BMQ (latency-biased)        |
+| Tick rate            | 300 Hz                          | 1000 Hz                         |
+| Preemption           | Voluntary                       | Full (`PREEMPT`)                |
+| Page replacement     | Standard                        | MG-LRU                          |
+| Security mitigations | All defaults on                 | Identical — nothing disabled    |
+| Best for             | General-purpose, servers, batch | Desktop, gaming, audio, UI      |
 
 **You should feel:** snappier window operations, more stable audio under load, smoother game frame pacing, and identical security posture. You will not notice any difference at the login screen, during install, or in day-to-day Pacman use.
 
@@ -40,12 +40,12 @@ Each of the sections below is a place we looked, what we found, and what the pra
 
 ### 1. CPU scheduler
 
-|               | `linux` (Arch)                    | `linux-lqx`                          |
-|---------------|-----------------------------------|--------------------------------------|
-| Scheduler     | CFS (Completely Fair Scheduler)   | PDS or BMQ (Project-C)               |
-| Algorithm     | Tree-based, throughput-biased     | Bitmap-based, latency-biased         |
-| Task priority | Dynamic, amortized                | Round-robin with priority decay      |
-| Best for      | Servers, compile jobs, batch work | Desktops, gaming, interactive loads  |
+|               | `linux` (Arch)                    | `linux-lqx`                         |
+|---------------|-----------------------------------|-------------------------------------|
+| Scheduler     | CFS (Completely Fair Scheduler)   | PDS or BMQ (Project-C)              |
+| Algorithm     | Tree-based, throughput-biased     | Bitmap-based, latency-biased        |
+| Task priority | Dynamic, amortized                | Round-robin with priority decay     |
+| Best for      | Servers, compile jobs, batch work | Desktops, gaming, interactive loads |
 
 Desktop workloads — window-manager redraws, audio callback chains, browser repaints, terminal input — are dominated by short, bursty tasks. PDS/BMQ schedules these by **prioritizing responsiveness over throughput fairness**. On a tiling WM like ohmychadwm or i3, the effect is directly perceptible: snappier application launches, smoother window operations.
 
@@ -110,16 +110,16 @@ Chaotic-AUR typically publishes the new `linux-lqx` within hours of an upstream 
 
 ## Performance verdict
 
-| Scenario                          | Winner        | Margin          |
-|-----------------------------------|---------------|-----------------|
-| Desktop responsiveness (UI, WM)   | `linux-lqx`   | Noticeable      |
-| Audio / low-latency I/O           | `linux-lqx`   | Significant     |
-| Gaming (frame pacing)             | `linux-lqx`   | Moderate        |
-| Compile / batch throughput        | `linux` (CFS) | Minor           |
-| Server / database workloads       | `linux` (CFS) | Moderate        |
-| Security                          | Tie           | Identical       |
-| Stability (desktop use)           | Tie           | Identical       |
-| Stability (package supply chain)  | `linux`       | Minor advantage |
+| Scenario                         | Winner        | Margin          |
+|----------------------------------|---------------|-----------------|
+| Desktop responsiveness (UI, WM)  | `linux-lqx`   | Noticeable      |
+| Audio / low-latency I/O          | `linux-lqx`   | Significant     |
+| Gaming (frame pacing)            | `linux-lqx`   | Moderate        |
+| Compile / batch throughput       | `linux` (CFS) | Minor           |
+| Server / database workloads      | `linux` (CFS) | Moderate        |
+| Security                         | Tie           | Identical       |
+| Stability (desktop use)          | Tie           | Identical       |
+| Stability (package supply chain) | `linux`       | Minor advantage |
 
 For a desktop-first ISO targeting a tiling-WM-savvy audience, `linux-lqx` wins on every metric that matters to the target user.
 
@@ -143,15 +143,15 @@ We considered these acceptable because: (a) we already had `[chaotic-aur]` enabl
 
 For users who fork or rebuild Kiro themselves, here is the exact change set. Five files; each change is a string replacement.
 
-| File                                                            | Change                                                                                       |
-|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| `kiro-iso/archiso/packages.x86_64`                              | `linux` → `linux-lqx`, `linux-headers` → `linux-lqx-headers`                                 |
-| `kiro-iso/archiso/efiboot/loader/entries/01-archiso-linux.conf` | `vmlinuz-linux` → `vmlinuz-linux-lqx`, `initramfs-linux.img` → `initramfs-linux-lqx.img`     |
-| `kiro-iso/archiso/efiboot/loader/entries/02-nvidianouveau.conf` | Same path renames                                                                            |
-| `kiro-iso/archiso/efiboot/loader/entries/03-nomodeset.conf`     | Same path renames                                                                            |
-| `kiro-iso/archiso/syslinux/archiso_sys-linux.cfg`               | Same path renames                                                                            |
-| `kiro-iso/archiso/syslinux/archiso_pxe-linux.cfg`               | Same path renames                                                                            |
-| `kiro-calamares-config/etc/calamares/modules/unpackfs2.conf`    | Source + destination kernel path                                                             |
+| File                                                            | Change                                                                                   |
+|-----------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| `kiro-iso/archiso/packages.x86_64`                              | `linux` → `linux-lqx`, `linux-headers` → `linux-lqx-headers`                             |
+| `kiro-iso/archiso/efiboot/loader/entries/01-archiso-linux.conf` | `vmlinuz-linux` → `vmlinuz-linux-lqx`, `initramfs-linux.img` → `initramfs-linux-lqx.img` |
+| `kiro-iso/archiso/efiboot/loader/entries/02-nvidianouveau.conf` | Same path renames                                                                        |
+| `kiro-iso/archiso/efiboot/loader/entries/03-nomodeset.conf`     | Same path renames                                                                        |
+| `kiro-iso/archiso/syslinux/archiso_sys-linux.cfg`               | Same path renames                                                                        |
+| `kiro-iso/archiso/syslinux/archiso_pxe-linux.cfg`               | Same path renames                                                                        |
+| `kiro-calamares-config/etc/calamares/modules/unpackfs2.conf`    | Source + destination kernel path                                                         |
 
 Files that **did not** need to change, in case you're checking parity with another ISO:
 

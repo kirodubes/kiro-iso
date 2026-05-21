@@ -18,19 +18,19 @@ Kiro is significantly more hardened than a vanilla Arch install at the kernel le
 ### System Users
 Kiro ships many more system users due to its wider package set:
 
-| Extra on Kiro | Purpose |
-|---|---|
-| `named` | BIND DNS (bind package) |
-| `dnsmasq` | dnsmasq daemon |
-| `_talkd` | Legacy talk daemon |
-| `nbd` | Network block device |
-| `nm-openconnect`, `nm-openvpn` | VPN daemons |
-| `nvidia-persistenced` | NVIDIA persistence daemon |
-| `openvpn` | OpenVPN |
-| `partimag` | Partimage backup tool |
-| `rpc`, `rpcuser` | NFS RPC |
-| `saned` | SANE scanner daemon |
-| `usbmux` | iOS USB multiplexer |
+| Extra on Kiro                  | Purpose                   |
+|--------------------------------|---------------------------|
+| `named`                        | BIND DNS (bind package)   |
+| `dnsmasq`                      | dnsmasq daemon            |
+| `_talkd`                       | Legacy talk daemon        |
+| `nbd`                          | Network block device      |
+| `nm-openconnect`, `nm-openvpn` | VPN daemons               |
+| `nvidia-persistenced`          | NVIDIA persistence daemon |
+| `openvpn`                      | OpenVPN                   |
+| `partimag`                     | Partimage backup tool     |
+| `rpc`, `rpcuser`               | NFS RPC                   |
+| `saned`                        | SANE scanner daemon       |
+| `usbmux`                       | iOS USB multiplexer       |
 
 All are legitimate service accounts with `/usr/bin/nologin` shells. No unexpected login-capable accounts.
 
@@ -45,11 +45,11 @@ video, storage, audio, users, scanner, lp, vboxsf, i2c
 This is intentional for a desktop distro — gives the user access to hardware without sudo. Expected and correct.
 
 ### sudo Configuration
-| | Arch | Kiro |
-|---|---|---|
-| File | `/etc/sudoers.d/00_erik` | `/etc/sudoers.d/10-installer` |
-| Rule | `erik ALL=(ALL) ALL` | `%wheel ALL=(ALL:ALL) ALL` |
-| Style | Direct user grant | Group-based (better) |
+|       | Arch                     | Kiro                          |
+|-------|--------------------------|-------------------------------|
+| File  | `/etc/sudoers.d/00_erik` | `/etc/sudoers.d/10-installer` |
+| Rule  | `erik ALL=(ALL) ALL`     | `%wheel ALL=(ALL:ALL) ALL`    |
+| Style | Direct user grant        | Group-based (better)          |
 
 **Kiro is better here.** Wheel-group sudo is the correct practice — adding a user to wheel grants sudo, removing from wheel revokes it, without editing sudoers.
 
@@ -60,25 +60,25 @@ This is intentional for a desktop distro — gives the user access to hardware w
 ### Extra SUID on Kiro (vs Arch)
 All are expected given the installed packages:
 
-| Binary | Reason |
-|---|---|
-| `/opt/brave-bin/chrome-sandbox` | Brave browser sandbox |
-| `/opt/vivaldi/vivaldi-sandbox` | Vivaldi browser sandbox |
-| `/usr/lib/signal-desktop/chrome-sandbox` | Signal sandbox |
-| `/usr/bin/crontab` | cronie — users need SUID to manage crontabs |
-| `/usr/bin/fusermount` | FUSE mounting |
-| `/usr/bin/mount.cifs` | CIFS/Samba mounting |
-| `/usr/bin/mount.ecryptfs_private` | eCryptfs home mounting |
-| `/usr/bin/mount.nfs` | NFS mounting |
-| `/usr/bin/ndisc6`, `rdisc6`, `rltraceroute6` | IPv6 tools (ndisc6 package) |
-| `/usr/bin/slock` | Screen locker (needs SUID to lock TTY) |
+| Binary                                       | Reason                                      |
+|----------------------------------------------|---------------------------------------------|
+| `/opt/brave-bin/chrome-sandbox`              | Brave browser sandbox                       |
+| `/opt/vivaldi/vivaldi-sandbox`               | Vivaldi browser sandbox                     |
+| `/usr/lib/signal-desktop/chrome-sandbox`     | Signal sandbox                              |
+| `/usr/bin/crontab`                           | cronie — users need SUID to manage crontabs |
+| `/usr/bin/fusermount`                        | FUSE mounting                               |
+| `/usr/bin/mount.cifs`                        | CIFS/Samba mounting                         |
+| `/usr/bin/mount.ecryptfs_private`            | eCryptfs home mounting                      |
+| `/usr/bin/mount.nfs`                         | NFS mounting                                |
+| `/usr/bin/ndisc6`, `rdisc6`, `rltraceroute6` | IPv6 tools (ndisc6 package)                 |
+| `/usr/bin/slock`                             | Screen locker (needs SUID to lock TTY)      |
 
 ### Extra SGID on Kiro
-| Binary | Reason |
-|---|---|
-| `/usr/bin/mount.cifs` | (also SGID) |
-| `/usr/bin/mount.ecryptfs_private` | (also SGID) |
-| `/usr/bin/plocate` | plocate database needs group access |
+| Binary                            | Reason                              |
+|-----------------------------------|-------------------------------------|
+| `/usr/bin/mount.cifs`             | (also SGID)                         |
+| `/usr/bin/mount.ecryptfs_private` | (also SGID)                         |
+| `/usr/bin/plocate`                | plocate database needs group access |
 
 **No unexpected SUID/SGID binaries.** All are explained by packages Kiro ships.
 
@@ -112,19 +112,19 @@ Arch (as a normal install) does not have this file; its sshd defaults to `Permit
 ## Phase 5 — Listening Ports & Firewall
 
 ### Listening ports
-| Port | Arch | Kiro |
-|---|---|---|
-| 22 (SSH) | yes | yes |
-| 631 (CUPS) | yes | yes |
-| 53 (DNS) | no | yes — `systemd-resolved` |
-| 5355 (mDNS) | no | yes — `systemd-resolved` |
+| Port        | Arch | Kiro                     |
+|-------------|------|--------------------------|
+| 22 (SSH)    | yes  | yes                      |
+| 631 (CUPS)  | yes  | yes                      |
+| 53 (DNS)    | no   | yes — `systemd-resolved` |
+| 5355 (mDNS) | no   | yes — `systemd-resolved` |
 
 systemd-resolved's port 53 is bound to `127.0.0.54` and `127.0.0.53` only (loopback) — not exposed externally.
 
 ### Firewall
-| | Arch | Kiro |
-|---|---|---|
-| nftables | not installed | not installed |
+|          | Arch          | Kiro                                 |
+|----------|---------------|--------------------------------------|
+| nftables | not installed | not installed                        |
 | iptables | not installed | installed, **no rules** (ACCEPT all) |
 
 **Note:** Kiro has `iptables` loaded but with empty chains (`policy ACCEPT`). This means no firewall is active. For a desktop this is typical, but worth documenting. Arch has no firewall either — same exposure, but Kiro's empty iptables table could give a false sense of security if someone checks `iptables -L`.
@@ -135,15 +135,15 @@ systemd-resolved's port 53 is bound to `127.0.0.54` and `127.0.0.53` only (loopb
 
 Extra services enabled on Kiro (not present on Arch):
 
-| Unit | Purpose |
-|---|---|
-| `ananicy-cpp` | CPU/IO priority daemon for responsiveness |
-| `avahi-daemon` | mDNS/DNS-SD (network discovery) |
-| `pamac-cleancache.timer` | Periodic pacman cache pruning |
-| `pci-latency` | PCI bus latency optimizer |
-| `systemd-oomd` | Out-of-memory daemon (graceful OOM handling) |
-| `systemd-resolved` | DNS resolver with caching |
-| `vboxservice` | VirtualBox guest additions |
+| Unit                     | Purpose                                      |
+|--------------------------|----------------------------------------------|
+| `ananicy-cpp`            | CPU/IO priority daemon for responsiveness    |
+| `avahi-daemon`           | mDNS/DNS-SD (network discovery)              |
+| `pamac-cleancache.timer` | Periodic pacman cache pruning                |
+| `pci-latency`            | PCI bus latency optimizer                    |
+| `systemd-oomd`           | Out-of-memory daemon (graceful OOM handling) |
+| `systemd-resolved`       | DNS resolver with caching                    |
+| `vboxservice`            | VirtualBox guest additions                   |
 
 All are legitimate desktop services. `avahi-daemon` enables mDNS service discovery — acceptable for a desktop, slightly increases network exposure compared to a minimal server.
 
@@ -161,21 +161,21 @@ This is needed for the network tools Kiro bundles. Slightly wider name resolutio
 ### /etc/pam.d — Extra PAM configs on Kiro
 Kiro has these PAM configs not present on Arch:
 
-| File | Package | Risk |
-|---|---|---|
-| `crond` | cronie | Normal |
-| `i3lock` | i3lock | Normal |
-| `partimaged` | partimage | Normal |
-| `screen` | screen | Normal |
-| `rlogin` | inetutils | ⚠️ Legacy protocol |
-| `rsh` | inetutils | ⚠️ Legacy protocol |
+| File         | Package   | Risk               |
+|--------------|-----------|--------------------|
+| `crond`      | cronie    | Normal             |
+| `i3lock`     | i3lock    | Normal             |
+| `partimaged` | partimage | Normal             |
+| `screen`     | screen    | Normal             |
+| `rlogin`     | inetutils | ⚠️ Legacy protocol |
+| `rsh`        | inetutils | ⚠️ Legacy protocol |
 
 `rlogin` and `rsh` PAM configs are present because `inetutils` is installed. The services themselves are not enabled, but the PAM stack is configured for them. Not an active risk unless `rlogin`/`rsh` daemons are started.
 
 ### /etc/cups — Permission difference
-| File | Arch | Kiro |
-|---|---|---|
-| `classes.conf` | `-rw-------` (root:cups) | `-rw-r--r--` (world-readable) |
+| File            | Arch                     | Kiro                          |
+|-----------------|--------------------------|-------------------------------|
+| `classes.conf`  | `-rw-------` (root:cups) | `-rw-r--r--` (world-readable) |
 | `printers.conf` | `-rw-------` (root:cups) | `-rw-r--r--` (world-readable) |
 
 **⚠️ Issue:** CUPS config files (which contain printer names, device URIs, and potentially credentials) are world-readable on Kiro. Arch keeps them `root:cups` with `600`. This is a permission regression.
@@ -184,19 +184,19 @@ Kiro has these PAM configs not present on Arch:
 
 Kiro ships `99-kiro-optimizations.conf` — a large, well-documented sysctl profile. Security-relevant comparison:
 
-| Parameter | Arch default | Kiro |
-|---|---|---|
-| `fs.suid_dumpable` | `2` (world-readable core dumps) | `0` (disabled) ✓ |
-| `kernel.kptr_restrict` | `0` (no restriction) | `2` (admin only) ✓ |
-| `kernel.dmesg_restrict` | `0` | `1` ✓ |
-| `kernel.perf_event_paranoid` | `2` | `3` ✓ |
-| `kernel.yama.ptrace_scope` | `0` | `1` ✓ |
-| `kernel.unprivileged_bpf_disabled` | `0` | `1` ✓ |
-| `kernel.sysrq` | `16` (sync only) | `244` (REISUB only) ✓ |
-| `net.ipv4.conf.all.send_redirects` | `1` | `0` ✓ |
-| `net.ipv4.tcp_syncookies` | `1` | `1` — same |
-| `fs.suid_dumpable` (core pattern) | default | `\|/bin/false` ✓ |
-| `vm.overcommit_memory` | `0` | `1` ⚠️ |
+| Parameter                          | Arch default                    | Kiro                  |
+|------------------------------------|---------------------------------|-----------------------|
+| `fs.suid_dumpable`                 | `2` (world-readable core dumps) | `0` (disabled) ✓      |
+| `kernel.kptr_restrict`             | `0` (no restriction)            | `2` (admin only) ✓    |
+| `kernel.dmesg_restrict`            | `0`                             | `1` ✓                 |
+| `kernel.perf_event_paranoid`       | `2`                             | `3` ✓                 |
+| `kernel.yama.ptrace_scope`         | `0`                             | `1` ✓                 |
+| `kernel.unprivileged_bpf_disabled` | `0`                             | `1` ✓                 |
+| `kernel.sysrq`                     | `16` (sync only)                | `244` (REISUB only) ✓ |
+| `net.ipv4.conf.all.send_redirects` | `1`                             | `0` ✓                 |
+| `net.ipv4.tcp_syncookies`          | `1`                             | `1` — same            |
+| `fs.suid_dumpable` (core pattern)  | default                         | `\|/bin/false` ✓      |
+| `vm.overcommit_memory`             | `0`                             | `1` ⚠️                |
 
 **Kiro is substantially more hardened at the kernel level than vanilla Arch.**
 
@@ -239,27 +239,27 @@ No structural permission issues beyond the CUPS files noted in Phase 7. All dire
 ## Phase 10 — Home Directory
 
 ### /home/erik
-| | Arch | Kiro |
-|---|---|---|
-| `.bashrc` size | 172 bytes (minimal) | 13775 bytes (full custom) |
-| `.zshrc` | absent | 17310 bytes |
-| `.bin/` | absent | present — 40+ user scripts |
-| `.fehbg` | absent | present, **executable** (`-rwxr-xr-x`) |
-| `.screenrc` | absent | present |
-| `.config/` entries | 4 dirs | 26 dirs (full desktop config) |
-| `.ssh/` | present (empty agent dir) | absent |
-| `.gnupg/` | present | absent |
+|                    | Arch                      | Kiro                                   |
+|--------------------|---------------------------|----------------------------------------|
+| `.bashrc` size     | 172 bytes (minimal)       | 13775 bytes (full custom)              |
+| `.zshrc`           | absent                    | 17310 bytes                            |
+| `.bin/`            | absent                    | present — 40+ user scripts             |
+| `.fehbg`           | absent                    | present, **executable** (`-rwxr-xr-x`) |
+| `.screenrc`        | absent                    | present                                |
+| `.config/` entries | 4 dirs                    | 26 dirs (full desktop config)          |
+| `.ssh/`            | present (empty agent dir) | absent                                 |
+| `.gnupg/`          | present                   | absent                                 |
 
 The populated `.bin/` and dotfiles are Kiro's user experience — expected. `.fehbg` is world-readable and executable; it only sets the wallpaper so this is not a risk, but world-execute on a dotfile is mildly unusual.
 
 ### /root (root home)
-| | Arch | Kiro |
-|---|---|---|
-| Size | ~5 files (minimal) | ~15 files + `.bin/`, `.config/` |
-| `.bashrc` | 172 bytes | 13775 bytes (same as user) |
-| `.bin/` | absent | present (same scripts as user) |
-| `.fehbg` | absent | present, executable |
-| `.config/` | absent | 23 directories |
+|            | Arch               | Kiro                            |
+|------------|--------------------|---------------------------------|
+| Size       | ~5 files (minimal) | ~15 files + `.bin/`, `.config/` |
+| `.bashrc`  | 172 bytes          | 13775 bytes (same as user)      |
+| `.bin/`    | absent             | present (same scripts as user)  |
+| `.fehbg`   | absent             | present, executable             |
+| `.config/` | absent             | 23 directories                  |
 
 Kiro populates root's home the same way as the user's home. This means root has a full shell environment out of the box. Not a security vulnerability but worth noting — `/root/.bin/` contains scripts with execute permissions.
 
@@ -267,11 +267,11 @@ Kiro populates root's home the same way as the user's home. This means root has 
 
 ## Action Items
 
-| Priority | Item | Status | Phase |
-|---|---|---|---|
-| **High** | Remove `/etc/ssh/sshd_config.d/10-archiso.conf` (`PermitRootLogin yes`) | ✓ Done 2026-05-19 | 4 |
-| **Medium** | Fix CUPS config permissions via tmpfiles.d | ✓ Done 2026-05-19 | 9 |
-| **Low** | `inetutils` rlogin/rsh — no daemons running, kept for `ifconfig` | ✓ Accepted | 7 |
-| **Low** | `virtualbox-guest-utils` / `vboxservice` — no-op on real hardware, modules won't load on `linux-lqx` without DKMS | ✓ Kept intentionally (testing convenience) | 6 |
-| **Info** | `vm.overcommit_memory = 1` requires ZRAM — confirmed active via `zram-generator` + `edu-system-files-git` config (`zstd`, `min(ram/2, 4GB)`, priority 100) | ✓ Safe | 7 |
-| **Info** | `iptables` installed but empty rules — no firewall by design | ✓ Accepted | 5 |
+| Priority   | Item                                                                                                                                                       | Status                                     | Phase |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|-------|
+| **High**   | Remove `/etc/ssh/sshd_config.d/10-archiso.conf` (`PermitRootLogin yes`)                                                                                    | ✓ Done 2026-05-19                          | 4     |
+| **Medium** | Fix CUPS config permissions via tmpfiles.d                                                                                                                 | ✓ Done 2026-05-19                          | 9     |
+| **Low**    | `inetutils` rlogin/rsh — no daemons running, kept for `ifconfig`                                                                                           | ✓ Accepted                                 | 7     |
+| **Low**    | `virtualbox-guest-utils` / `vboxservice` — no-op on real hardware, modules won't load on `linux-lqx` without DKMS                                          | ✓ Kept intentionally (testing convenience) | 6     |
+| **Info**   | `vm.overcommit_memory = 1` requires ZRAM — confirmed active via `zram-generator` + `edu-system-files-git` config (`zstd`, `min(ram/2, 4GB)`, priority 100) | ✓ Safe                                     | 7     |
+| **Info**   | `iptables` installed but empty rules — no firewall by design                                                                                               | ✓ Accepted                                 | 5     |

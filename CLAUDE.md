@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Production** — stable kernel, tested packages, released to users. Paired with `kiro-calamares-config`.
 
-| Repo | Role | Calamares config |
-|---|---|---|
-| `kiro-iso` | **Production** — stable kernel, tested packages, released to users | `kiro-calamares-config` |
+| Repo            | Role                                                                                    | Calamares config             |
+|-----------------|-----------------------------------------------------------------------------------------|------------------------------|
+| `kiro-iso`      | **Production** — stable kernel, tested packages, released to users                      | `kiro-calamares-config`      |
 | `kiro-iso-next` | **Beta/Testing** — experimental features, kernel changes, new packages under evaluation | `kiro-calamares-config-next` |
 
 ## Project
@@ -37,11 +37,11 @@ cd build-scripts && bash build-the-iso.sh
 
 `change-version.sh` updates the version string (`vYY.MM.DD.01`) in exactly these three places — keep them in sync:
 
-| File | Field |
-|---|---|
-| `archiso/airootfs/etc/dev-rel` | `ISO_RELEASE=` |
-| `archiso/profiledef.sh` | `iso_label=` and `iso_version=` |
-| `build-scripts/build-the-iso.sh` | `kiroVersion=` |
+| File                             | Field                           |
+|----------------------------------|---------------------------------|
+| `archiso/airootfs/etc/dev-rel`   | `ISO_RELEASE=`                  |
+| `archiso/profiledef.sh`          | `iso_label=` and `iso_version=` |
+| `build-scripts/build-the-iso.sh` | `kiroVersion=`                  |
 
 To bump the `.01` suffix for same-day rebuilds, edit `extra="01"` in `change-version.sh`.
 

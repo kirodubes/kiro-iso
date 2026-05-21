@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-05-21 — Add WHAT-CHANGED-TO-THE-ISO.md (rolling release log)
+
+**What changed.** New top-level doc [WHAT-CHANGED-TO-THE-ISO.md](./WHAT-CHANGED-TO-THE-ISO.md) added — a rolling, user-facing release log that explains what's actually different between Kiro ISO builds (kernel, audio stack, defaults, calamares, security baseline, tooling). Updated monthly or per significant release; new entries land at the top. First entry covers the 2026-05-17 → 2026-05-21 release window: Liquorix kernel default, PipeWire migration, new `kiro-*` diagnostic toolchain in `edu-system-files`, security hardening pass (live-ISO SSH lockdown, CUPS 0600, sysctl tightening, PAM, udev, BFQ), installer mkinitcpio HOOKS fix + resume hook, version-scheme cleanup, edu-chadwm drop.
+
+**Why.** Users browsing the repo had no single place to see "what's new in this release" — the CHANGELOG is implementation-focused and not pitched at end users, and the per-feature docs (LIQUORIX.md, PIPEWIRE-MIGRATION.md, KIRO-VS-PRISM.md) each cover one thing in depth. The new doc is the elevator-pitch level, with links down into the deep dives. Designed to be the script source for monthly video walkthroughs as well.
+
+**Files modified.**
+- [WHAT-CHANGED-TO-THE-ISO.md](./WHAT-CHANGED-TO-THE-ISO.md) (new)
+
+## 2026-05-21 — User-facing LIQUORIX.md rewrite
+
+**What changed.** [LIQUORIX.md](./LIQUORIX.md) rewritten from a pre-decision "should we switch?" study into a user-facing "why we ship Liquorix" doc. New structure: TL;DR comparison table; what-you'll-feel summary; eight study sections (scheduler, HZ, preemption, memory/IO, security parity, modules, DKMS, update cadence); performance verdict; honest trade-offs (Chaotic-AUR supply chain, no LTS variant); five-file change-set table for forkers; looking-ahead notes (NVIDIA hygiene, LTS fallback, rEFInd, `linux-kiro-lqx` separation).
+
+**Why.** The doc was written before the kernel switch landed. By the time `linux-lqx` was actually shipping in `archiso/packages.x86_64`, `efiboot/loader/entries/*.conf`, `syslinux/*.cfg`, and `kiro-calamares-config/.../unpackfs2.conf`, the doc still asked an already-answered question. Reframing it to "we shipped this, here's the reasoning" makes it useful to readers (potential Kiro users, forkers, anyone evaluating distros) instead of just to past-Erik.
+
+**Files modified.**
+- [LIQUORIX.md](./LIQUORIX.md)
+
 ## 2026-05-19 — Deep source-vs-VM verification + duplicate config cleanup
 
 ### Source-to-VM integrity check

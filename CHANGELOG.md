@@ -4,13 +4,13 @@
 
 ---
 
-## 2026-05-22 — `tuned` finished: add `tuned-ppd`, enable services, default to `desktop` profile
+## 2026-05-22 — `tuned` finished: add `tuned-ppd`, enable services, default to `throughput-performance`
 
 **What changed.** The `tuned` package had been sitting in [archiso/packages.x86_64](./archiso/packages.x86_64) installed-but-dormant — no service enabled, no PPD bridge, no profile selected. Finished the job:
 
 - **`tuned-ppd` added** to [archiso/packages.x86_64](./archiso/packages.x86_64) (line 530) — provides the `power-profiles-daemon`-compatible D-Bus interface so XFCE / KDE / GNOME power widgets can drive `tuned` without users dropping to `tuned-adm` in a terminal.
 - **`tuned.service` and `tuned-ppd.service` enabled on the live ISO** via symlinks in `archiso/airootfs/etc/systemd/system/multi-user.target.wants/`.
-- **Default profile pinned to `desktop`** via `archiso/airootfs/etc/tuned/active_profile` + `profile_mode=manual`. Chosen over `balanced` because Kiro already ships Liquorix (desktop-tuned kernel) and ohmychadwm — the `desktop` profile aligns with that positioning while remaining safe on laptops and VMs.
+- **Default profile pinned to `throughput-performance`** via `archiso/airootfs/etc/tuned/active_profile` + `profile_mode=manual`. This is the tuned profile that maps to PPD's `performance` mode — DE power widgets will display "Performance" as the active profile on first boot. Chosen over `balanced` / `desktop` because Kiro is explicitly a performance-oriented distro (Liquorix kernel, ohmychadwm, BFQ scheduler, ananicy-cpp); the default should match that positioning rather than hedge.
 
 **Why.** Mid-task audit caught the half-baked state — `tuned` was listed but not wired up, contradicting the README's "Performance Tuned" claim. Without `tuned-ppd`, no DE power widget could see profiles; without a service symlink, the daemon never ran. The CHANGELOG history shows `tuned` was added → removed → re-added over time without a clean finish; this commit closes that loop.
 

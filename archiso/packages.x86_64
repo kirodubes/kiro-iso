@@ -527,6 +527,7 @@ glances
 hblock
 libgepub
 tuned
+tuned-ppd
 vte4
 pciutils
 sysz

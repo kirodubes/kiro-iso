@@ -4,6 +4,25 @@
 
 ---
 
+## 2026-05-22 — `tuned` finished: add `tuned-ppd`, enable services, default to `desktop` profile
+
+**What changed.** The `tuned` package had been sitting in [archiso/packages.x86_64](./archiso/packages.x86_64) installed-but-dormant — no service enabled, no PPD bridge, no profile selected. Finished the job:
+
+- **`tuned-ppd` added** to [archiso/packages.x86_64](./archiso/packages.x86_64) (line 530) — provides the `power-profiles-daemon`-compatible D-Bus interface so XFCE / KDE / GNOME power widgets can drive `tuned` without users dropping to `tuned-adm` in a terminal.
+- **`tuned.service` and `tuned-ppd.service` enabled on the live ISO** via symlinks in `archiso/airootfs/etc/systemd/system/multi-user.target.wants/`.
+- **Default profile pinned to `desktop`** via `archiso/airootfs/etc/tuned/active_profile` + `profile_mode=manual`. Chosen over `balanced` because Kiro already ships Liquorix (desktop-tuned kernel) and ohmychadwm — the `desktop` profile aligns with that positioning while remaining safe on laptops and VMs.
+
+**Why.** Mid-task audit caught the half-baked state — `tuned` was listed but not wired up, contradicting the README's "Performance Tuned" claim. Without `tuned-ppd`, no DE power widget could see profiles; without a service symlink, the daemon never ran. The CHANGELOG history shows `tuned` was added → removed → re-added over time without a clean finish; this commit closes that loop.
+
+**Follow-up (not in this repo).** The installed system enables services via Calamares, not this overlay. `kiro-calamares-config` and/or `kiro_final` need a matching `systemctl enable tuned.service tuned-ppd.service` so the post-install system inherits the same setup — flagged for the next session.
+
+**Files modified.**
+- [archiso/packages.x86_64](./archiso/packages.x86_64)
+- `archiso/airootfs/etc/tuned/active_profile` (new)
+- `archiso/airootfs/etc/tuned/profile_mode` (new)
+- `archiso/airootfs/etc/systemd/system/multi-user.target.wants/tuned.service` (new symlink)
+- `archiso/airootfs/etc/systemd/system/multi-user.target.wants/tuned-ppd.service` (new symlink)
+
 ## 2026-05-21 — Add WHAT-CHANGED-TO-THE-ISO.md (rolling release log)
 
 **What changed.** New top-level doc [WHAT-CHANGED-TO-THE-ISO.md](./WHAT-CHANGED-TO-THE-ISO.md) added — a rolling, user-facing release log that explains what's actually different between Kiro ISO builds (kernel, audio stack, defaults, calamares, security baseline, tooling). Updated monthly or per significant release; new entries land at the top. First entry covers the 2026-05-17 → 2026-05-21 release window: Liquorix kernel default, PipeWire migration, new `kiro-*` diagnostic toolchain in `edu-system-files`, security hardening pass (live-ISO SSH lockdown, CUPS 0600, sysctl tightening, PAM, udev, BFQ), installer mkinitcpio HOOKS fix + resume hook, version-scheme cleanup, edu-chadwm drop.

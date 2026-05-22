@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-05-22 — `tuned-ppd` clobber fix: pre-seed `ppd_base_profile`
+
+**What changed.** Discovered that the earlier "default to `throughput-performance`" work (same day, below) didn't actually survive first boot — installed Kiro VMs were landing on `active_profile = balanced` regardless. Root cause traced through `tuned.ppd.controller.Controller.initialize()`:
+
+```python
+self._base_profile = self._load_base_profile() \
+                  or self._get_recommend_profile() \
+                  or self._config.default_profile
+```
+
+Short-circuit chain. `_load_base_profile()` reads `/etc/tuned/ppd_base_profile` (empty on first boot → None). `_get_recommend_profile()` asks `tuned.service` via D-Bus for its recommendation — tuned's `recommend.d` runs `virt-what` (binary not installed → error logged 4×), then falls back to its generic recommendation of `balanced`. That maps via `ppd.conf` `[profiles]` to PPD `balanced` → step 2 returns `"balanced"` → step 3 (`default=performance` in `ppd.conf`) **never fires**. The "Without this override, the airootfs-seeded active_profile is silently clobbered" comment in `ppd.conf` was correct about the symptom but wrong about the mechanism — the `default=` line itself was load-bearing for nothing.
+
+**The fix — one new file.** Added `archiso/airootfs/etc/tuned/ppd_base_profile` containing `performance\n`. That makes step 1 of the short-circuit chain succeed, returning `"performance"`, which tuned-ppd then maps via `ppd.conf` `[profiles]` back to tuned's `throughput-performance` — exactly the airootfs-seeded `active_profile`. No more clobber.
+
+The `tuned` package does NOT list `ppd_base_profile` in its pacman `Backup` array (only `active_profile`, `profile_mode`, etc. are), so on a `pacman -S tuned` reinstall the file would be silently overwritten with the empty package version — but Calamares does not reinstall `tuned` (only `pacman -Sy` + `systemctl enable`), so the pre-seeded file rides the airootfs squashfs unpack into the installed target intact. Verified on a fresh Kiro VM install (2026-05-22): tuned-ppd starts, reads `ppd_base_profile = performance`, maps to `throughput-performance`, writes it back to `active_profile`. Same profile, no more reset.
+
+**Comment in `ppd.conf` rewritten.** The misleading "default=performance overrides upstream balanced" explanation replaced with an accurate description of the three-step short-circuit chain and which step actually wins. The `default=` line itself is kept as belt-and-braces — it fires only if `ppd_base_profile` is later wiped.
+
+**Not the cause (but worth noting).** `virt-what` not being installed *produces* the four `tuned.utils.commands` errors in `/var/log/tuned/tuned.log`, but installing it wouldn't have fixed the underlying bug — on bare-metal desktops tuned still recommends `balanced` (no virt detected), short-circuiting before `default=`. The `ppd_base_profile` approach is the universal fix.
+
+**Why this matters.** Without this, Kiro's "Performance Tuned" positioning was a lie at boot — DE power widgets showed "Balanced", CPU governor stayed on `schedutil` default, dirty page ratios used the conservative balanced profile. Now the installed system actually inherits the performance-oriented tuning the rest of the stack (Liquorix, BFQ, ananicy-cpp) is built around.
+
+**Files modified.**
+- `archiso/airootfs/etc/tuned/ppd_base_profile` (new — single line, `performance\n`)
+- `archiso/airootfs/etc/tuned/ppd.conf` (comment rewritten; `default=` line unchanged)
+
 ## 2026-05-22 — `tuned` finished: add `tuned-ppd`, enable services, default to `throughput-performance`
 
 **What changed.** The `tuned` package had been sitting in [archiso/packages.x86_64](./archiso/packages.x86_64) installed-but-dormant — no service enabled, no PPD bridge, no profile selected. Finished the job:

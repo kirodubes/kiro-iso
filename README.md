@@ -1,6 +1,8 @@
 # KIRO ISO
 
-![Kiro Logo](images/kiro.jpg)
+<p align="center">
+  <img src="images/kiro.jpg" alt="Kiro" width="220" />
+</p>
 
 ![Kiro Desktop - XFCE](images/kiro-xfce.jpg)
 

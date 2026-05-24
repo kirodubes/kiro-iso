@@ -73,14 +73,12 @@ KIRO comes pre-loaded with:
 ### Build Workflow
 
 ```bash
-# 1. Bump the version string across all version files
-bash change-version.sh
-
-# 2. Build the ISO (run as normal user from build-scripts/)
+# One command does everything — version bump and build are merged
+# (run as normal user from build-scripts/; the script calls sudo internally)
 cd build-scripts && bash build-the-iso.sh
 ```
 
-Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.
+The build bumps the version (`vYY.MM.DD`) across all version files as its **Phase 2**, gated by the `bump_version="yes"` flag in the config block — set it to `no` for a same-day rebuild of the currently-pinned version. Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.
 
 ### NVIDIA Driver Selection
 
@@ -122,7 +120,6 @@ kiro-iso/
 │   └── pacman.conf             # pacman config installed on the build host
 ├── images/                     # Screenshots and branding assets
 ├── CHANGELOG.md                # Full project history
-├── change-version.sh           # Bumps version across all version files
 ├── setup.sh                    # Git remote and identity setup
 └── up.sh                       # Pull → commit → push helper
 ```

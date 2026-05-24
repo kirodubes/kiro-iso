@@ -161,7 +161,7 @@ All bash scripts in this repo follow the standard template:
 8. `main()` ending with `log_success "$(basename "$0") done"`
 9. `main "$@"`
 
-All four build scripts (`build-the-iso.sh`, `get-pacman-repos-keys-and-mirrors.sh`, `install-yay-or-paru.sh`, `change-version.sh`) conform to this template as of 2026-05-18.
+All three build scripts (`build-the-iso.sh`, `get-pacman-repos-keys-and-mirrors.sh`, `install-yay-or-paru.sh`) conform to this template as of 2026-05-18.
 
 ## Commit Conventions
 

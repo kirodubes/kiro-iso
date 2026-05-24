@@ -84,9 +84,8 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 - `archiso/profiledef.sh` — ArchISO profile: name, label, version, bootmodes, compression
 - `archiso/pacman.conf` — pacman config used inside the ISO build
 - `archiso/efiboot/loader/entries/` — UEFI boot entries (kernel + initrd paths; must match kernel in packages.x86_64)
-- `build-scripts/build-the-iso.sh` — full build pipeline
+- `build-scripts/build-the-iso.sh` — full build pipeline (includes `apply_version_bump()` as Phase 2)
 - `build-scripts/get-pacman-repos-keys-and-mirrors.sh` — installs chaotic-keyring/mirrorlist if missing
-- `change-version.sh` — version bump script
 - `up.sh` — git pull → `git add --all` + commit `"update"` + push; quick-push only, not for structured commits
 - `audit.sh` — installed system health checker; run on a freshly installed Kiro VM to verify all Calamares modules ran correctly
 

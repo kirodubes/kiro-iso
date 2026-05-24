@@ -4,6 +4,65 @@
 
 ---
 
+## 2026-05-24 — `v26.05.24`: build/version merge, de-branding sweep, hibernate validation
+
+A multi-theme day. Newest commits first within the day.
+
+### Build workflow — version bump merged into the build, `change-version.sh` retired
+
+**What changed.** The two-step release dance (`bash change-version.sh` then `bash build-the-iso.sh`) collapsed into one command. **`change-version.sh` was deleted** (128 lines) and its logic re-homed inside [build-scripts/build-the-iso.sh](./build-scripts/build-the-iso.sh) as a new `apply_version_bump()` function that runs as **Phase 2**, after the root/btrfs/chaotic preflight but before package checks. The bump is gated by a new `bump_version="yes"` flag in the config block — set it to `no` for a same-day rebuild of the currently-pinned version.
+
+**Technical details.** `apply_version_bump()` derives `newversion="v$(date +%y.%m.%d)"` and `sed`-rewrites the three canonical version fields in place: `ISO_RELEASE=` in **dev-rel**, `kiroVersion='…'` in **build-the-iso.sh**, and both `iso_label=`/`iso_version=` in **profiledef.sh**. The `kiroVersion` substitution is anchored to `^` so it only touches the config-block assignment and never the `sed` line itself. Crucially, it then re-derives the in-memory `kiroVersion` and `isoLabel` so the *current* build uses the freshly bumped string — no stale-version mismatch between the bump and the `mkarchiso` run. A summary block echoes the three resulting lines for at-a-glance verification.
+
+**Why.** The split was a footgun: forgetting `change-version.sh`, or running it twice, produced version drift across the three files (the exact failure mode the `## isoLabel Must Match` note in CLAUDE.md guards against). Folding it into the build as a flagged phase makes the single documented command (`cd build-scripts && bash build-the-iso.sh`) authoritative and keeps all version mutation in one place. [CLAUDE.md](./CLAUDE.md) build-workflow section was rewritten to match.
+
+### De-branding sweep — ArcoLinux / arconet → Kiro
+
+**What changed.** A pass to scrub residual ArcoLinux ancestry from user-visible boot and shell surfaces:
+
+- **Boot menus** — `arconet` / `arcolinux` titles replaced with `kiro` across [archiso/efiboot/loader/entries/](./archiso/efiboot/loader/entries/) (01/02/03), [archiso/grub/grub.cfg](./archiso/grub/grub.cfg), and the syslinux configs ([archiso_head.cfg](./archiso/syslinux/archiso_head.cfg), [archiso_pxe-linux.cfg](./archiso/syslinux/archiso_pxe-linux.cfg), [archiso_sys-linux.cfg](./archiso/syslinux/archiso_sys-linux.cfg)). Menu labels and help text now read "Boot kiro …" / "install kiro …".
+- **GRUB distributor** — `GRUB_DISTRIBUTOR` in **archiso/airootfs/etc/default/grub** changed from `"ArcoLinux Kiro"` to `"Kiro"`.
+- **Hostname** — **archiso/airootfs/etc/hostname** changed from `arconet` to `kiro`.
+- **SDDM** — `Current=` in **kde_settings.conf** moved from `arcolinux-simplicity` to `edu-simplicity`.
+- **skel `.bashrc`** — three dead Arco-era aliases removed: `rmlogoutlock` (pointed at `/tmp/arcologout.lock`), `install-grub-efi` (hard-coded `--bootloader-id=ArcoLinux`), and `npicom` (pointed at the non-existent `~/.config/arco-chadwm/picom/picom.conf`).
+
+**Why.** The branding note in CLAUDE.md flags this migration as ongoing; these were the last `arco*` strings a user would actually *see* (boot screen, hostname, login theme) or trip over (broken aliases). Cosmetic, but it's the difference between a polished distro and an obvious fork.
+
+### Live-ISO skel `.bashrc` now sourced from `edu-shells`
+
+**What changed.** [up.sh](./up.sh) gained an `update_skel_bashrc()` step in `main()` (after `git_pull`, before `clean_pycache`) that copies `~/EDU/edu-shells/etc/skel/.bashrc-latest` over [archiso/airootfs/etc/skel/.bashrc](./archiso/airootfs/etc/skel/.bashrc). It warns and skips gracefully if the source file is absent, so the quick-push flow never breaks on a machine without the `edu-shells` checkout.
+
+**Why.** Keeps the live-ISO skel shell config in lockstep with the canonical `edu-shells` source instead of letting the in-tree copy drift by hand-editing. See [[skel-bashrc-only]] — skel still ships only `.bashrc` (the live env is bash; the user's real shell is chosen later via ATT).
+
+### `tuned` — `ppd_base_profile` removed
+
+**What changed.** The `archiso/airootfs/etc/tuned/ppd_base_profile` file (added 2026-05-22 as the clobber fix) was deleted. `active_profile`, `profile_mode`, and `ppd.conf` remain.
+
+**Caveat.** `ppd.conf` still carries the comment "Step 1 wins in practice, so `default=` only matters if `ppd_base_profile` [is wiped]" — which no longer holds now that the file is gone. With step 1 of the short-circuit chain removed, profile selection falls through to tuned's `recommend` (→ `balanced` on bare metal) before `default=performance` can fire, re-exposing the exact reset documented on 2026-05-22. **Flagged for verification** — confirm on a fresh install whether `active_profile` survives, and either restore the seed or rewrite the stale `ppd.conf` comment.
+
+### DISTRO_TESTING — Picard bare-metal hibernate validation
+
+**What changed.** New [DISTRO_TESTING.md](./DISTRO_TESTING.md) entry for `v26.05.24` on **Picard** (bare-metal ASUS STRIX Z270H, i7-7700K, Intel I219-V, UEFI/systemd-boot, `linux-lqx 7.0.10`). Boot PASS at 17.8s; install via Calamares with a **dedicated swap partition** (new `kiro-calamares-config-next` feature); `kiro-audit` **92 PASS / 0 WARN / 0 FAIL**. Hibernate→resume (S4) and suspend (S3) both PASS on bare metal — `resume` hook present and correctly ordered, `resume=UUID=` matches swap, swap ≥ RAM. Documented that hibernate **cannot** be validated under VirtualBox (`vmwgfx` aborts the freeze with "Can't hibernate while 3D resources are active" when VMSVGA 3D is on — a VM-GPU limitation, not a distro bug). One cosmetic finding: two boot-time `ethtool` errors from `62-network-optimization.rules` wrongly applying server-NIC knobs to the I219-V `e1000e` — fixed in `edu-system-files` `36b4f77`, pending package + ISO rebuild.
+
+### Files modified
+
+- [build-scripts/build-the-iso.sh](./build-scripts/build-the-iso.sh) (Phase 2 `apply_version_bump()`, `bump_version` flag, version → `v26.05.24`)
+- `change-version.sh` (**deleted**)
+- [CLAUDE.md](./CLAUDE.md) (build-workflow rewrite)
+- `archiso/airootfs/etc/dev-rel`, [archiso/profiledef.sh](./archiso/profiledef.sh) (version → `v26.05.24`)
+- `archiso/efiboot/loader/entries/{01,02,03}-*.conf`, [archiso/grub/grub.cfg](./archiso/grub/grub.cfg), `archiso/syslinux/*.cfg` (boot-menu de-branding)
+- `archiso/airootfs/etc/default/grub`, `archiso/airootfs/etc/hostname`, `archiso/airootfs/etc/sddm.conf.d/kde_settings.conf` (de-branding)
+- [archiso/airootfs/etc/skel/.bashrc](./archiso/airootfs/etc/skel/.bashrc) (dead Arco aliases removed)
+- [up.sh](./up.sh) (`update_skel_bashrc()` step)
+- `archiso/airootfs/etc/tuned/ppd_base_profile` (**deleted**)
+- [DISTRO_TESTING.md](./DISTRO_TESTING.md) (Picard `v26.05.24` entry)
+
+## 2026-05-23 — New Kiro logo on README
+
+**What changed.** [README.md](./README.md) now shows the new Kiro logo, and `images/kiro.jpg` was re-exported far smaller (≈197 KB → ≈37 KB). **Why.** Updated branding asset plus a lighter repo — the old JPG was ~5× the size for no visual benefit at README display dimensions.
+
+**Files modified.** [README.md](./README.md), `images/kiro.jpg`.
+
 ## 2026-05-22 — `tuned-ppd` clobber fix: pre-seed `ppd_base_profile`
 
 **What changed.** Discovered that the earlier "default to `throughput-performance`" work (same day, below) didn't actually survive first boot — installed Kiro VMs were landing on `active_profile = balanced` regardless. Root cause traced through `tuned.ppd.controller.Controller.initialize()`:

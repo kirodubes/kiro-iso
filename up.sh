@@ -101,6 +101,20 @@ git_pull() {
     git -C "${SCRIPT_DIR}" pull || log_warn "Git pull failed — continuing with local state"
 }
 
+update_skel_bashrc() {
+    local src="/home/erik/EDU/edu-shells/etc/skel/.bashrc-latest"
+    local dest="${SCRIPT_DIR}/archiso/airootfs/etc/skel/.bashrc"
+
+    if [[ ! -f "${src}" ]]; then
+        log_warn "Source .bashrc-latest not found at ${src} — skipping skel update"
+        return 0
+    fi
+
+    log_section "Updating skel .bashrc from edu-shells"
+    cp -f "${src}" "${dest}"
+    log_success "skel .bashrc updated"
+}
+
 ensure_git_remote_configured() {
     local remote_url
     if ! git -C "${SCRIPT_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -141,6 +155,7 @@ git_commit_and_push() {
 main() {
     ensure_git_remote_configured
     git_pull
+    update_skel_bashrc
     clean_pycache
 
     if [[ -f "${SCRIPT_DIR}/chaotic.sh" ]]; then

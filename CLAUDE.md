@@ -33,7 +33,7 @@ cd build-scripts && bash build-the-iso.sh
 
 ## Version Files
 
-`change-version.sh` updates the version string (`vYY.MM.DD.01`) in exactly these three places — keep them in sync:
+`build-the-iso.sh`'s `apply_version_bump()` (Phase 2) sets the version string (`vYY.MM.DD`) in exactly these three places — keep them in sync:
 
 | File                             | Field                           |
 |----------------------------------|---------------------------------|
@@ -41,7 +41,7 @@ cd build-scripts && bash build-the-iso.sh
 | `archiso/profiledef.sh`          | `iso_label=` and `iso_version=` |
 | `build-scripts/build-the-iso.sh` | `kiroVersion=`                  |
 
-To bump the `.01` suffix for same-day rebuilds, edit `extra="01"` in `change-version.sh`.
+For a same-day rebuild that keeps the currently-pinned version, set `bump_version="no"` in the config block of `build-the-iso.sh`.
 
 ## Nvidia Driver Selection
 

@@ -295,6 +295,8 @@ duf
 evince
 expac
 file-roller
+firewalld
+firewall-config
 git
 gnome-disk-utility
 gnome-keyring
@@ -527,6 +529,7 @@ irqbalance
 glances
 hblock
 libgepub
+timeshift
 tuned
 tuned-ppd
 vte4

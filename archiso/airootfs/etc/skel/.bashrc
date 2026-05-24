@@ -93,9 +93,6 @@ alias setlocales="sudo localectl set-x11-keymap be && sudo localectl set-locale 
 alias unlock="sudo rm /var/lib/pacman/db.lck"
 alias rmpacmanlock="sudo rm /var/lib/pacman/db.lck"
 
-#logout unlock
-alias rmlogoutlock="sudo rm /tmp/arcologout.lock"
-
 #which graphical card is working
 alias whichvga="/usr/local/bin/edu-which-vga"
 
@@ -129,8 +126,6 @@ alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
 #grub update
 alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 alias grub-update="sudo grub-mkconfig -o /boot/grub/grub.cfg"
-#grub issue 08/2022
-alias install-grub-efi="sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ArcoLinux"
 
 #add new fonts
 alias update-fc='sudo fc-cache -fv'
@@ -285,7 +280,6 @@ alias nrefind="sudo $EDITOR /boot/refind_linux.conf"
 alias nalacritty="nano /home/$USER/.config/alacritty/alacritty.toml"
 alias nemptty="sudo $EDITOR /etc/emptty/conf"
 alias nkitty="$EDITOR ~/.config/kitty/kitty.conf"
-alias npicom="$EDITOR ~/.config/arco-chadwm/picom/picom.conf"
 
 #removing packages
 alias rvariety="edu-remove-variety"

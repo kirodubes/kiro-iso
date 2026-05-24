@@ -17,16 +17,14 @@ Custom Arch Linux ISO builder based on ArchISO. Produces a live/installable ISO 
 
 ## Build Workflow
 
-Always run these in order from `build-scripts/`:
+A single command does everything — version bump and build are merged:
 
 ```bash
-# 1. Bump version across all version files (generates vYY.MM.DD.01)
-bash change-version.sh
-
-# 2. Build the ISO (run as normal user — script calls sudo internally)
+# Build the ISO (run as normal user — script calls sudo internally)
 cd build-scripts && bash build-the-iso.sh
 ```
 
+- The script bumps the version (`vYY.MM.DD`) as its **Phase 2**, before the build, gated by the `bump_version` flag in the config block (default `yes`). Set `bump_version="no"` for a same-day rebuild of the currently-pinned version.
 - Build output lands in `~/kiro-Out/`
 - Build working directory is `~/kiro-build/` (deleted/recreated each run)
 - Checksums (sha1, sha256, md5) and a pkglist are auto-generated alongside the ISO

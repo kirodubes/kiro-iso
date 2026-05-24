@@ -87,7 +87,8 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Build configuration — edit these before building
 #####################################################################
 desktop="xfce4/ohmychadwm"
-kiroVersion='v26.05.22'
+kiroVersion='v26.05.24'
+bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
 chaoticsrepo=true
 clean_pacman_cache="no"       # yes | no
@@ -101,6 +102,44 @@ PACKAGES_FILE="${buildFolder}/archiso/packages.x86_64"
 #####################################################################
 # Functions
 #####################################################################
+apply_version_bump() {
+    if [[ "${bump_version}" != "yes" ]]; then
+        log_info "Skipping version bump (bump_version=no) — building ${kiroVersion}"
+        return 0
+    fi
+
+    local newversion
+    newversion="v$(date +%y.%m.%d)"
+
+    log_section "Phase 2 — Bumping version to ${newversion}"
+
+    local devrel="${REPO_DIR}/archiso/airootfs/etc/dev-rel"
+    local buildiso="${SCRIPT_DIR}/build-the-iso.sh"
+    local profiledef="${REPO_DIR}/archiso/profiledef.sh"
+
+    echo "Updating ${devrel}"
+    sed -i "s|^ISO_RELEASE=.*|ISO_RELEASE=${newversion}|" "${devrel}"
+
+    echo "Updating ${buildiso}"
+    # Anchored to ^ so this only rewrites the config-block assignment, never this sed line itself
+    sed -i "s|^kiroVersion='[^']*'|kiroVersion='${newversion}'|" "${buildiso}"
+
+    echo "Updating iso_label in ${profiledef}"
+    sed -i "s|^iso_label=\"kiro-.*\"|iso_label=\"kiro-${newversion}\"|" "${profiledef}"
+
+    echo "Updating iso_version in ${profiledef}"
+    sed -i "s|^iso_version=\"v.*\"|iso_version=\"${newversion}\"|" "${profiledef}"
+
+    # Re-derive in-memory values so this build uses the freshly bumped version
+    kiroVersion="${newversion}"
+    isoLabel="kiro-${kiroVersion}-x86_64.iso"
+
+    log_info "Version bump summary:
+  dev-rel     : $(grep '^ISO_RELEASE=' "${devrel}")
+  build-iso   : $(grep 'kiroVersion=' "${buildiso}")
+  profiledef  : $(grep '^iso_label=' "${profiledef}") / $(grep '^iso_version=' "${profiledef}")"
+}
+
 check_not_root() {
     if [[ "${EUID}" -eq 0 ]]; then
         log_error "Do not run this script as root. Run as a normal user — sudo is called internally where needed."
@@ -282,11 +321,11 @@ create_checksums() {
 # Main
 #####################################################################
 main() {
-    log_section "First run change-version.sh if you haven't already"
-
     check_not_root
     warn_btrfs
     setup_chaotic
+
+    apply_version_bump
 
     log_section "Phase 1 — Checking required packages"
     ensure_package archiso

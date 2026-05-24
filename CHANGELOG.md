@@ -180,7 +180,7 @@ Three issues were identified and resolved:
 
 ### Fix 1 — Remove archiso SSH override (`PermitRootLogin yes`)
 
-`archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` was shipping with the ISO and surviving into installed systems. It explicitly set `PermitRootLogin yes` and `PasswordAuthentication yes` — intended for the archiso build environment, not for user machines. Neither Kiro's live environment nor its install workflow requires root SSH with password. The file was deleted; OpenSSH's safe default (`prohibit-password`) now applies everywhere. Password login for user `erik` is unaffected (default sshd behaviour allows it).
+`archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` was shipping with the ISO and surviving into installed systems. It explicitly set `PermitRootLogin yes` and `PasswordAuthentication yes` — intended for the archiso build environment, not for user machines. Neither Kiro's live environment nor its install workflow requires root SSH with password. The file was deleted; OpenSSH's safe default (`prohibit-password`) now applies everywhere. Password login for the user account is unaffected (default sshd behaviour allows it).
 
 ### Fix 2 — CUPS config file permissions
 
@@ -199,11 +199,11 @@ Three issues were identified and resolved:
 - **`check_permissions()` expanded** — now also checks that `10-archiso.conf` SSH override is absent, `tmpfiles.d/cups-permissions.conf` is present, and CUPS config files are `600` if they exist.
 - **MAKEFLAGS CPU check** — replaced the basic `-j exists` check with a `nproc` comparison: PASS if MAKEFLAGS `-j` matches actual CPU count, WARN if fewer, FAIL if missing.
 
-The audit was run on **riker** (real metal, `192.168.1.43:22`) and produced 79 PASS / 0 WARN / 4 FAIL — the 4 FAILs are all expected pre-fix issues from riker's older ISO install (archiso SSH override, missing tmpfiles.d, CUPS permissions). All new checks behaved correctly on real hardware.
+The audit was run on the test box (real metal, `<ip>:<port>`) and produced 79 PASS / 0 WARN / 4 FAIL — the 4 FAILs are all expected pre-fix issues from the test box's older ISO install (archiso SSH override, missing tmpfiles.d, CUPS permissions). All new checks behaved correctly on real hardware.
 
 ### Real metal SSH script
 
-`ssh-into-riker.sh` added to `~/DATA/arcolinux-nemesis/scripts/`. Simpler than the VirtualBox scripts — no NAT forwarding needed, just a reachability ping check before connecting with `sshpass`. Host `192.168.1.43`, port `22`, user `erik`.
+`ssh-into-testbox.sh` added to `~/DATA/arcolinux-nemesis/scripts/`. Simpler than the VirtualBox scripts — no NAT forwarding needed, just a reachability ping check before connecting with `sshpass`. Host `<ip>`, port `<port>`, user `<user>`.
 
 ### Security fixes synced to kiro-iso-next
 

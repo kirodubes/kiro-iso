@@ -106,11 +106,11 @@ A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARC
 ## VirtualBox SSH Scripts
 
 Three helper scripts live in `~/DATA/arcolinux-nemesis/scripts/`:
-- `ssh-into-kiro-vb.sh` — connects to the Kiro VM (`127.0.0.1:2022`, user `erik`)
-- `ssh-into-arch-vb.sh` — connects to a virgin Arch VM (`127.0.0.1:2023`, user `erik`)
-- `ssh-into-riker.sh` — connects to riker, real metal Kiro machine (`192.168.1.43:22`, user `erik`)
+- `ssh-into-kiro-vb.sh` — connects to the Kiro VM (`<host>:<port>`, user `<user>`)
+- `ssh-into-arch-vb.sh` — connects to a virgin Arch VM (`<host>:<port>`, user `<user>`)
+- `ssh-into-testbox.sh` — connects to the test box, real metal Kiro machine (`<ip>:<port>`, user `<user>`)
 
-VirtualBox scripts auto-configure NAT port forwarding (`VBoxManage controlvm natpf1` for running VMs, `modifyvm --natpf1` for stopped VMs) and handle `sshpass` + `known_hosts` cleanup automatically. The riker script just pings first then connects.
+VirtualBox scripts auto-configure NAT port forwarding (`VBoxManage controlvm natpf1` for running VMs, `modifyvm --natpf1` for stopped VMs) and handle `sshpass` + `known_hosts` cleanup automatically. The metal script just pings first then connects.
 
 ## kiro-audit (edu-system-files-git)
 

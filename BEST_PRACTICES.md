@@ -41,7 +41,7 @@ In Plymouth's script language, `Image.Scale(w, h)` creates a scaled copy once at
 Rebooting to check every Plymouth script change wastes minutes per iteration. Instead: `sudo plymouthd --no-daemon --debug` starts the daemon in the foreground (Ctrl-C to stop); then in a second terminal `sudo plymouth --show-splash` renders the theme. Script errors appear in the first terminal's output. `sudo plymouth quit` tears it down cleanly. This loop — edit script, show-splash, inspect, quit — cuts Plymouth development time dramatically.
 
 
-## 2026-05-19 (session end — kiro-iso audit expansion + riker)
+## 2026-05-19 (session end — kiro-iso audit expansion + test box)
 
 **Tip: Use `declare -A` associative arrays in bash audit scripts for key/expected-value checks — one loop replaces N identical if-blocks**
 Instead of writing a separate `sysctl -n key` + compare block for each security parameter, declare `declare -A expected=([kernel.kptr_restrict]=2 [fs.suid_dumpable]=0 ...)` and loop: `for key in "${!expected[@]}"; do actual=$(sysctl -n "$key"); [[ "$actual" == "${expected[$key]}" ]] && pass ... || fail ...; done`. Adding a new check costs one line in the array, not 4 lines of new code. The same pattern applies to any audit script that checks multiple key/value pairs — file permissions, config values, systemd unit states.

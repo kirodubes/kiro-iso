@@ -2,7 +2,7 @@
 set -euo pipefail
 #####################################################################
 # Author    : Erik Dubois
-# Website   : https://www.erikdubois.be
+# Website   : https://kiroproject.be
 #####################################################################
 #
 #   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
@@ -87,7 +87,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Build configuration — edit these before building
 #####################################################################
 desktop="xfce4/ohmychadwm"
-kiroVersion='v26.05.24'
+kiroVersion='v26.05.25'
 bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
 chaoticsrepo=true

@@ -10,6 +10,67 @@ Related docs:
 
 ---
 
+## 2026-05 — covering 2026-05-22 → 2026-05-25
+
+Headline: the ISO becomes visibly **Kiro** — ArcoLinux branding stripped end-to-end — and gains a **firewall enabled by default** plus **tuned power profiles**, alongside a round of ATT accuracy fixes and installer/hardware hardening.
+
+### Headline diffs
+
+| Area              | Previous ISO                                           | Current ISO                                                                                              |
+|-------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| Branding          | residual ArcoLinux logos, themes, boot splash, names   | Kiro throughout — Kiro logos, `Kiro Simplicity` SDDM theme, `Kiro-*` rofi themes, arco boot splash gone  |
+| Firewall          | none                                                   | `firewalld` shipped + **enabled by default** (deny-incoming baseline), turned on via Calamares           |
+| Power profiles    | unmanaged                                              | `tuned` + `tuned-ppd` shipped + enabled; default `throughput-performance` (PPD "performance")            |
+| Partition default | Calamares default                                      | GPT default partition-table type                                                                        |
+| ATT Dev page      | false "mismatch" / "hook required" alarms when healthy | checks verify real state; firewall + microcode + power-profile status surfaced                          |
+
+### Branding — ArcoLinux → Kiro
+
+The shipped tree no longer carries ArcoLinux brand assets:
+
+- Boot splash `splash-arcolinux.png` removed (`kiro-iso` + `-next`); the active `splash.png` is unchanged.
+- skel `.config/logos/arcolinux*` replaced by Kiro logos (`Logo-Kiro`); the ArcoLinux Plank theme removed and a Kiro Plank theme added (`edu-dot-files`).
+- rofi `ArcoLinux-{Nord,Darkish}.rasi` renamed to `Kiro-*`, and the `* User: ArcoLinux` generator stamp swept to `Kiro` across all 74 theme files (`edu-rofi-themes`).
+- SDDM theme display name is now **Kiro Simplicity** (theme-id kept `edu-simplicity` to match the folder + the `kiro-audit` check) (`edu-sddm-simplicity`).
+- ATT's bundled `arcolinux*` images and `archlinux-logout`'s betterlockscreen arco images removed; the `arco-chadwm` skel folder renamed to `chadwm`.
+- Kept by design (real identifiers, not branding): the `arcolinux-arc-*` theme packages, the i3/qtile theme names, and the upstream `arcolinux-nemesis` clone.
+
+### Firewall — firewalld on by default
+
+- `firewalld` ships on the ISO and is **enabled on the installed system** via the Calamares `services-systemd` module (production + `-next`).
+- The default `public` zone is deny-incoming / allow-outgoing — secure out of the box, no config needed.
+- ATT's **Network** page gained firewall controls: live status, an enable/disable toggle, and one-click **Allow network discovery (mDNS)** / **Allow Samba** (the default zone blocks both, which is what network discovery and file sharing need).
+- `kiro-audit`, `kiro-verify` and `kiro-diag` now report whether firewalld is enabled/active.
+
+### Power profiles — tuned + tuned-ppd
+
+- `tuned` + `tuned-ppd` are shipped and enabled (live + Calamares). Default profile is `throughput-performance`, exposed over the power-profiles-daemon D-Bus interface as `performance` so the desktop power widget works.
+- `ppd.conf` is seeded with `default=performance` to stop the active profile resetting on boot.
+
+### ATT accuracy & UX
+
+- **Dev page** false alarms fixed — every check now *verifies* real state instead of asserting it: distro detection reads "Arch-based (expected)" (Kiro is Arch-based, not a "mismatch"); the kernel-install row confirms the `pacman-hook-kernel-install` package is actually present; the microcode row confirms the installed ucode's `/boot` image exists (catching the archiso-strips-the-image bug) and no longer warns on the normal single-ucode case.
+- **Performance** page: `makepkg.conf` tuning rewritten in pure Python, with explainer dialogs that say *why* a change is made, not just *what*.
+
+### Installer & hardware fixes
+
+- Calamares: GPT set as the default partition-table type; `pacman -Sy` gated on the `hasInternet` flag and run before later chroot pacman calls; bare-metal detection fixed and orphan VM service symlinks unlinked on bare metal.
+- udev (`edu-system-files`): stopped ethtool errors on consumer Intel e1000e NICs; fixed a net-rename race on Intel NICs; removed a dead HDD `fifo_batch` rule; moved the `systemd-logind` drop-in out of `multi-user.target.wants`.
+- `edu-dot-files`: removed a GTK bookmarks file with hardcoded `/home/erik` paths; `up.sh` now refreshes the `usr/local/share/kiro/` reference configs from the `kiro-iso` airootfs on every run.
+
+### Validated on real hardware
+
+The firewalld enablement and the ATT changes (Network-page firewall controls + the Dev-page distro / kernel-hook / microcode fixes) were rebuilt and tested on the test box this cycle. Kernel/power-profile and installer fixes are tracked in [DISTRO_TESTING.md](./DISTRO_TESTING.md).
+
+### Sources
+
+- [kiro-iso](https://github.com/erikdubois/kiro-iso) / [kiro-iso-next](https://github.com/erikdubois/kiro-iso-next) — commits since `2026-05-22` (tuned wiring, de-brand, splash removal).
+- [kiro-calamares-config](https://github.com/erikdubois/kiro-calamares-config) / `-next` — firewalld + tuned `services-systemd` enablement; GPT/pacman/bare-metal installer fixes.
+- [edu-system-files](https://github.com/erikdubois/edu-system-files) — firewalld audit-script checks; udev/e1000e/logind fixes.
+- `edu-rofi-themes`, `edu-sddm-simplicity`, `edu-dot-files`, `archlinux-tweak-tool-gtk4`, `archlinux-logout-gtk4`, `ohmychadwm` — de-brand + ATT Network/Dev/Performance changes.
+
+---
+
 ## 2026-05 — covering 2026-05-17 → 2026-05-21
 
 Headline: kernel swap, audio-stack swap, brand-new diagnostic toolchain, security-baseline hardening, installer tightening. The biggest single-release change set since the move to Kiro.

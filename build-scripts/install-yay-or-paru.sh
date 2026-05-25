@@ -2,7 +2,7 @@
 set -euo pipefail
 #####################################################################
 # Author    : Erik Dubois
-# Website   : https://www.erikdubois.be
+# Website   : https://kiroproject.be
 #####################################################################
 #
 #   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.

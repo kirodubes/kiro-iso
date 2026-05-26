@@ -526,6 +526,7 @@ irqbalance
 glances
 hblock
 libgepub
+peek
 timeshift
 tuned
 tuned-ppd

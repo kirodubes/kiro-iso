@@ -4,6 +4,10 @@
 
 ---
 
+## 2026-05-26 — README: community framing, dropped "personal"
+
+The README overview opened with "KIRO is a **personal** Arch Linux ISO builder" — leftover single-user framing from Kiro's early phase that contradicts the public, community-facing positioning. Reworded to lead with Kiro's identity as a **community Arch-based Linux distribution**, with this repo described as its ISO builder. Codified the rule in [Kiro-HQ/ASSISTANT.md](../../Insync/Kiro/Kiro-HQ/ASSISTANT.md) ("never call the shipped distro personal"). README only — no build artifacts affected, no rebuild needed.
+
 ## 2026-05-24 — `v26.05.24`: build/version merge, de-branding sweep, hibernate validation
 
 A multi-theme day. Newest commits first within the day.

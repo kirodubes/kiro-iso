@@ -14,7 +14,7 @@
 
 ## Overview
 
-**KIRO** is a personal Arch Linux ISO builder that creates fully customized installation media using the official ArchISO toolchain. KIRO produces reproducible builds with pre-configured packages, desktop environments, system optimizations, and custom configurations baked in.
+**KIRO** is a community Arch-based Linux distribution. This repository is its ISO builder — it uses the official ArchISO toolchain to produce reproducible builds with pre-configured packages, desktop environments, system optimizations, and custom configurations baked in, ready to install and use out of the box.
 
 KIRO is designed with specific preferences in mind:
 

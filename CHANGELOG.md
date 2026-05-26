@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-05-26 — cups: airootfs trimmed to socket-only
+
+The live ISO airootfs enabled CUPS three different ways: **`sockets.target.wants/cups.socket`**, **`printer.target.wants/cups.service`**, and **`multi-user.target.wants/cups.path`**. The service and path symlinks were redundant — socket activation alone is enough, since `cupsd` is started on demand the moment a client opens the print socket (e.g. opening printer settings or sending a job). Removed **`printer.target.wants/cups.service`** and **`multi-user.target.wants/cups.path`** (and the now-empty `printer.target.wants/` directory), leaving only **`cups.socket`** in the overlay.
+
+**Why this matters.** These airootfs symlinks only affect the *live* session — they are not carried into the installed system, where service enablement is driven entirely by Calamares. Printing was therefore off after a fresh install + reboot. The matching fix lives in **`kiro-calamares-config`**, which now explicitly enables **`cups.socket`** (socket activation only) on the installed system. Keeping the live ISO consistent with that — socket-only everywhere — avoids confusion about why CUPS appears enabled three ways live but absent post-install.
+
+**Files modified.**
+- `archiso/airootfs/etc/systemd/system/printer.target.wants/cups.service` (removed)
+- `archiso/airootfs/etc/systemd/system/multi-user.target.wants/cups.path` (removed)
+
 ## 2026-05-26 — README: community framing, dropped "personal"
 
 The README overview opened with "KIRO is a **personal** Arch Linux ISO builder" — leftover single-user framing from Kiro's early phase that contradicts the public, community-facing positioning. Reworded to lead with Kiro's identity as a **community Arch-based Linux distribution**, with this repo described as its ISO builder. Codified the rule in [Kiro-HQ/ASSISTANT.md](../../Insync/Kiro/Kiro-HQ/ASSISTANT.md) ("never call the shipped distro personal"). README only — no build artifacts affected, no rebuild needed.

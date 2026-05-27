@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Trust desktop launchers
+Comment=Pre-trust live desktop launchers so XFCE does not prompt (Install kiro)
+Exec=/usr/local/bin/kiro-trust-desktop-launchers
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

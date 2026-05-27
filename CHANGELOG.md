@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-05-27 — live ISO: pre-trust the "Install kiro" launcher
+
+Clicking the **Install kiro** desktop launcher on the live ISO popped XFCE/Thunar's **"Untrusted application launcher"** dialog (_"…is in an insecure location and not marked as secure"_) before Calamares would start — an avoidable speed bump on first contact with the installer. Thunar 4.20 refuses to launch a `.desktop` unless it carries the GIO trust metadata, and `cal-kiro.desktop` (shipped by the calamares package, already `chmod 755`) had none.
+
+Added a tiny live-session autostart — **[/usr/local/bin/kiro-trust-desktop-launchers](./archiso/airootfs/usr/local/bin/kiro-trust-desktop-launchers)**, launched by **[~/.config/autostart/trust-desktop-launchers.desktop](./archiso/airootfs/home/liveuser/.config/autostart/trust-desktop-launchers.desktop)** (liveuser only) — that sets both `metadata::trusted=true` and the XFCE-specific `metadata::xfce-exe-checksum` on every `~/Desktop/*.desktop` at login. The checksum is computed **at runtime** so it always matches the current file (a value baked at build time would break the moment the launcher changes). Confirmed on the live VM (Thunar 4.20.8): with the flags set the launcher opens straight into Calamares, no prompt. **Live-session scope only** — not shipped to `/etc/skel`, so installed systems are unaffected. Mirrored to `kiro-iso-next`.
+
+**Files Modified**
+
+- **[archiso/airootfs/usr/local/bin/kiro-trust-desktop-launchers](./archiso/airootfs/usr/local/bin/kiro-trust-desktop-launchers)** (new)
+- **[archiso/airootfs/home/liveuser/.config/autostart/trust-desktop-launchers.desktop](./archiso/airootfs/home/liveuser/.config/autostart/trust-desktop-launchers.desktop)** (new)
+
 ## 2026-05-27 — kernel-agnostic ISO: build-time kernel selector
 
 [build-the-iso.sh](./build-scripts/build-the-iso.sh) no longer hardcodes `linux-lqx`. A new **`kernel=`** config knob (default `linux-lqx`; set to `ask` for an interactive **`dialog`** menu, or a space-separated list for several kernels) lets the ISO be built with **any kernel(s)** the enabled repos offer. This pairs with the new **`kiro_kernel`** Calamares module in `kiro-calamares-config`, which installs whatever kernel(s) the ISO ships — together the whole pipeline (live ISO + installed system) becomes kernel-agnostic from a single selection point, with **zero edits to the config**.

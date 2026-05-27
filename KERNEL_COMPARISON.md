@@ -32,7 +32,7 @@ is **what gets patched in, how it's compiled, and what it's tuned for**:
 | Arch `linux`         |   8.0   | The dependable baseline; safe, official, well-supported.     |
 | linux-cachyos        |   9.0   | Fastest all-rounder; best raw performance + flexibility.     |
 | linux-cachyos-bore   |   8.8   | Best pure desktop/gaming responsiveness.                     |
-| linux-lqx       |   8.0   | Easiest low-latency desktop kernel; great feel, less tunable.|
+| linux-lqx            |   8.0   | Easiest low-latency desktop kernel; great feel, less tunable.|
 
 > The custom kernels score higher on *performance* axes, but Arch stock remains
 > the right default for anything where "boring and guaranteed to work" matters
@@ -47,7 +47,7 @@ is **what gets patched in, how it's compiled, and what it's tuned for**:
 | Arch `linux`         | 7.0.10.arch1-1     | mainline 7.0.x        | EEVDF (upstream)         |
 | linux-cachyos        | ~7.0.8             | mainline 7.0.x        | BORE-EEVDF               |
 | linux-cachyos-bore   | ~7.0.8             | mainline 7.0.x        | BORE                     |
-| linux-lqx       | 7.0-11 (24 May 26) | stable 7.0.10         | PDS (Project C)          |
+| linux-lqx            | 7.0-11 (24 May 26) | stable 7.0.10         | PDS (Project C)          |
 
 All four are on the **Linux 7.0 series** right now, so kernel-feature parity is
 high; the differences below are about configuration and patches, not version

@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-05-27 — kernel selector: `picker=` toggle + broader dynamic discovery
+
+Two refinements to the `kernel="ask"` selector:
+
+**1. `picker=` config var** (`auto` | `gum` | `dialog`). `auto` (default) uses gum if installed, else dialog; set it explicitly to force one — `dialog` to test that path or run on a host without gum, `gum` to insist on the truecolor UI. Previously the choice was implicit (`command -v gum`).
+
+**2. Broader, fully-dynamic kernel discovery.** The selector now offers every kernel in the **first four families** the enabled repos provide, discovered dynamically (no stale hardcoded list): the mainstream set plus all **CachyOS**, **XanMod**, and **pinned-LTS** flavors. Static candidates are now just the stable mainstream names (`linux`, `-lts`, `-zen`, `-hardened`, `-rt`, `-rt-lts`, `-lqx`, `-mainline`); the multi-flavor families are matched dynamically via `^(linux-cachyos|linux-xanmod|linux-lts[0-9])`.
+
+**What we deliberately leave out, and why.** The repos also ship CPU-microarch builds (`linux-x64v2/v3/v4`, `linux-znver2…5`) and niche kernels (`linux-cjktty`, `-nitrous`, `-tachyon`, `-vfio`). These are **excluded by design**: low demand, and the microarch ones are **dangerous on a general ISO — they silently fail to boot on the wrong CPU level** (e.g. `x64v4` needs AVX-512, `znver5` needs Zen 5). Anyone who explicitly wants one can still set `kernel="linux-znver4"` directly.
+
+| Bucket | Kernels | Offered? |
+|---|---|---|
+| Mainstream | `linux`, `-lts`, `-zen`, `-hardened`, `-rt`, `-rt-lts`, `-lqx`, `-mainline` | ✅ |
+| CachyOS | `linux-cachyos`, `-bore`, `-lts`, `-rc` | ✅ |
+| XanMod | `linux-xanmod-lts`, `-rt`, `-x64v2`, `-x64v3`, `-edge-x64v3` | ✅ |
+| LTS pins | `linux-lts515`, `-lts61`, `-lts66`, `-lts612` | ✅ |
+| CPU-microarch | `linux-x64v2/v3/v4`, `linux-znver2…5` | ❌ won't boot on the wrong CPU |
+| Niche | `linux-cjktty`, `-nitrous`, `-tachyon`, `-vfio(-lts)` | ❌ low demand |
+
+**Files Modified**
+
+- **[build-scripts/build-the-iso.sh](./build-scripts/build-the-iso.sh)** — `picker=` config var; `KERNEL_CANDIDATES` trimmed to mainstream + `linux-mainline`; dynamic grep widened to CachyOS/XanMod/LTS-pins; picker-aware dispatch in `select_kernels`.
+
 ## 2026-05-27 — kernel selector: gum picker (truecolor Arc Dark) with dialog fallback
 
 `select_kernels()` now prefers **`gum`** for the `kernel="ask"` picker, falling back to **`dialog`** when gum isn't installed. gum renders **truecolor**, so it hits the exact Arc Dark palette the dialog theme could only approximate through the terminal's 16 colors: blue accent `#5294e2`, text `#d3dae3`, muted header `#8b9bb4`. Refactored into `_select_kernels_gum` (`gum choose --no-limit`, with a second `gum choose` for the live-boot kernel when several are picked) and `_select_kernels_dialog` (the existing checklist/radiolist, unchanged). The parent runs `detect_available_kernels` once, then dispatches on `command -v gum`. gum is host-only and not in the ISO — fine, since the selector runs host-side at build time; the `dialog` path keeps a bare build host working.

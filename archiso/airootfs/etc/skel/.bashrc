@@ -73,6 +73,9 @@ alias u="sudo pacman -Syu"
 alias up="./up.sh"
 alias ua="paru -Syu --noconfirm"
 
+#claude code
+alias c="claude"
+
 ## Colorize the grep command output for ease of use (good for log files)##
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'

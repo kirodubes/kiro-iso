@@ -125,6 +125,30 @@ For a desktop-first ISO targeting a tiling-WM-savvy audience, `linux-lqx` wins o
 
 ---
 
+## Validation — what we tested on real hardware
+
+The sections above are the *why*. This is the *proof*: the kernel-specific results pulled from every boot/install test we ran. Liquorix was trialled on the `kiro-iso-next` track first, then promoted to the stable `kiro-iso` build on **2026-05-19** once these passed. Full per-build logs (including non-kernel checks) live in [DISTRO_TESTING.md](./DISTRO_TESTING.md); this table is the kernel summary.
+
+| Build            | Hardware                  | `linux-lqx`  | Boot | Kernel-specific result                                                                                          |
+|------------------|---------------------------|--------------|------|----------------------------------------------------------------------------------------------------------------|
+| v26.05.18        | VirtualBox (UEFI, Intel)  | 7.0.9-lqx1   | PASS | Kernel running, `vmlinuz-linux-lqx` + initramfs present, `linux-lqx.preset` exists / `linux.preset` removed — all PASS |
+| v26.05.19        | VirtualBox (UEFI, Intel)  | 7.0.9-lqx1   | PASS | 93/0/0 audit; kernel boot phase 3.0s                                                                            |
+| v26.05.24 (next) | Bare metal (UEFI, Intel)  | 7.0.10-lqx1  | PASS | 92/0/0; **hibernate/resume (S4) + suspend (S3) PASS**; kernel boot phase 1.7s                                   |
+| v26.05.25        | Bare metal (UEFI, Intel)  | 7.0.10-lqx1  | PASS | 110/1/0; kernel boot phase 1.655s                                                                               |
+
+What each kernel-relevant check confirmed:
+
+- **Boot path (UEFI / systemd-boot)** — PASS on both VirtualBox and bare-metal Picard. The EFI entries reference `vmlinuz-linux-lqx` / `initramfs-linux-lqx.img` and load correctly.
+- **Boot path (BIOS / syslinux)** — syslinux configs updated to the `-lqx` paths; BIOS boot verified working.
+- **Boot image generation** — `mkarchiso` detects the installed `linux-lqx` and generates matching boot images; on the installed system `linux-lqx.preset` is present and the stock `linux.preset` is removed.
+- **NVIDIA DKMS** — `nvidia-open-dkms` compiles cleanly against `linux-lqx-headers`; `driver=nonfree` boot verified on a real NVIDIA GPU. No regression versus the stock kernel.
+- **Hibernate / resume (S4) and suspend (S3)** — PASS on bare metal. The `resume` hook is present in the `linux-lqx` initramfs, ordered after `block` / before `filesystems`, and the `resume=UUID=` cmdline matches the swap partition. (Hibernate could not be validated under VirtualBox — `vmwgfx` blocks the freeze while 3D resources are active; that is a VM virtual-GPU limitation, not a kernel issue.)
+- **Boot-phase timing** — kernel phase ~1.7s on bare metal, ~3.0s in VirtualBox; in line with stock-kernel timings, no regression from the Liquorix patchset.
+
+> mkinitcpio hooks, microcode handling, and the PipeWire stack are kernel-agnostic and were verified unaffected by the switch — see DISTRO_TESTING.md for those non-kernel details.
+
+---
+
 ## The trade-off we accepted
 
 The honest counter-argument: **Chaotic-AUR is a third-party repository**. Two real (if infrequent) consequences:

@@ -4,6 +4,15 @@
 
 ---
 
+## 2026-05-27 — LIQUORIX.md: kernel validation summary consolidated
+
+[LIQUORIX.md](./LIQUORIX.md) is now the single kernel reference. Added a **"Validation — what we tested on real hardware"** section that consolidates the kernel-specific findings previously scattered across [DISTRO_TESTING.md](./DISTRO_TESTING.md), TODO.md, and WHAT-CHANGED-TO-THE-ISO.md. The new section carries a per-build table (the four `linux-lqx` validation builds spanning `7.0.9` → `7.0.10`) plus a checklist of what each kernel-relevant test confirmed: UEFI/systemd-boot and BIOS/syslinux boot paths, `mkarchiso` boot-image generation (`vmlinuz-linux-lqx` + `linux-lqx.preset`, stock `linux.preset` removed), `nvidia-open-dkms` DKMS compile against `linux-lqx-headers` with `driver=nonfree` boot on real NVIDIA hardware, S3 suspend / S4 hibernate-resume on bare metal, and kernel boot-phase timings.
+
+**Why this matters.** The kernel content itself was already fully promoted to production and is byte-identical to the beta track; the only thing missing was a single place to *read* the kernel story end-to-end. Folding the test outcomes into the rationale doc means anyone evaluating the Liquorix choice sees the evidence next to the argument instead of cross-referencing the testing log. Docs only — no build artifacts affected, no rebuild needed.
+
+**Files modified.**
+- `LIQUORIX.md` (new Validation section)
+
 ## 2026-05-26 — cups: airootfs trimmed to socket-only
 
 The live ISO airootfs enabled CUPS three different ways: **`sockets.target.wants/cups.socket`**, **`printer.target.wants/cups.service`**, and **`multi-user.target.wants/cups.path`**. The service and path symlinks were redundant — socket activation alone is enough, since `cupsd` is started on demand the moment a client opens the print socket (e.g. opening printer settings or sending a job). Removed **`printer.target.wants/cups.service`** and **`multi-user.target.wants/cups.path`** (and the now-empty `printer.target.wants/` directory), leaving only **`cups.socket`** in the overlay.

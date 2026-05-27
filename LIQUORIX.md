@@ -11,7 +11,7 @@ The change was first trialled on the `kiro-iso-next` experimental track, then pr
 |                      | Before (stock `linux`)          | After (`linux-lqx`)             |
 |----------------------|---------------------------------|---------------------------------|
 | Kernel source        | Arch core repo                  | Chaotic-AUR (Liquorix patchset) |
-| CPU scheduler        | CFS (throughput-biased)         | PDS/BMQ (latency-biased)        |
+| CPU scheduler        | EEVDF (fairness-oriented)       | PDS/BMQ (latency-biased)        |
 | Tick rate            | 300 Hz                          | 1000 Hz                         |
 | Preemption           | Voluntary                       | Full (`PREEMPT`)                |
 | Page replacement     | Standard                        | MG-LRU                          |
@@ -42,8 +42,8 @@ Each of the sections below is a place we looked, what we found, and what the pra
 
 |               | `linux` (Arch)                    | `linux-lqx`                         |
 |---------------|-----------------------------------|-------------------------------------|
-| Scheduler     | CFS (Completely Fair Scheduler)   | PDS or BMQ (Project-C)              |
-| Algorithm     | Tree-based, throughput-biased     | Bitmap-based, latency-biased        |
+| Scheduler     | EEVDF (Earliest Eligible Virtual Deadline First) | PDS or BMQ (Project-C) |
+| Algorithm     | Tree-based, fairness-oriented     | Bitmap-based, latency-biased        |
 | Task priority | Dynamic, amortized                | Round-robin with priority decay     |
 | Best for      | Servers, compile jobs, batch work | Desktops, gaming, interactive loads |
 
@@ -115,8 +115,8 @@ Chaotic-AUR typically publishes the new `linux-lqx` within hours of an upstream 
 | Desktop responsiveness (UI, WM)  | `linux-lqx`   | Noticeable      |
 | Audio / low-latency I/O          | `linux-lqx`   | Significant     |
 | Gaming (frame pacing)            | `linux-lqx`   | Moderate        |
-| Compile / batch throughput       | `linux` (CFS) | Minor           |
-| Server / database workloads      | `linux` (CFS) | Moderate        |
+| Compile / batch throughput       | `linux` (EEVDF) | Minor           |
+| Server / database workloads      | `linux` (EEVDF) | Moderate        |
 | Security                         | Tie           | Identical       |
 | Stability (desktop use)          | Tie           | Identical       |
 | Stability (package supply chain) | `linux`       | Minor advantage |
@@ -196,7 +196,19 @@ Things we still want to track over time:
 - **NVIDIA DKMS** — on each Liquorix major version bump, smoke-test that `nvidia-open-dkms` still builds. It always has so far, but this is the most likely place a regression would first appear.
 - **LTS fallback** — we don't currently ship `linux-lts` as a fallback kernel. If we add one in the future, we'd also add `linux-lts-headers` and a second EFI entry. Worth doing once we hit a Liquorix release that misbehaves on real user hardware.
 - **rEFInd support** — Kiro uses systemd-boot, so the `refindKernelList` in `bootloader.conf` is currently inert. If we ever add rEFInd, `linux-lqx` needs to be added to that list.
-- **`linux-kiro-lqx` (Erik's personal kernel)** — stays separate from this. It's a machine-specific native-CPU build, not distributable, and not what Kiro ships. Anyone reading the Kiro source who sees both names: `linux-lqx` is the ISO kernel, `linux-kiro-lqx` is Erik's daily-driver kernel — different package, different purpose, no shared code path.
+- **Package-name clarity** — the `linux-lqx` / `linux-liquorix` / `linux-kiro-lqx` names are a recurring source of confusion for anyone reading the source or comparing notes. Keep the distinction documented; see [A note on names](#a-note-on-names) at the end of this doc.
+
+---
+
+## A note on names
+
+Three similar-looking names float around the Liquorix world. Only the first is what Kiro ships:
+
+- **`linux-lqx`** — the Arch package of the Liquorix patchset, built by the Chaotic-AUR team (Piotr Gorski). **This is Kiro's kernel.** Kiro pulls it as a prebuilt binary from `[chaotic-aur]`; there is no compile step.
+- **`linux-liquorix`** — shorthand for the *upstream* Liquorix project's own pre-compiled binaries, distributed via [liquorix.net](https://liquorix.net) for Debian/Ubuntu (installed there with a repo/curl script). Same patchset, different packaging — it is **not** the Arch package name and **not** how Kiro installs the kernel. If a comparison or article calls Kiro's kernel "linux-liquorix", read it as `linux-lqx`.
+- **`linux-kiro-lqx`** — Erik's personal, machine-specific **native-CPU** Liquorix build. Not portable, not distributed, and **not** what the ISO ships. It shares the patchset but nothing else — different package, different purpose, no shared code path.
+
+If you remember one thing: **Kiro ships `linux-lqx` from Chaotic-AUR.**
 
 ---
 

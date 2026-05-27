@@ -4,14 +4,26 @@
 
 ---
 
-## 2026-05-27 — LIQUORIX.md: kernel validation summary consolidated
+## 2026-05-27 — kernel docs: validation summary, comparison reconciliation, scheduler fix
 
-[LIQUORIX.md](./LIQUORIX.md) is now the single kernel reference. Added a **"Validation — what we tested on real hardware"** section that consolidates the kernel-specific findings previously scattered across [DISTRO_TESTING.md](./DISTRO_TESTING.md), TODO.md, and WHAT-CHANGED-TO-THE-ISO.md. The new section carries a per-build table (the four `linux-lqx` validation builds spanning `7.0.9` → `7.0.10`) plus a checklist of what each kernel-relevant test confirmed: UEFI/systemd-boot and BIOS/syslinux boot paths, `mkarchiso` boot-image generation (`vmlinuz-linux-lqx` + `linux-lqx.preset`, stock `linux.preset` removed), `nvidia-open-dkms` DKMS compile against `linux-lqx-headers` with `driver=nonfree` boot on real NVIDIA hardware, S3 suspend / S4 hibernate-resume on bare metal, and kernel boot-phase timings.
+Docs-only day, all centred on the kernel story. No build artifacts affected, no rebuild needed.
 
-**Why this matters.** The kernel content itself was already fully promoted to production and is byte-identical to the beta track; the only thing missing was a single place to *read* the kernel story end-to-end. Folding the test outcomes into the rationale doc means anyone evaluating the Liquorix choice sees the evidence next to the argument instead of cross-referencing the testing log. Docs only — no build artifacts affected, no rebuild needed.
+### LIQUORIX.md — validation summary consolidated
 
-**Files modified.**
-- `LIQUORIX.md` (new Validation section)
+[LIQUORIX.md](./LIQUORIX.md) is now the single kernel reference. Added a **"Validation — what we tested on real hardware"** section that consolidates the kernel-specific findings previously scattered across [DISTRO_TESTING.md](./DISTRO_TESTING.md), TODO.md, and WHAT-CHANGED-TO-THE-ISO.md. The new section carries a per-build table (the four `linux-lqx` validation builds spanning `7.0.9` → `7.0.10`) plus a checklist of what each kernel-relevant test confirmed: UEFI/systemd-boot and BIOS/syslinux boot paths, `mkarchiso` boot-image generation (`vmlinuz-linux-lqx` + `linux-lqx.preset`, stock `linux.preset` removed), `nvidia-open-dkms` DKMS compile against `linux-lqx-headers` with `driver=nonfree` boot on real NVIDIA hardware, S3 suspend / S4 hibernate-resume on bare metal, and kernel boot-phase timings. The kernel content itself was already fully promoted to production and byte-identical to the beta track; what was missing was a single place to *read* the kernel story end-to-end, evidence beside the argument.
+
+### KERNEL_COMPARISON.md added + reconciled with LIQUORIX.md
+
+A new four-way kernel comparison ([KERNEL_COMPARISON.md](./KERNEL_COMPARISON.md) — Arch `linux` vs `linux-cachyos` vs `linux-cachyos-bore` vs Liquorix) was added and cross-checked against LIQUORIX.md. Two corrections came out of that:
+
+- **Package identity.** The comparison described Kiro's kernel as the upstream `linux-liquorix` Debian/Ubuntu binary (repo/curl install). Kiro actually ships **`linux-lqx`** — the Chaotic-AUR build of the same patchset. Renamed `linux-liquorix` → `linux-lqx` throughout and rewrote the install-story prose to reflect the Chaotic-AUR prebuilt-binary path.
+- **Stock scheduler.** The comparison correctly lists Arch stock as **EEVDF** (the mainline scheduler since 6.6); LIQUORIX.md still said **CFS**. Fixed CFS → EEVDF in LIQUORIX.md (TL;DR, scheduler study, and performance verdict) and softened the "throughput-biased" framing to "fairness-oriented."
+
+Also added a **"A note on names"** section at the bottom of LIQUORIX.md disambiguating `linux-lqx` (Kiro's kernel) vs upstream `linux-liquorix` (Debian/Ubuntu binaries) vs `linux-kiro-lqx` (Erik's personal native-CPU build).
+
+### DISTRO_TESTING.md — privacy scrub
+
+Removed a personal hostname and an embedded username from the testing log (replaced with the standard `the test box` / `<user>` placeholders) per the privacy rule for published files. Test data and hardware-class details unchanged.
 
 ## 2026-05-26 — cups: airootfs trimmed to socket-only
 

@@ -4,9 +4,9 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
-## 2026-05-25 — v26.05.25 — Picard (bare metal, UEFI, Intel)
+## 2026-05-25 — v26.05.25 — the test box (bare metal, UEFI, Intel)
 
-**Environment:** Picard — bare-metal Kiro on ASUS STRIX Z270H GAMING, Intel Core i7-7700K, Intel I219-V NIC (e1000e), UEFI/systemd-boot. Kernel `linux-lqx 7.0.10-lqx1-1-lqx`. Installed from the `v26.05.25` ISO (built Mon May 25 14:04 CEST).
+**Environment:** the test box — bare-metal Kiro on ASUS STRIX Z270H GAMING, Intel Core i7-7700K, Intel I219-V NIC (e1000e), UEFI/systemd-boot. Kernel `linux-lqx 7.0.10-lqx1-1-lqx`. Installed from the `v26.05.25` ISO (built Mon May 25 14:04 CEST).
 
 **Boot:** PASS — UEFI boot via systemd-boot.
 **Boot time:** 24.176s total (firmware 13.376s + loader 5.434s + kernel 1.655s + userspace 3.709s). Firmware POST dominates; Kiro's own userspace is 3.7s.
@@ -20,15 +20,15 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 - **`/kiro-check`** — Source-to-installed integrity **CLEAN**. `10-archiso.conf` removed on install, all live-env survivors cleaned, no config drift, all 18 `edu-system-files` scripts present (under their current `kiro-` prefixed names).
 - **`Calamares.log`** — no errors or tracebacks. Only benign warnings: `chcon` ×8 (upstream SELinux-distro noise, no `chcon` on Kiro), a transient "EFI but no ESP" before partitioning, and Qt/firmware cosmetics.
 
-**Finding — cosmetic, not a defect:** hostname left at the install default `erik-systemproductname` (DMI-derived `<username>-<product>`). Install-time choice, user-overridable with `hostnamectl set-hostname`; did not affect any subsystem (it did mean `picard.local` mDNS didn't resolve until set).
+**Finding — cosmetic, not a defect:** hostname left at the install default `<user>-systemproductname` (DMI-derived `<username>-<product>`). Install-time choice, user-overridable with `hostnamectl set-hostname`; did not affect any subsystem (it did mean the chosen `.local` mDNS name didn't resolve until set).
 
 **Pending updates at test time:** 0
 
 ---
 
-## 2026-05-24 — v26.05.24 (kiro-next) — Picard (bare metal, UEFI, Intel)
+## 2026-05-24 — v26.05.24 (kiro-next) — the test box (bare metal, UEFI, Intel)
 
-**Environment:** Picard — bare-metal Kiro on ASUS STRIX Z270H GAMING, Intel Core i7-7700K, Intel I219-V NIC (e1000e), UEFI/systemd-boot. Kernel `linux-lqx 7.0.10-lqx1-1-lqx`. Installed from the `kiro-next-v26.05.24` ISO (built Sun May 24 12:45 CEST). Resume/swap config also cross-checked on a VirtualBox guest.
+**Environment:** the test box — bare-metal Kiro on ASUS STRIX Z270H GAMING, Intel Core i7-7700K, Intel I219-V NIC (e1000e), UEFI/systemd-boot. Kernel `linux-lqx 7.0.10-lqx1-1-lqx`. Installed from the `kiro-next-v26.05.24` ISO (built Sun May 24 12:45 CEST). Resume/swap config also cross-checked on a VirtualBox guest.
 
 **Boot:** PASS — UEFI boot via systemd-boot.
 **Boot time:** 17.8s total (firmware 6.9s + loader 5.4s + kernel 1.7s + userspace 3.8s); graphical.target at 3.8s userspace.

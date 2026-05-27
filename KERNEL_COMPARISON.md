@@ -3,9 +3,9 @@
 **Date:** 2026-05-26
 **Scope:** A practical comparison of the four kernels most relevant to an
 Arch-based desktop/gaming distro: the official Arch `linux` package, CachyOS's
-`linux-cachyos`, the `linux-cachyos-bore` variant, and `linux-liquorix`.
+`linux-cachyos`, the `linux-cachyos-bore` variant, and `linux-lqx`.
 **Author context:** Written for the Kiro distro, which currently ships
-linux-liquorix.
+`linux-lqx` (the Chaotic-AUR build of the Liquorix patchset).
 
 ---
 
@@ -32,7 +32,7 @@ is **what gets patched in, how it's compiled, and what it's tuned for**:
 | Arch `linux`         |   8.0   | The dependable baseline; safe, official, well-supported.     |
 | linux-cachyos        |   9.0   | Fastest all-rounder; best raw performance + flexibility.     |
 | linux-cachyos-bore   |   8.8   | Best pure desktop/gaming responsiveness.                     |
-| linux-liquorix       |   8.0   | Easiest low-latency desktop kernel; great feel, less tunable.|
+| linux-lqx       |   8.0   | Easiest low-latency desktop kernel; great feel, less tunable.|
 
 > The custom kernels score higher on *performance* axes, but Arch stock remains
 > the right default for anything where "boring and guaranteed to work" matters
@@ -47,7 +47,7 @@ is **what gets patched in, how it's compiled, and what it's tuned for**:
 | Arch `linux`         | 7.0.10.arch1-1     | mainline 7.0.x        | EEVDF (upstream)         |
 | linux-cachyos        | ~7.0.8             | mainline 7.0.x        | BORE-EEVDF               |
 | linux-cachyos-bore   | ~7.0.8             | mainline 7.0.x        | BORE                     |
-| linux-liquorix       | 7.0-11 (24 May 26) | stable 7.0.10         | PDS (Project C)          |
+| linux-lqx       | 7.0-11 (24 May 26) | stable 7.0.10         | PDS (Project C)          |
 
 All four are on the **Linux 7.0 series** right now, so kernel-feature parity is
 high; the differences below are about configuration and patches, not version
@@ -95,10 +95,11 @@ that yield the CPU often (interactive apps, game main threads) and penalises
 CPU-hogs, which translates to a more "snappy" desktop under load. It is the
 CachyOS family's recommendation for interactivity- and gaming-first desktops.
 
-### 3.4 linux-liquorix
+### 3.4 linux-lqx
 A long-running low-latency desktop kernel (the spiritual successor to the
-Zen/liquorix lineage), shipped as **pre-compiled binaries** for Debian/Ubuntu
-and Arch:
+Zen/liquorix lineage). Upstream Liquorix ships pre-compiled binaries for
+Debian/Ubuntu; on Arch the same patchset is the **`linux-lqx`** package (AUR,
+and pre-built in Chaotic-AUR — which is how Kiro pulls it):
 
 - **Scheduler:** **PDS** (from Alfred Chen's Project C), tuned for interactivity.
 - **Responsiveness:** **1000 Hz** tick, **hard kernel preemption** (the most
@@ -108,7 +109,8 @@ and Arch:
 - **Network/VM:** **TCP BBR2**, background-reclaim hugepages, "Zen Interactive"
   block/VM/freq-scaling tuning.
 - **Build:** a single opinionated config, generic build (**no LTO/PGO**, no
-  per-microarch variants). Install is famously simple (one repo/curl script).
+  per-microarch variants). On Arch the install is trivial — a **prebuilt
+  binary from Chaotic-AUR**, no compile step (unlike building CachyOS from the AUR).
 
 ---
 
@@ -166,7 +168,7 @@ in §6.
 - **You want the snappiest desktop/gaming feel above all** → **linux-cachyos-bore**
   (or Liquorix if you prefer a simpler install).
 - **You want a low-latency desktop kernel with a one-command install and no
-  tuning fuss** → **linux-liquorix**.
+  tuning fuss** → **linux-lqx**.
 
 For a **distro that ships to other people** (Kiro's case), the trade-off is
 between *performance reputation* (CachyOS family) and *install simplicity +

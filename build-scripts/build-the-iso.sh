@@ -98,6 +98,7 @@ desktop="xfce4/ohmychadwm"
 kiroVersion='v26.05.27'
 bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
+kernel="linux-lqx"            # space-separated kernel package(s); "ask" = interactive dialog menu. First = the kernel the live ISO boots.
 chaoticsrepo=true
 clean_pacman_cache="no"       # yes | no
 remove_build_folder="no"      # yes | no — set to yes to clean up after build
@@ -287,6 +288,7 @@ show_overview() {
     echo "  Version      : ${kiroVersion}"
     echo "  ISO label    : ${isoLabel}"
     echo "  NVIDIA driver: ${nvidia_driver}"
+    echo "  Kernel(s)    : ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
     echo "  Build folder : ${buildFolder}"
     echo "  Out folder   : ${outFolder}"
 }
@@ -357,6 +359,122 @@ inject_nvidia_packages() {
     esac
 }
 
+#####################################################################
+# Kernel selection — keeps the ISO independent of any one kernel.
+# The repo ships ${CANONICAL_KERNEL} as its default; this rewrites the
+# build-tree copies to whatever the user picks. Pairs with the calamares
+# kiro_kernel module, which installs whatever kernel(s) the ISO ships.
+#####################################################################
+KERNEL_CANDIDATES=(linux linux-lts linux-zen linux-hardened linux-rt linux-rt-lts linux-lqx linux-cachyos linux-xanmod)
+CANONICAL_KERNEL="linux-lqx"   # the kernel token the repo's archiso tree ships by default
+AVAILABLE_KERNELS=()
+SELECTED_KERNELS=()
+PRIMARY_KERNEL=""
+
+detect_available_kernels() {
+    AVAILABLE_KERNELS=()
+    local k
+    for k in "${KERNEL_CANDIDATES[@]}"; do
+        # Only offer a kernel if both it and its -headers exist in the enabled repos
+        # (-headers is required for the DKMS NVIDIA drivers to build).
+        if pacman -Si "${k}" &>/dev/null && pacman -Si "${k}-headers" &>/dev/null; then
+            AVAILABLE_KERNELS+=("${k}")
+        fi
+    done
+
+    # Plus EVERY CachyOS kernel flavor the enabled repos offer. CachyOS kernels
+    # topped our benchmark study (see KERNEL_COMPARISON), so expose them all and
+    # discover dynamically rather than hardcode a list that goes stale as new
+    # flavors appear. The "<name>-headers exists" test filters out non-kernel
+    # companion packages (zfs, nvidia, etc.).
+    local c
+    while IFS= read -r c; do
+        [[ -z "${c}" || "${c}" == *-headers ]] && continue
+        pacman -Si "${c}-headers" &>/dev/null || continue
+        [[ " ${AVAILABLE_KERNELS[*]} " == *" ${c} "* ]] && continue
+        AVAILABLE_KERNELS+=("${c}")
+    done < <(pacman -Slq 2>/dev/null | grep -E '^linux-cachyos' || true)
+}
+
+select_kernels() {
+    log_section "Selecting kernel(s)"
+
+    if [[ "${kernel}" != "ask" ]]; then
+        read -ra SELECTED_KERNELS <<< "${kernel}"
+        PRIMARY_KERNEL="${SELECTED_KERNELS[0]}"
+        log_info "Kernel(s) from config: ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
+        return 0
+    fi
+
+    ensure_package dialog
+    [[ -f "${SCRIPT_DIR}/kiro.dialogrc" ]] && export DIALOGRC="${SCRIPT_DIR}/kiro.dialogrc"
+    detect_available_kernels
+    if [[ "${#AVAILABLE_KERNELS[@]}" -eq 0 ]]; then
+        log_error "No kernels with a matching -headers package found in the enabled repos"
+        exit 1
+    fi
+
+    local items=() k ver state
+    for k in "${AVAILABLE_KERNELS[@]}"; do
+        ver="$(pacman -Si "${k}" 2>/dev/null | awk -F': *' '/^Version/{print $2; exit}')"
+        state="off"; [[ "${k}" == "${CANONICAL_KERNEL}" ]] && state="on"
+        items+=("${k}" "${ver}" "${state}")
+    done
+
+    local selection
+    selection="$(dialog --stdout --backtitle "Kiro ISO builder" --title "Select kernel(s)" --checklist \
+        "Select kernel(s) to install on the ISO (the live-boot kernel is chosen next):" \
+        20 76 12 "${items[@]}")" \
+        || { clear; log_error "Kernel selection cancelled — aborting"; exit 1; }
+
+    read -ra SELECTED_KERNELS <<< "${selection}"
+    if [[ "${#SELECTED_KERNELS[@]}" -eq 0 ]]; then
+        clear; log_error "No kernel selected — aborting"; exit 1
+    fi
+
+    if [[ "${#SELECTED_KERNELS[@]}" -eq 1 ]]; then
+        PRIMARY_KERNEL="${SELECTED_KERNELS[0]}"
+    else
+        local ritems=() rstate
+        for k in "${SELECTED_KERNELS[@]}"; do
+            rstate="off"; [[ "${k}" == "${SELECTED_KERNELS[0]}" ]] && rstate="on"
+            ritems+=("${k}" "" "${rstate}")
+        done
+        PRIMARY_KERNEL="$(dialog --stdout --backtitle "Kiro ISO builder" --title "Live-boot kernel" --radiolist \
+            "Which kernel should the LIVE ISO boot?" 18 70 10 "${ritems[@]}")" \
+            || { clear; log_error "Primary-kernel selection cancelled — aborting"; exit 1; }
+    fi
+    clear
+    log_info "Selected kernel(s): ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
+}
+
+apply_kernel() {
+    log_section "Phase 6b — Applying kernel(s): ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
+
+    # packages.x86_64: drop the canonical kernel + headers, then add every selected kernel + its headers
+    sed -i "/^${CANONICAL_KERNEL}\$/d;/^${CANONICAL_KERNEL}-headers\$/d" "${PACKAGES_FILE}"
+    local k
+    for k in "${SELECTED_KERNELS[@]}"; do
+        sed -i "/^${k}\$/d;/^${k}-headers\$/d" "${PACKAGES_FILE}"
+        printf '%s\n%s-headers\n' "${k}" "${k}" >> "${PACKAGES_FILE}"
+    done
+
+    # boot entries + live presets reference a single kernel — the primary
+    if [[ "${PRIMARY_KERNEL}" != "${CANONICAL_KERNEL}" ]]; then
+        local f
+        for f in \
+            "${buildFolder}"/archiso/efiboot/loader/entries/*.conf \
+            "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
+            "${buildFolder}"/archiso/syslinux/archiso_pxe-linux.cfg \
+            "${buildFolder}"/archiso/grub/grub.cfg \
+            "${buildFolder}"/archiso/grub/loopback.cfg \
+            "${buildFolder}"/archiso/airootfs/etc/mkinitcpio.d/kiro \
+            "${buildFolder}"/archiso/airootfs/etc/mkinitcpio.d/linux.preset; do
+            [[ -f "${f}" ]] && sed -i "s/${CANONICAL_KERNEL}/${PRIMARY_KERNEL}/g" "${f}"
+        done
+    fi
+}
+
 stamp_build_date() {
     log_section "Phase 7 — Stamping build date"
     local date_build
@@ -408,11 +526,13 @@ main() {
     log_section "Phase 1 — Checking required packages"
     ensure_package archiso
     ensure_package grub
+    select_kernels
     show_overview
 
     prepare_build_tree
     prepopulate_keyring
     inject_nvidia_packages
+    apply_kernel
     stamp_build_date
     build_iso
     create_checksums

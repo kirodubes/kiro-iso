@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-05-27 — kernel-agnostic ISO: build-time kernel selector
+
+[build-the-iso.sh](./build-scripts/build-the-iso.sh) no longer hardcodes `linux-lqx`. A new **`kernel=`** config knob (default `linux-lqx`; set to `ask` for an interactive **`dialog`** menu, or a space-separated list for several kernels) lets the ISO be built with **any kernel(s)** the enabled repos offer. This pairs with the new **`kiro_kernel`** Calamares module in `kiro-calamares-config`, which installs whatever kernel(s) the ISO ships — together the whole pipeline (live ISO + installed system) becomes kernel-agnostic from a single selection point, with **zero edits to the config**.
+
+**How it works.** `select_kernels()` detects installable kernels by probing a candidate list (`linux`, `-lts`, `-zen`, `-hardened`, `-rt`, `-rt-lts`, `-lqx`, `-cachyos`) plus **every `linux-cachyos*` flavor discovered dynamically** — CachyOS kernels topped our benchmark study, so all flavors are exposed and discovered at build time rather than hardcoded into a list that goes stale. Only kernels with a matching `-headers` are offered (the DKMS NVIDIA drivers need them). When several are picked, a second `dialog` chooses which one the **live ISO boots** (the "primary"). `apply_kernel()` then rewrites the **build-tree** copies (never the repo source): all selected kernels + `-headers` into [packages.x86_64](./archiso/packages.x86_64), and the primary kernel name into the boot entries (`efiboot`/`syslinux`/`grub`) and the live presets (`kiro`, `linux.preset`). The repo keeps `linux-lqx` as its canonical default, mirroring the existing `inject_nvidia_packages()` pattern. The picker is host-only (terminal-native `dialog`, so it works over SSH/tty) and themed via a bundled **[kiro.dialogrc](./build-scripts/kiro.dialogrc)** (dark background, blue accents).
+
+**Validated on the `-next` track first** — built ISOs with CachyOS (single) and `linux-lts` + `linux-zen` (multi), installed and booted both, confirming `kiro_kernel` lays down every kernel's image, initramfs, and intact headers — then mirrored here for production.
+
+**Files Modified**
+
+- **[build-scripts/build-the-iso.sh](./build-scripts/build-the-iso.sh)** — `kernel=` config var; `detect_available_kernels()`, `select_kernels()`, `apply_kernel()`; wired into `main()` + `show_overview`.
+- **[build-scripts/kiro.dialogrc](./build-scripts/kiro.dialogrc)** — new dark dialog theme for the picker.
+
 ## 2026-05-27 — build: pre-flight version-sync check
 
 [build-the-iso.sh](./build-scripts/build-the-iso.sh) now runs a **`verify_version_sync()`** guard immediately after `apply_version_bump()` (logged as **Phase 2b**), before any of the expensive build phases. It extracts the version string from all four authoritative sources — `ISO_RELEASE=` in **dev-rel**, `iso_version=` and `iso_label=` in **profiledef.sh**, and `kiroVersion=` in **build-the-iso.sh** itself — and asserts they all equal the in-memory `${kiroVersion}` that drives the build (with `iso_label` checked as `${iso_name}-${version}`). Any mismatch prints the offending file/value list and **hard-aborts with `exit 1`** before `mkarchiso` runs.

@@ -1,0 +1,56 @@
+# Kiro dark dialog theme — used by build-the-iso.sh (select_kernels).
+# dialog is limited to the terminal's 16 ANSI colors, so this is a dark
+# theme with blue accents that blends with a dark desktop; exact Arc Dark
+# hex (#2f343f / #5294e2) is only reachable with a truecolor tool (gum).
+# Format: (foreground, background, highlight=ON/OFF).
+
+aspect = 0
+separate_widget = ""
+tab_len = 0
+visit_items = OFF
+use_shadow = OFF
+use_colors = ON
+
+# Desktop behind the box, and the box itself
+screen_color           = (BLUE,BLACK,ON)
+shadow_color           = (BLACK,BLACK,OFF)
+dialog_color           = (WHITE,BLACK,OFF)
+
+# Title + borders → blue accent
+title_color            = (BLUE,BLACK,ON)
+border_color           = (BLUE,BLACK,ON)
+border2_color          = (BLUE,BLACK,ON)
+
+# Buttons: active = black-on-blue accent bar, inactive = light on dark
+button_active_color        = (BLACK,BLUE,ON)
+button_inactive_color      = (WHITE,BLACK,OFF)
+button_key_active_color    = (BLACK,BLUE,ON)
+button_key_inactive_color  = (CYAN,BLACK,ON)
+button_label_active_color  = (BLACK,BLUE,ON)
+button_label_inactive_color= (WHITE,BLACK,ON)
+
+# List items: selected row = black-on-blue accent bar
+tag_color              = (WHITE,BLACK,ON)
+tag_selected_color     = (BLACK,BLUE,ON)
+tag_key_color          = (CYAN,BLACK,ON)
+tag_key_selected_color = (BLACK,BLUE,ON)
+item_color             = (WHITE,BLACK,OFF)
+item_selected_color    = (BLACK,BLUE,ON)
+
+# Checkboxes / radios
+check_color            = (BLUE,BLACK,ON)
+check_selected_color   = (BLACK,BLUE,ON)
+
+# Misc widgets kept on-theme
+inputbox_color           = (WHITE,BLACK,OFF)
+inputbox_border_color    = (BLUE,BLACK,ON)
+inputbox_border2_color   = (BLUE,BLACK,ON)
+searchbox_color          = (WHITE,BLACK,OFF)
+searchbox_title_color    = (BLUE,BLACK,ON)
+searchbox_border_color   = (BLUE,BLACK,ON)
+searchbox_border2_color  = (BLUE,BLACK,ON)
+position_indicator_color = (BLUE,BLACK,ON)
+menubox_color            = (WHITE,BLACK,OFF)
+menubox_border_color     = (BLUE,BLACK,ON)
+menubox_border2_color    = (BLUE,BLACK,ON)
+itemhelp_color           = (CYAN,BLACK,OFF)

@@ -69,6 +69,14 @@ log_success() {
     echo
 }
 
+status_ok() {
+    echo "${GREEN}[ OK ]${RESET}  $1"
+}
+
+status_nok() {
+    echo "${RED}[ NOK ]${RESET} $1"
+}
+
 #####################################################################
 # Error handling
 #####################################################################
@@ -87,7 +95,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Build configuration — edit these before building
 #####################################################################
 desktop="xfce4/ohmychadwm"
-kiroVersion='v26.05.26'
+kiroVersion='v26.05.27'
 bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
 chaoticsrepo=true
@@ -136,8 +144,42 @@ apply_version_bump() {
 
     log_info "Version bump summary:
   dev-rel     : $(grep '^ISO_RELEASE=' "${devrel}")
-  build-iso   : $(grep 'kiroVersion=' "${buildiso}")
+  build-iso   : $(grep '^kiroVersion=' "${buildiso}")
   profiledef  : $(grep '^iso_label=' "${profiledef}") / $(grep '^iso_version=' "${profiledef}")"
+}
+
+verify_version_sync() {
+    # Confirms dev-rel, profiledef.sh and build-the-iso.sh all carry ${kiroVersion}.
+    # Matters most for bump_version=no rebuilds, where drift silently survives.
+    log_section "Phase 2b — Verifying version files are in sync"
+
+    local devrel="${REPO_DIR}/archiso/airootfs/etc/dev-rel"
+    local profiledef="${REPO_DIR}/archiso/profiledef.sh"
+    local buildiso="${SCRIPT_DIR}/build-the-iso.sh"
+
+    local devrel_ver prof_version prof_label prof_name build_ver
+    devrel_ver=$(grep -oP '^ISO_RELEASE=\K.*'        "${devrel}")
+    prof_version=$(grep -oP '^iso_version="\K[^"]*'  "${profiledef}")
+    prof_label=$(grep -oP '^iso_label="\K[^"]*'      "${profiledef}")
+    prof_name=$(grep -oP '^iso_name="\K[^"]*'        "${profiledef}")
+    build_ver=$(grep -oP "^kiroVersion='\K[^']*"     "${buildiso}")
+
+    local expected="${kiroVersion}"
+    local errors=()
+
+    [[ "${devrel_ver}" == "${expected}" ]]              || errors+=("dev-rel ISO_RELEASE='${devrel_ver}'")
+    [[ "${prof_version}" == "${expected}" ]]            || errors+=("profiledef iso_version='${prof_version}'")
+    [[ "${build_ver}" == "${expected}" ]]               || errors+=("build-the-iso kiroVersion='${build_ver}'")
+    [[ "${prof_label}" == "${prof_name}-${expected}" ]] || errors+=("profiledef iso_label='${prof_label}' (expected '${prof_name}-${expected}')")
+
+    if (( ${#errors[@]} > 0 )); then
+        log_error "Version files out of sync — expected '${expected}' everywhere:
+$(printf '  - %s\n' "${errors[@]}")
+Fix the files above, or set bump_version=yes to re-stamp them, then re-run."
+        exit 1
+    fi
+
+    log_info "Version files in sync: ${expected}"
 }
 
 check_not_root() {
@@ -173,10 +215,11 @@ remove_buildfolder() {
     local action="${1:-no}"
     if [[ "${action}" == "yes" ]]; then
         if [[ -d "${buildFolder}" ]]; then
+            status_ok "Build folder present — proceeding to delete"
             log_warn "Deleting build folder: ${buildFolder}"
             sudo rm -rf "${buildFolder}"
         else
-            log_info "No build folder found — nothing to delete"
+            status_nok "Build folder not found — nothing to delete"
         fi
     fi
 }
@@ -191,6 +234,34 @@ ensure_package() {
         log_error "${pkg} could not be installed — aborting"
         exit 1
     fi
+}
+
+files_are_identical() {
+    # Reports whether two files are a byte-for-byte exact copy. Returns 0 when
+    # identical, non-zero otherwise — meant to be used in an `if`, not bare.
+    local src="$1"
+    local dst="$2"
+
+    if [[ ! -f "${src}" ]]; then
+        status_nok "Source file missing: ${src}"
+        return 1
+    fi
+    if [[ ! -f "${dst}" ]]; then
+        status_nok "Compare target missing: ${dst}"
+        return 1
+    fi
+
+    if cmp -s "${src}" "${dst}"; then
+        status_ok "Identical:
+        ${src}
+        == ${dst}"
+        return 0
+    fi
+
+    status_nok "Differ:
+        ${src}
+        != ${dst}"
+    return 1
 }
 
 setup_chaotic() {
@@ -326,6 +397,13 @@ main() {
     setup_chaotic
 
     apply_version_bump
+    verify_version_sync
+
+    log_section "Phase 2c — Comparing skel .bashrc with edu-shells"
+    # Informational only — print the colored OK/NOK and keep going regardless.
+    files_are_identical \
+        "${REPO_DIR}/archiso/airootfs/etc/skel/.bashrc" \
+        "${HOME}/EDU/edu-shells/etc/skel/.bashrc-latest" || true
 
     log_section "Phase 1 — Checking required packages"
     ensure_package archiso

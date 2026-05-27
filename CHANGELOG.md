@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-05-27 — build: pre-flight version-sync check
+
+[build-the-iso.sh](./build-scripts/build-the-iso.sh) now runs a **`verify_version_sync()`** guard immediately after `apply_version_bump()` (logged as **Phase 2b**), before any of the expensive build phases. It extracts the version string from all four authoritative sources — `ISO_RELEASE=` in **dev-rel**, `iso_version=` and `iso_label=` in **profiledef.sh**, and `kiroVersion=` in **build-the-iso.sh** itself — and asserts they all equal the in-memory `${kiroVersion}` that drives the build (with `iso_label` checked as `${iso_name}-${version}`). Any mismatch prints the offending file/value list and **hard-aborts with `exit 1`** before `mkarchiso` runs.
+
+**Why:** the version lives in three files that must stay in lockstep (documented in CLAUDE.md). When `bump_version="yes"` the bump re-stamps all of them, so they can't drift — but on a `bump_version="no"` same-day rebuild, a hand-edited or half-reverted version string survives silently and only surfaces as a confusing failure (or a mislabelled ISO) deep into the build. Failing fast at Phase 2b turns a ~20-minute wasted build into an instant, explicit error. The check is cheap enough to run unconditionally, so it also doubles as a self-test that `apply_version_bump()`'s `sed` rewrites actually landed.
+
+Also added compact colored status helpers (**`status_ok`** → green `[ OK ]`, **`status_nok`** → red `[ NOK ]`) and wired them into **`remove_buildfolder()`**: a green `[ OK ]` prints before the "Deleting build folder" banner when the folder is present, and a red `[ NOK ]` (replacing the previous blue info banner) when there is nothing to delete.
+
+Added a reusable **`files_are_identical()`** helper — a byte-for-byte exact-copy check (`cmp -s`) between two paths that guards both paths first and reports green `[ OK ]` / red `[ NOK ]`. Returns 0/non-zero for use in an `if`. Wired into `main()` as **Phase 2c**, comparing the committed skel `.bashrc` against the local **`~/EDU/edu-shells`** clone (`.bashrc-latest`); the call is followed by `|| true` so a `[ NOK ]` (drift, or no local clone) is purely informational and never aborts the build.
+
 ## 2026-05-27 — kernel docs: validation summary, comparison reconciliation, scheduler fix
 
 Docs-only day, all centred on the kernel story. No build artifacts affected, no rebuild needed.

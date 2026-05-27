@@ -406,13 +406,57 @@ select_kernels() {
         return 0
     fi
 
-    ensure_package dialog
-    [[ -f "${SCRIPT_DIR}/kiro.dialogrc" ]] && export DIALOGRC="${SCRIPT_DIR}/kiro.dialogrc"
     detect_available_kernels
     if [[ "${#AVAILABLE_KERNELS[@]}" -eq 0 ]]; then
         log_error "No kernels with a matching -headers package found in the enabled repos"
         exit 1
     fi
+
+    # gum gives a truecolor, Arc-Dark-themed picker; fall back to dialog on a bare host.
+    if command -v gum &>/dev/null; then
+        _select_kernels_gum
+    else
+        _select_kernels_dialog
+    fi
+
+    if [[ "${#SELECTED_KERNELS[@]}" -eq 0 || -z "${PRIMARY_KERNEL}" ]]; then
+        log_error "No kernel selected — aborting"
+        exit 1
+    fi
+    log_info "Selected kernel(s): ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
+}
+
+_select_kernels_gum() {
+    # Arc Dark (truecolor): blue accent #5294e2, text #d3dae3, muted header #8b9bb4.
+    local blue="#5294e2" text="#d3dae3" muted="#8b9bb4" selection k
+    selection="$(gum choose --no-limit --height 12 \
+        --header "Kiro ISO builder · select kernel(s) to install" \
+        --selected "${CANONICAL_KERNEL}" \
+        --cursor.foreground "${blue}" --selected.foreground "${blue}" \
+        --item.foreground "${text}" --header.foreground "${muted}" \
+        "${AVAILABLE_KERNELS[@]}")" \
+        || { log_error "Kernel selection cancelled — aborting"; exit 1; }
+
+    SELECTED_KERNELS=()
+    while IFS= read -r k; do
+        [[ -n "${k}" ]] && SELECTED_KERNELS+=("${k}")
+    done <<< "${selection}"
+    if [[ "${#SELECTED_KERNELS[@]}" -le 1 ]]; then
+        PRIMARY_KERNEL="${SELECTED_KERNELS[0]:-}"
+        return 0
+    fi
+
+    PRIMARY_KERNEL="$(gum choose --height 10 \
+        --header "Which kernel should the LIVE ISO boot?" \
+        --cursor.foreground "${blue}" --selected.foreground "${blue}" \
+        --item.foreground "${text}" --header.foreground "${muted}" \
+        "${SELECTED_KERNELS[@]}")" \
+        || { log_error "Primary-kernel selection cancelled — aborting"; exit 1; }
+}
+
+_select_kernels_dialog() {
+    ensure_package dialog
+    [[ -f "${SCRIPT_DIR}/kiro.dialogrc" ]] && export DIALOGRC="${SCRIPT_DIR}/kiro.dialogrc"
 
     local items=() k ver state
     for k in "${AVAILABLE_KERNELS[@]}"; do
@@ -426,26 +470,23 @@ select_kernels() {
         "Select kernel(s) to install on the ISO (the live-boot kernel is chosen next):" \
         20 76 12 "${items[@]}")" \
         || { clear; log_error "Kernel selection cancelled — aborting"; exit 1; }
+    clear
 
     read -ra SELECTED_KERNELS <<< "${selection}"
-    if [[ "${#SELECTED_KERNELS[@]}" -eq 0 ]]; then
-        clear; log_error "No kernel selected — aborting"; exit 1
+    if [[ "${#SELECTED_KERNELS[@]}" -le 1 ]]; then
+        PRIMARY_KERNEL="${SELECTED_KERNELS[0]:-}"
+        return 0
     fi
 
-    if [[ "${#SELECTED_KERNELS[@]}" -eq 1 ]]; then
-        PRIMARY_KERNEL="${SELECTED_KERNELS[0]}"
-    else
-        local ritems=() rstate
-        for k in "${SELECTED_KERNELS[@]}"; do
-            rstate="off"; [[ "${k}" == "${SELECTED_KERNELS[0]}" ]] && rstate="on"
-            ritems+=("${k}" "" "${rstate}")
-        done
-        PRIMARY_KERNEL="$(dialog --stdout --backtitle "Kiro ISO builder" --title "Live-boot kernel" --radiolist \
-            "Which kernel should the LIVE ISO boot?" 18 70 10 "${ritems[@]}")" \
-            || { clear; log_error "Primary-kernel selection cancelled — aborting"; exit 1; }
-    fi
+    local ritems=() rstate
+    for k in "${SELECTED_KERNELS[@]}"; do
+        rstate="off"; [[ "${k}" == "${SELECTED_KERNELS[0]}" ]] && rstate="on"
+        ritems+=("${k}" "" "${rstate}")
+    done
+    PRIMARY_KERNEL="$(dialog --stdout --backtitle "Kiro ISO builder" --title "Live-boot kernel" --radiolist \
+        "Which kernel should the LIVE ISO boot?" 18 70 10 "${ritems[@]}")" \
+        || { clear; log_error "Primary-kernel selection cancelled — aborting"; exit 1; }
     clear
-    log_info "Selected kernel(s): ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
 }
 
 apply_kernel() {

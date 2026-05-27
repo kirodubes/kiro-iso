@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-27 — kernel selector: gum picker (truecolor Arc Dark) with dialog fallback
+
+`select_kernels()` now prefers **`gum`** for the `kernel="ask"` picker, falling back to **`dialog`** when gum isn't installed. gum renders **truecolor**, so it hits the exact Arc Dark palette the dialog theme could only approximate through the terminal's 16 colors: blue accent `#5294e2`, text `#d3dae3`, muted header `#8b9bb4`. Refactored into `_select_kernels_gum` (`gum choose --no-limit`, with a second `gum choose` for the live-boot kernel when several are picked) and `_select_kernels_dialog` (the existing checklist/radiolist, unchanged). The parent runs `detect_available_kernels` once, then dispatches on `command -v gum`. gum is host-only and not in the ISO — fine, since the selector runs host-side at build time; the `dialog` path keeps a bare build host working.
+
+**Files Modified**
+
+- **[build-scripts/build-the-iso.sh](./build-scripts/build-the-iso.sh)** — split `select_kernels` into gum + dialog backends.
+
 ## 2026-05-27 — live ISO: pre-trust the "Install kiro" launcher
 
 Clicking the **Install kiro** desktop launcher on the live ISO popped XFCE/Thunar's **"Untrusted application launcher"** dialog (_"…is in an insecure location and not marked as secure"_) before Calamares would start — an avoidable speed bump on first contact with the installer. Thunar 4.20 refuses to launch a `.desktop` unless it carries the GIO trust metadata, and `cal-kiro.desktop` (shipped by the calamares package, already `chmod 755`) had none.

@@ -21,5 +21,11 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 ## How rows get added
 
-- **ISO Builds** — `build-the-iso.sh` captures start epoch in `main()`, calls `record_build_time()` after `create_checksums`, and inserts a row at the top of the table. Squashfs setting is read live from `archiso/profiledef.sh`. Failure is non-fatal (logs a warning, build still succeeds).
-- **Calamares Installs** — currently manual. Pull the START/END timestamps from `/var/log/Calamares.log` on the target (via SSH or by mounting the install disk), count `==> Building image` lines for the mkinitcpio-passes column, and prepend the row. **Future automation:** a one-line `printf` in `kiro_final` to `/var/log/kiro-install-time` plus a dev-box helper script that SSHes in, pulls the file, and `sed`-inserts the row here.
+- **ISO Builds** — [`build-scripts/build-the-iso.sh`](build-scripts/build-the-iso.sh) captures start epoch in `main()`, calls `record_build_time()` after `create_checksums`, and inserts a row at the top of the table. Squashfs setting is read live from `archiso/profiledef.sh`. Failure is non-fatal (logs a warning, build still succeeds).
+- **Calamares Installs** — run [`build-scripts/record-install-time.sh`](build-scripts/record-install-time.sh) after each test install. It SSHes into the target, reads `/var/log/Calamares.log` (first/last timestamp = duration; `==> Building image` count = mkinitcpio passes), reads ISO version from `/etc/dev-rel`, and prepends a row. No kiro_final / package-rebuild needed — Calamares already timestamps every log line, so the data is right there. Usage:
+  ```bash
+  bash build-scripts/record-install-time.sh vm                          # VirtualBox guest on port 2022
+  bash build-scripts/record-install-time.sh picard --notes "bare metal" # named host
+  bash build-scripts/record-install-time.sh riker  --notes "post-fix"   # named host
+  bash build-scripts/record-install-time.sh vm     --dry-run            # print, don't write
+  ```

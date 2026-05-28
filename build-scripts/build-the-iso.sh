@@ -536,6 +536,21 @@ apply_kernel() {
             [[ -f "${f}" ]] && sed -i "s/${CANONICAL_KERNEL}/${PRIMARY_KERNEL}/g" "${f}"
         done
     fi
+
+    # Zen fallback entries: keep only if linux-zen is in SELECTED_KERNELS, else strip them.
+    # The boot menus include a "fallback kernel linux-zen" entry in 04-fallback-zen.conf
+    # and inside KIRO_ZEN_FALLBACK markers in syslinux/grub configs — these reference
+    # vmlinuz-linux-zen, so they're dead entries unless linux-zen is installed.
+    if [[ ! " ${SELECTED_KERNELS[*]} " == *" linux-zen "* ]]; then
+        log_info "linux-zen not selected — stripping zen fallback entries from boot configs"
+        rm -f "${buildFolder}/archiso/efiboot/loader/entries/04-fallback-zen.conf"
+        local zf
+        for zf in \
+            "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
+            "${buildFolder}"/archiso/grub/grub.cfg; do
+            [[ -f "${zf}" ]] && sed -i '/KIRO_ZEN_FALLBACK_BEGIN/,/KIRO_ZEN_FALLBACK_END/d' "${zf}"
+        done
+    fi
 }
 
 stamp_build_date() {

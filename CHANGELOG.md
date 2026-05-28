@@ -4,6 +4,35 @@
 
 ---
 
+## 2026-05-28 — Live-boot fallback kernel: `linux-zen` entries added to UEFI / BIOS-syslinux / GRUB menus
+
+### What changed
+
+A 4th entry, **"fallback kernel linux-zen"**, was added to each live boot menu so a user whose hardware refuses `linux-cachyos` can pick `linux-zen` at the boot screen — not just post-install. Three additions:
+
+- **UEFI:** new file [archiso/efiboot/loader/entries/04-fallback-zen.conf](archiso/efiboot/loader/entries/04-fallback-zen.conf) (sort-key 04, mirrors 01-archiso-linux.conf's open-source / KMS-on driver combo with `vmlinuz-linux-zen`)
+- **BIOS/syslinux:** new `LABEL arch_fallback_zen` block appended to [archiso/syslinux/archiso_sys-linux.cfg](archiso/syslinux/archiso_sys-linux.cfg), wrapped in `# >>> KIRO_ZEN_FALLBACK_BEGIN/END <<<` markers
+- **GRUB:** new `menuentry` with id `'kirofallback'` inserted into [archiso/grub/grub.cfg](archiso/grub/grub.cfg), same marker pair
+
+The PXE syslinux config and the GRUB loopback.cfg were left alone — niche boot paths where a user can edit the kernel parameter at the GRUB/syslinux prompt if they need to.
+
+A small **strip-step** was added to `apply_kernel()` in [build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh): if the user sets `kernel=` to something that excludes `linux-zen`, the new UEFI file is deleted and the marker-wrapped blocks are sed-deleted from syslinux/grub before `mkarchiso` runs. Keeps the build robust to non-default `kernel=` settings without leaving broken boot entries pointing at an uninstalled kernel.
+
+### Why
+
+A fallback kernel only serves its purpose if it's reachable from the live-ISO boot menu. Having `linux-zen` installed in the squashfs but with no boot entry means a user whose hardware refuses cachyos can't even reach Calamares to install — making the "fallback" useless in exactly the scenario that matters.
+
+The design is informed by CachyOS's own live ISO ([CachyOS/CachyOS-Live-ISO](https://github.com/CachyOS/CachyOS-Live-ISO/blob/master/archiso/grub/grub.cfg)), which ships their main kernel + an LTS fallback in the same boot menu for the same reason. We kept Kiro's three existing entries (open-source / NVIDIA / nomodeset) intact and added zen as a 4th, rather than collapsing the kernel-fallback and graphics-fallback axes into one entry as CachyOS does — Erik's call, to keep both axes orthogonal so a user can pick "kernel-only fallback" without losing modeset.
+
+### Files
+
+- [archiso/efiboot/loader/entries/04-fallback-zen.conf](archiso/efiboot/loader/entries/04-fallback-zen.conf) (new)
+- [archiso/syslinux/archiso_sys-linux.cfg](archiso/syslinux/archiso_sys-linux.cfg)
+- [archiso/grub/grub.cfg](archiso/grub/grub.cfg)
+- [build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh)
+
+---
+
 ## 2026-05-28 — Default kernel: `linux-lqx` → `linux-cachyos`
 
 ### What changed
@@ -18,7 +47,7 @@ The ISO's canonical kernel was switched from `linux-lqx` (Liquorix) to `linux-ca
 
 Why now: latest test ISO showed the picker pre-selecting `linux-lqx` (the canonical), and the builder's auto-rewrite logic at `apply_kernel()` (line 526) only fires when the user's pick differs from the canonical — so the default build path was emitting `linux-lqx`-based boot entries unchanged. With cachyos chosen as the new community default (responsiveness + active upstream + healthier security track than lqx), the canonical needs to match that decision so the default flow produces a cachyos ISO without depending on the user picking it explicitly.
 
-`linux-zen` remains available as a one-click pick in the gum/dialog picker, intended as the runtime fallback when a user wants something more conservative than cachyos without leaving the kiro-shipped set.
+The build-time default `kernel=` is now `"linux-cachyos linux-zen"` — both kernels are installed in the live ISO by default. `linux-zen` is the chosen fallback for users whose hardware doesn't accept cachyos; see the separate entry below for the live-boot-menu wiring that exposes it at boot time.
 
 LIQUORIX.md is retained as a historical record of the prior kernel era; a header note flags it as superseded.
 

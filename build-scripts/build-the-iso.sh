@@ -558,6 +558,16 @@ record_build_time() {
     # Append a row to ../BUILD_TIMES.md ## ISO Builds with this build's
     # duration, kernel(s), live squashfs setting, and ISO size. Non-fatal —
     # failure here logs a warning but doesn't abort the build.
+    #
+    # Hostname gate: only run on Erik's dev box ('hq'). End users who clone
+    # kiro-iso and run build-the-iso.sh shouldn't end up with a dirty
+    # working tree from a row they don't care about — they hit this early
+    # return silently. Erik's machine is the only one that ever builds the
+    # canonical ISO, so this is a safe identity check.
+    if [[ "$(hostname)" != "hq" ]]; then
+        return 0
+    fi
+
     [[ -z "${build_start_epoch:-}" ]] && { log_warn "record_build_time: build_start_epoch unset — skipping"; return 0; }
 
     local end_epoch duration mins secs stamp iso_file iso_size compression kernels_used row btf tmp

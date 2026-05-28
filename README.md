@@ -80,6 +80,25 @@ cd build-scripts && bash build-the-iso.sh
 
 The build bumps the version (`vYY.MM.DD`) across all version files as its **Phase 2**, gated by the `bump_version="yes"` flag in the config block — set it to `no` for a same-day rebuild of the currently-pinned version. Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.
 
+### Kernel Selection
+
+The default build ships **`linux-cachyos`** as the live-boot + post-install default and **`linux-zen`** as a secondary installed kernel selectable from the boot loader menu. Both are set on one line in the `build-scripts/build-the-iso.sh` config block:
+
+```bash
+kernel="linux-cachyos linux-zen"   # space-separated; first entry = live-boot kernel
+picker="auto"                       # auto | gum | dialog — only used when kernel="ask"
+```
+
+**Fixed list (default):** any space-separated combination of kernels available in your enabled repos works — `linux-zen linux-lts`, `linux-hardened`, `linux-cachyos-bore`, etc. The first kernel in the list is what the live ISO boots and what the installed system defaults to; additional kernels are installed alongside it, each selectable from systemd-boot's menu.
+
+**Interactive (`kernel="ask"`):** the build pauses and shows a TUI of every kernel + `-headers` pair available in your enabled repos. Pick one or more, then pick which one the live ISO should boot. Two TUIs are supported — `picker="dialog"` (ncurses) or `picker="gum"` (truecolor Arc-Dark); `picker="auto"` uses dialog if installed, else gum:
+
+![dialog kernel picker](images/choose-kernel-dialog.webp)
+
+![gum kernel picker](images/choose-kernel-gum.webp)
+
+The `kiro_kernel` Calamares module is kernel-agnostic — it copies whichever kernel(s) the live medium ships into the target system, with the live-boot kernel becoming the default for the installed system. No manual edits to `packages.x86_64` or boot loader configs are needed; `apply_kernel()` in the build script rewrites all of that from the single `kernel=` variable.
+
 ### NVIDIA Driver Selection
 
 Before building, open `build-scripts/build-the-iso.sh` and set `nvidia_driver` in the config block at the top:

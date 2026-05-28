@@ -23,6 +23,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-05-28 19:27 | v26.05.28 | picard (bare metal) | 3m11s | 2 | fresh install — kiro-audit 130/0/0 |
 | 2026-05-28 15:57 | v26.05.28 | 192.168.1.14 | 3m12s | 2 | riker, post-ppd-pin fix |
 | 2026-05-28 10:55 | v26.05.28 | riker (bare metal) | 123m28s* | 2 | second physical machine; *duration includes wizard-UI time (mkinitcpio pass count is the relevant install-execution metric — 2 passes, identical to post-fix VM) |
 | 2026-05-28 08:43 | v26.05.28  | VirtualBox VM     | ~3 min   | 2                   | post-fix: cmdline + hook suppression in place |

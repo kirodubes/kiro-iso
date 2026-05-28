@@ -49,7 +49,7 @@ less
 #lftp
 libfido2
 libusb-compat
-linux-lqx
+linux-cachyos
 linux-atm
 linux-firmware
 linux-firmware-marvell
@@ -131,7 +131,7 @@ aic94xx-firmware
 dialog
 dnsutils
 libadwaita
-linux-lqx-headers
+linux-cachyos-headers
 logrotate
 #ntp
 upd72020x-fw

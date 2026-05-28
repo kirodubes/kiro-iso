@@ -366,8 +366,8 @@ inject_nvidia_packages() {
 # build-tree copies to whatever the user picks. Pairs with the calamares
 # kiro_kernel module, which installs whatever kernel(s) the ISO ships.
 #####################################################################
-KERNEL_CANDIDATES=(linux linux-lts linux-zen linux-hardened linux-rt linux-rt-lts linux-lqx linux-mainline)
-CANONICAL_KERNEL="linux-lqx"   # the kernel token the repo's archiso tree ships by default
+KERNEL_CANDIDATES=(linux linux-lts linux-zen linux-hardened linux-rt linux-rt-lts linux-mainline)
+CANONICAL_KERNEL="linux-cachyos"   # the kernel token the repo's archiso tree ships by default
 AVAILABLE_KERNELS=()
 SELECTED_KERNELS=()
 PRIMARY_KERNEL=""

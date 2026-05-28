@@ -4,6 +4,41 @@
 
 ---
 
+## 2026-05-28 — Default kernel: `linux-lqx` → `linux-cachyos`
+
+### What changed
+
+The ISO's canonical kernel was switched from `linux-lqx` (Liquorix) to `linux-cachyos`. Both [build-the-iso.sh](build-scripts/build-the-iso.sh) (lines 369-370) and every load-bearing archiso template were updated:
+
+- **Builder:** `KERNEL_CANDIDATES` dropped `linux-lqx`; `CANONICAL_KERNEL` set to `linux-cachyos`. The cachyos family (`-bore`, `-lts`, `-rc`) continues to be discovered dynamically from the enabled repos at picker time — no static list change needed.
+- **Package list:** `archiso/packages.x86_64` lines 52 and 134 now install `linux-cachyos` + `linux-cachyos-headers`.
+- **Boot configs (templates):** 9 files mass-rewritten from `linux-lqx` → `linux-cachyos` — `archiso/efiboot/loader/entries/{01-archiso-linux,02-nvidianouveau,03-nomodeset}.conf`, `archiso/syslinux/archiso_{sys,pxe}-linux.cfg`, `archiso/grub/{grub,loopback}.cfg`, `archiso/airootfs/etc/mkinitcpio.d/{linux.preset,kiro}`.
+
+### Why
+
+Why now: latest test ISO showed the picker pre-selecting `linux-lqx` (the canonical), and the builder's auto-rewrite logic at `apply_kernel()` (line 526) only fires when the user's pick differs from the canonical — so the default build path was emitting `linux-lqx`-based boot entries unchanged. With cachyos chosen as the new community default (responsiveness + active upstream + healthier security track than lqx), the canonical needs to match that decision so the default flow produces a cachyos ISO without depending on the user picking it explicitly.
+
+`linux-zen` remains available as a one-click pick in the gum/dialog picker, intended as the runtime fallback when a user wants something more conservative than cachyos without leaving the kiro-shipped set.
+
+LIQUORIX.md is retained as a historical record of the prior kernel era; a header note flags it as superseded.
+
+### Files
+
+- [build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh)
+- [archiso/packages.x86_64](archiso/packages.x86_64)
+- [archiso/efiboot/loader/entries/01-archiso-linux.conf](archiso/efiboot/loader/entries/01-archiso-linux.conf)
+- [archiso/efiboot/loader/entries/02-nvidianouveau.conf](archiso/efiboot/loader/entries/02-nvidianouveau.conf)
+- [archiso/efiboot/loader/entries/03-nomodeset.conf](archiso/efiboot/loader/entries/03-nomodeset.conf)
+- [archiso/syslinux/archiso_sys-linux.cfg](archiso/syslinux/archiso_sys-linux.cfg)
+- [archiso/syslinux/archiso_pxe-linux.cfg](archiso/syslinux/archiso_pxe-linux.cfg)
+- [archiso/grub/grub.cfg](archiso/grub/grub.cfg)
+- [archiso/grub/loopback.cfg](archiso/grub/loopback.cfg)
+- [archiso/airootfs/etc/mkinitcpio.d/linux.preset](archiso/airootfs/etc/mkinitcpio.d/linux.preset)
+- [archiso/airootfs/etc/mkinitcpio.d/kiro](archiso/airootfs/etc/mkinitcpio.d/kiro)
+- [LIQUORIX.md](LIQUORIX.md) (historical-note banner)
+
+---
+
 ## 2026-05-28 — squashfs compression L6 → L3 (faster unpackfs phase)
 
 ### What changed

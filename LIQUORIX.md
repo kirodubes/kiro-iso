@@ -1,5 +1,7 @@
 # Why Kiro Ships the Liquorix Kernel
 
+> **Historical note — 2026-05-28:** Kiro no longer ships `linux-lqx`. The default kernel was switched to `linux-cachyos` (with `linux-zen` as a fallback option in the boot menu). This page is kept as a record of the prior Liquorix era and the reasoning that informed it; for the current kernel choice, see `KERNEL_CHOICE_FOR_KIRO.md`.
+
 Kiro ships `linux-lqx` (Liquorix) as its default kernel instead of the stock Arch `linux` kernel. This page explains **what changed**, **why we changed it**, and **what it means for you as a Kiro user**.
 
 The change was first trialled on the `kiro-iso-next` experimental track, then promoted to the stable `kiro-iso` build once we were satisfied with stability and hardware compatibility.

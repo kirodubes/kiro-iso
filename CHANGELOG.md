@@ -4,6 +4,34 @@
 
 ---
 
+## 2026-05-28 — Hardware-aware install via **chwd** (synced from `kiro-iso-next`)
+
+Mirror of the same-date `kiro-iso-next` change. The chwd Calamares integration validated in `kiro-iso-next` + `kiro-calamares-config-next` is now ready for production: this commit syncs the four package additions to `archiso/packages.x86_64` so the live ISO carries everything `kiro-calamares-config`'s new `chwd` Calamares module needs at install time + leaves on the target for post-install rerun via `sudo chwd -a`.
+
+### What Changed
+
+Four edits to **[archiso/packages.x86_64](archiso/packages.x86_64)**:
+
+- **Enabled `b43-fwcutter`** (was commented) — Broadcom B43/B43legacy firmware extractor for older Broadcom Wi-Fi chipsets.
+- **Enabled `broadcom-wl-dkms`** (was commented) — Broadcom proprietary `wl` kernel module via DKMS. chwd's `broadcom-wl` profile (priority 1) expects this to be available.
+- **Added `chwd`** — CachyOS's Hardware Detection Tool (Rust, GPL-3.0). Pulled from `nemesis_repo` where it ships with our patched profiles.toml fixing the upstream `[virtualbox]` / `[vmware]` vendor_id swap.
+- **Added `hwdetect`** — console hardware-detect helper, complements `hwinfo` / `inxi` / `hw-probe`.
+
+### Why
+
+Same rationale as the `kiro-iso-next` entry: chwd picks the right NVIDIA / AMD / Intel / Broadcom / hybrid-PRIME variant at install time based on detected hardware. Removes the need for per-build `nvidia_driver=open|580xx|390xx` selection in `build-the-iso.sh` once chwd is fully trusted (retirement TODO already filed in kiro-iso-next).
+
+### Pairs With
+
+- [kiro-calamares-config](../kiro-calamares-config/) — committed the chwd Calamares module + settings.conf sequence entry in the same session.
+- [edu-pkgbuild-3party/chwd](../../EDU-PKG-BUILD/edu-pkgbuild-3party/chwd/) — patched chwd PKGBUILD in nemesis_repo (vbox/vmware vendor_id fix).
+
+**Files Modified**
+
+- **[archiso/packages.x86_64](archiso/packages.x86_64)** — uncommented `b43-fwcutter` (line 5), uncommented `broadcom-wl-dkms` (line 11), added `chwd` (line 523), added `hwdetect` (line 529).
+
+---
+
 ## 2026-05-28 — Live-boot fallback kernel: `linux-zen` entries added to UEFI / BIOS-syslinux / GRUB menus
 
 ### What changed

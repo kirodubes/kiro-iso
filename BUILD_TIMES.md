@@ -8,6 +8,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-05-28 15:33 | v26.05.28 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m51s | 6.1G | |
 | 2026-05-28 13:52 | v26.05.28 | linux-cachyos linux-zen | zstd L3 -b 1M | 8m16s | 6.1G | |
 | 2026-05-28 11:58 | v26.05.28 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m3s | 6.1G | |
 | 2026-05-28 11:27 | v26.05.28 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m20s | 6.1G | |
@@ -19,6 +20,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-05-28 15:57 | v26.05.28 | 192.168.1.14 | 3m12s | 2 | riker, post-ppd-pin fix |
 | 2026-05-28 10:55 | v26.05.28 | riker (bare metal) | 123m28s* | 2 | second physical machine; *duration includes wizard-UI time (mkinitcpio pass count is the relevant install-execution metric — 2 passes, identical to post-fix VM) |
 | 2026-05-28 08:43 | v26.05.28  | VirtualBox VM     | ~3 min   | 2                   | post-fix: cmdline + hook suppression in place |
 | 2026-05-28 07:21 | v26.05.28  | VirtualBox VM     | ~4 min   | 10                  | baseline: cmdline-dup bug + 5× mkinitcpio churn |

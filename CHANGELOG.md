@@ -4,6 +4,50 @@
 
 ---
 
+## 2026-05-28 — default kernel switched: linux-lqx → linux-cachyos + linux-zen
+
+### What changed
+
+The ISO's default kernel is now **`linux-cachyos`** (live-boot + post-install default), with **`linux-zen`** shipped as a secondary installed kernel the user can boot from the boot loader menu. Liquorix (`linux-lqx`) is no longer the default.
+
+### Why
+
+Two clear choices, both from repos Kiro already trusts: `linux-zen` lives in Arch `[extra]` (zero third-party trust burden), `linux-cachyos` comes via `chaotic-aur` which is already in the ISO's pacman.conf. Killing lqx removes the third-party `liquorix.net` repo / AUR-build complexity and the special-case docs around it. The narrative tightens too: *"fastest desktop → cachyos, conservative stock-Arch → zen"* sells itself in a way *"what's Liquorix?"* never did. Both kernels have been independently tested across many combinations.
+
+### How — single-line change
+
+The build is fully templated. One line in [build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh) (line 101):
+
+```bash
+kernel="linux-cachyos linux-zen"   # was: "linux-lqx"
+```
+
+`apply_kernel()` (line 514+) rewrites at build time:
+- `packages.x86_64` — strips the canonical kernel + headers, adds every selected kernel + its headers
+- live mkinitcpio presets in `airootfs/etc/mkinitcpio.d/`
+- all boot loader entries (`efiboot/loader/entries/`, `grub/grub.cfg`, `grub/loopback.cfg`, `syslinux/*.cfg`)
+
+`CANONICAL_KERNEL=linux-lqx` (line 370) is **untouched** — it's the *source token* the sed-templating substitutes FROM, matching the literal kernel name in the archiso tree as-shipped. Changing it would break the substitution.
+
+### Calamares side: nothing needed
+
+`kiro_kernel` (in `kiro-calamares-config`) is already kernel-agnostic — it detects whichever kernel(s) the live medium ships and installs them into the target, with the live-boot kernel becoming the post-install default. So this build-script change propagates all the way through to the installed system without touching Calamares.
+
+### Files modified
+
+- `build-scripts/build-the-iso.sh` (line 101)
+- `TODO.md` (closed the "Choose a different kernel" item)
+- `CHANGELOG.md` (this entry)
+
+### Follow-ups (separate passes, not on this commit)
+
+- Retire `LIQUORIX.md` / fold `KERNEL_CHOICE_FOR_KIRO.md` into a decision-archive note — the new default makes them historical.
+- `KIRO-VS-CACHYOS.md` — invert the comparison: Kiro now ships CachyOS's kernel; the doc should be reframed as *"what Kiro adds on top of the CachyOS kernel choice"*.
+- Mirror this kernel default into `kiro-iso-next` once we're happy with the June-1 build.
+- `WHAT-CHANGED-TO-THE-ISO.md` entry will be appended in the standard next-release pass.
+
+---
+
 ## 2026-05-28 — launcher trust moved out of airootfs; kernel selector hardening
 
 ### Launcher trust: out of airootfs, into the calamares package

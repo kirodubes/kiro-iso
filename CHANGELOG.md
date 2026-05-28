@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-05-28 — KIRO-VS-GARUDA.md analysis added
+
+### What changed
+
+New comparison document [`KIRO-VS-GARUDA.md`](KIRO-VS-GARUDA.md), joining the `KIRO-VS-ARCH` / `KIRO-VS-CACHYOS` / `KIRO-VS-PRISM` series. SSH-based inspection of Garuda Mokka's tuning footprint, scored against `edu-system-files`.
+
+### Why
+
+Reference distros are checked quarterly so good ideas don't drift past us. This round produced 5 adoptions (implemented same day in `edu-system-files`): systemd-oomd enablement + tuning, Intel ME blacklist (mei/mei_me), `btusb reset=1`, kernel-zswap disable tmpfile, NetworkManager `unmanaged-lo`. Also formalised the **kernel-agnostic rule** (every system tweak must work on any kernel a user might run) and recorded it in the analysis doc + `edu-system-files/CLAUDE.md`.
+
+### Files
+
+- [KIRO-VS-GARUDA.md](KIRO-VS-GARUDA.md) (new)
+
+---
+
 ## 2026-05-28 — default kernel switched: linux-lqx → linux-cachyos + linux-zen
 
 ### What changed
@@ -85,14 +101,14 @@ Two refinements to the `kernel="ask"` selector:
 
 **What we deliberately leave out, and why.** The repos also ship CPU-microarch builds (`linux-x64v2/v3/v4`, `linux-znver2…5`) and niche kernels (`linux-cjktty`, `-nitrous`, `-tachyon`, `-vfio`). These are **excluded by design**: low demand, and the microarch ones are **dangerous on a general ISO — they silently fail to boot on the wrong CPU level** (e.g. `x64v4` needs AVX-512, `znver5` needs Zen 5). Anyone who explicitly wants one can still set `kernel="linux-znver4"` directly.
 
-| Bucket | Kernels | Offered? |
-|---|---|---|
-| Mainstream | `linux`, `-lts`, `-zen`, `-hardened`, `-rt`, `-rt-lts`, `-lqx`, `-mainline` | ✅ |
-| CachyOS | `linux-cachyos`, `-bore`, `-lts`, `-rc` | ✅ |
-| XanMod | `linux-xanmod-lts`, `-rt`, `-x64v2`, `-x64v3`, `-edge-x64v3` | ✅ |
-| LTS pins | `linux-lts515`, `-lts61`, `-lts66`, `-lts612` | ✅ |
-| CPU-microarch | `linux-x64v2/v3/v4`, `linux-znver2…5` | ❌ won't boot on the wrong CPU |
-| Niche | `linux-cjktty`, `-nitrous`, `-tachyon`, `-vfio(-lts)` | ❌ low demand |
+| Bucket        | Kernels                                                                     | Offered?                      |
+|---------------|-----------------------------------------------------------------------------|-------------------------------|
+| Mainstream    | `linux`, `-lts`, `-zen`, `-hardened`, `-rt`, `-rt-lts`, `-lqx`, `-mainline` | ✅                             |
+| CachyOS       | `linux-cachyos`, `-bore`, `-lts`, `-rc`                                     | ✅                             |
+| XanMod        | `linux-xanmod-lts`, `-rt`, `-x64v2`, `-x64v3`, `-edge-x64v3`                | ✅                             |
+| LTS pins      | `linux-lts515`, `-lts61`, `-lts66`, `-lts612`                               | ✅                             |
+| CPU-microarch | `linux-x64v2/v3/v4`, `linux-znver2…5`                                       | ❌ won't boot on the wrong CPU |
+| Niche         | `linux-cjktty`, `-nitrous`, `-tachyon`, `-vfio(-lts)`                       | ❌ low demand                  |
 
 **Files Modified**
 

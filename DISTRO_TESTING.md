@@ -4,6 +4,118 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-28 — cachyos+zen, **fixes verified** — VirtualBox VM (UEFI, Intel i7-10700K)
+
+**Environment:** Same "Kiro" VirtualBox VM, UEFI/systemd-boot. New ISO built after [kiro-calamares-config](/home/erik/KIRO/kiro-calamares-config) commits `8195c9f` (multi-kernel install fixes: cmdline dedup + mkinitcpio churn cut) and `b49668c` (.gitignore for makepkg artifacts), plus [calamares-3.4.2.r4.g841b478-6](/home/erik/KIRO-PKG-BUILD/calamares-3.4.2.r4.g841b478-6/) package carrying the bootloader/main.py `list()` defensive copy. Calamares `3.4.3.20260528-841b4785-dirty`. Host: erik-virtualbox.
+
+**Boot + install:** PASS, both fixes verified.
+
+### Results vs the morning's baseline install
+
+| Metric                                | Baseline (07:21 install) | Post-fix (08:43 install) |
+|---------------------------------------|--------------------------|--------------------------|
+| `==> Building image` passes in log    | 10 (5 hook-fires × 2 kernels) | **2** (1 explicit Calamares pass × 2 kernels) |
+| Install duration (Calamares start→end) | ~4 min                   | **~40 sec**              |
+| `/etc/kernel/cmdline`                 | duplicated `rw root=UUID=…` | **single** `rw root=UUID=…` |
+| zen entry `options` line              | duplicated                | **clean**                |
+| cachyos entry `options` line          | clean (first call)        | clean                    |
+| `kiro-audit`                          | 117 / 1 WARN / 0 FAIL     | 117 / 1 WARN / 0 FAIL    |
+| Failed systemd units                  | 0                        | 0                        |
+
+### Evidence in the log (`/var/log/Calamares.log`)
+
+```
+1171: [PYTHON JOB]: "Suppressed upstream mkinitcpio pacman hook:
+      /tmp/calamares-root-.../etc/pacman.d/hooks/90-mkinitcpio-install.hook -> /dev/null"
+1189: [PYTHON JOB]: "  Suppress mkinitcpio hook: SUCCESS"
+1733: [PYTHON JOB]: "  Restore mkinitcpio hook: SUCCESS"
+```
+
+The two `==> Building image` passes are the official Calamares `initcpiocfg` + `Creating initramfs with mkinitcpio…` job — exactly the source-of-truth pass that has to run. All four redundant hook-triggered passes from the morning install (`kiro_remove_nvidia` DKMS removal, `pacman -Rs mkinitcpio-archiso`, two `kiro_ucode` microcode triggers) are now silently suppressed. `kiro_final` then removes the `/dev/null` symlink so the user's first `pacman -Syu` rebuilds initramfs normally on kernel upgrades.
+
+### Boot-loader entries (both clean)
+
+`/boot/efi/loader/entries/`:
+
+- `db6392…-7.0.10-1-cachyos.conf` — current entry, `sort-key=kiro`, single-clean cmdline
+- `db6392…-7.0.10-zen1-1-zen.conf` — selectable from menu, single-clean cmdline (was duplicated in baseline)
+
+Both inherit the same `quiet nowatchdog rw root=UUID=… resume=UUID=… systemd.machine_id=…`, only the `linux`/`initrd` paths differ per kernel.
+
+### Not tested this session (queued for bare-metal pass)
+
+- Two physical machines to test next per [README + RESUME flow](RESUME-not-applicable).
+- Picking zen as the default at install (would need a build with `kernel="linux-zen linux-cachyos"` reversed — current test boots cachyos by default and zen from the menu only).
+
+### Dev-side wins from the same session (not user-visible)
+
+- `kiro-calamares-config-*.pkg.tar.zst` size dropped from **97 MB** to expected ~5–7 MB after stripping the makepkg `calamares/` bare-clone artifact from the package source.
+- `kiro-enable-ssh` now does `pacman -Sy` first and (on the live ISO only) sets `liveuser`'s password to `erik` so SSH actually works after the one-command opt-in — verified the live-ISO gate via `/run/archiso/bootmnt` is a no-op on the installed system (this install correctly logged "Not on live ISO… skipping").
+
+---
+
+## 2026-05-28 — cachyos+zen default kernels — VirtualBox VM (UEFI, Intel i7-10700K)
+
+**Environment:** "Kiro" VirtualBox VM, UEFI/systemd-boot. Live ISO built today after the [build-the-iso.sh:101](build-scripts/build-the-iso.sh) `kernel=` flip from `linux-lqx` → `linux-cachyos linux-zen`. Calamares 3.4.3.20260528-841b4785-dirty. Host: erik-virtualbox.
+
+**Boot:** PASS — live ISO boots `7.0.10-1-cachyos` (cachyos = first in the space-separated `kernel=` list = live-boot per the [build-the-iso.sh:101](build-scripts/build-the-iso.sh) contract). XFCE desktop comes up clean, "Install kiro" launcher pre-trusted (the launcher-trust fix from earlier today held).
+
+**Install:** PASS — Calamares completes end-to-end. `START CALAMARES` 07:20:53 → final `Saving files…` 07:24:50 = **~4 minutes total install**. Both kernels (`linux-cachyos` + `linux-zen`) + their `-headers` land in the target; both initramfs files generated; both systemd-boot loader entries written.
+
+**Score: 117 PASS / 1 WARN / 0 FAIL** (`kiro-audit`). The WARN is the expected/intentional `multilib missing from pacman.conf`. **This validates today's kernel-agnostic kiro-audit work end-to-end on a kernel we had never tested with the audit before** — the previous lqx-hardcoded code would have produced 6 spurious FAILs on cachyos.
+
+**Boot loader:** systemd-boot 260.1-2-arch, current entry `e6033dc5...-7.0.10-1-cachyos.conf`. Two entries on disk in `/boot/efi/loader/entries/` — cachyos (default, `sort-key=kiro`) + zen (selectable). Boot time: 14.066s total (kernel 6.745s + userspace 7.321s).
+
+**Kernel-agnostic chain proven end-to-end:**
+- Build side: [kiro-iso/build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh) `apply_kernel()` rewrote `packages.x86_64` + every boot loader template from a single `kernel=` variable.
+- Install side: `kiro_kernel` Calamares module detected both kernels from the live medium, wrote slim `PRESETS=('default')` presets for each (NO fallback ever built — wins half the mkinitcpio time for free).
+- Audit side: kernel-agnostic `kiro-audit` (today's change) validates whatever's installed via `/usr/lib/modules/*/pkgbase`.
+
+### Findings
+
+**[BUG, cosmetic] zen boot-loader entry has duplicated `rw root=UUID=…`**
+
+The cachyos `.conf` cmdline is clean:
+```
+options    quiet nowatchdog rw root=UUID=021e749f-… systemd.machine_id=…
+```
+The zen `.conf` cmdline has `rw root=UUID=…` twice:
+```
+options    quiet nowatchdog rw root=UUID=021e749f-… rw root=UUID=021e749f-… systemd.machine_id=…
+```
+Root cause: `/etc/kernel/cmdline` on the installed system **itself** is duplicated (`quiet nowatchdog rw root=UUID=… rw root=UUID=…`). cachyos entry was generated first (clean cmdline) → clean entry; zen entry generated after the duplication → carries the dupes. So one of Calamares' modules is writing `/etc/kernel/cmdline` twice (appending instead of overwriting on the second pass) — likely `kiro_before` or `initcpiocfg` re-running. Boot-functional (kernel ignores duplicate params) but ugly and will compound on future kernel installs. **Fix candidate:** locate the second writer in `kiro-calamares-config`, switch from append to write-or-overwrite.
+
+**[PERF] mkinitcpio ran FIVE times during install — 10 kernel builds total**
+
+Search `==> Building image from preset` in `/var/log/Calamares.log` returns five passes:
+1. ~07:23:?? — during `kiro_remove_nvidia` / `kiro_before` window (after `kiro_kernel` writes presets)
+2. 07:24:08 — Calamares's own `Creating initramfs with mkinitcpio…` job (24/41), running `mkinitcpio -P`
+3. 07:24:16 — triggered by `pacman -Rs --noconfirm mkinitcpio-archiso`
+4. 07:24:26 — triggered by `kiro_ucode` (microcode reinstall)
+5. ~07:24:35 — second pass after another microcode-related action
+
+Each pass builds both kernels → 10 builds. The slim-preset win is already taken (every pass is `'default'` only, no fallback). The remaining churn is consolidation: defer mkinitcpio until the LAST preset/cmdline change, then run `mkinitcpio -P` once. Standard mechanism: symlink `/etc/pacman.d/hooks/90-mkinitcpio-install.hook` → `/dev/null` in the chroot during install, run it explicitly at the end. Estimated save: ~30-60s of a ~4min install.
+
+**[PERF] microcode reinstall churns mkinitcpio twice on its own**
+
+`kiro_ucode` triggers two mkinitcpio runs in the same job — `intel-ucode-20260512-1 is up to date -- reinstalling` followed by `warning: could not get file information for boot/intel-ucode.img`. Whatever `kiro_ucode` is doing (install correct ucode, remove wrong one) is firing the pacman mkinitcpio hook twice. Same fix as above resolves it.
+
+**[INFO] /syscheck needs no updates**
+
+Erik asked whether `/syscheck` needs updating. It does not — the spec at [~/.claude/commands/syscheck.md](file:///home/erik/.claude/commands/syscheck.md) has zero kernel-name hardcoding. Its kernel-related checks delegate to `journalctl -k` (kernel-agnostic) and `kiro-audit` (now kernel-agnostic). All 17 items work unchanged on cachyos/zen.
+
+**[INFO] Calamares.log warnings — all known-benign**
+
+`chcon` ×8 (no `chcon` on Kiro per `project_calamares_chcon_benign`), transient "EFI but no ESP" before partitioning, Qt UI warnings, `WARNING: Unknown GS key autoLoginUser` (Calamares config key it doesn't recognise — minor cleanup item, not a defect), `Possibly missing firmware for module: 'adf7242'/'softing_cs'` (obscure modules, standard Arch noise). Zero Python tracebacks, zero failed jobs.
+
+**Failed systemd units after first boot:** zero.
+
+**Pending updates at test time:** 0.
+
+**Not tested this session (queued for next two machines):** bare-metal install (Erik will burn the ISO and test on two physical machines next), zen as the **default** (would need a second build with `kernel="linux-zen linux-cachyos"` reversed — current test boots zen only from the boot loader menu).
+
+---
+
 ## 2026-05-28 — hardened-kernel live ISO (VirtualBox, UEFI) — launcher-trust focus
 
 **Environment:** "Kiro" VirtualBox VM, UEFI. Live ISO built with `kernel="linux-hardened"`. Kernel `7.0.9-hardened1-1-hardened`.

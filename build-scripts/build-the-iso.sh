@@ -554,6 +554,57 @@ build_iso() {
     sudo mkarchiso -v -w "${buildFolder}" -o "${outFolder}" "${buildFolder}/archiso/"
 }
 
+record_build_time() {
+    # Append a row to ../BUILD_TIMES.md ## ISO Builds with this build's
+    # duration, kernel(s), live squashfs setting, and ISO size. Non-fatal —
+    # failure here logs a warning but doesn't abort the build.
+    [[ -z "${build_start_epoch:-}" ]] && { log_warn "record_build_time: build_start_epoch unset — skipping"; return 0; }
+
+    local end_epoch duration mins secs stamp iso_file iso_size compression kernels_used row btf tmp
+    end_epoch=$(date +%s)
+    duration=$((end_epoch - build_start_epoch))
+    mins=$((duration / 60))
+    secs=$((duration % 60))
+    stamp="$(date '+%Y-%m-%d %H:%M')"
+
+    iso_file="$(ls -1t "${outFolder}"/*.iso 2>/dev/null | head -1)"
+    iso_size="$(du -h "${iso_file}" 2>/dev/null | cut -f1)"
+
+    # Squashfs setting read live from profiledef.sh so we always log what
+    # the build actually used, not a stale constant.
+    compression="$(grep -E '^airootfs_image_tool_options=' "${REPO_DIR}/archiso/profiledef.sh" 2>/dev/null \
+        | sed -E "s/.*'-comp' '([^']+)'.*-Xcompression-level' '([0-9]+)'.*'-b' '([^']+)'.*/\\1 L\\2 -b \\3/")"
+    compression="${compression:-?}"
+
+    # Prefer SELECTED_KERNELS (what the build actually shipped, in order)
+    # over the kernel= config value (which is "ask" in interactive mode).
+    if [[ ${#SELECTED_KERNELS[@]} -gt 0 ]]; then
+        kernels_used="${SELECTED_KERNELS[*]}"
+    else
+        kernels_used="${kernel}"
+    fi
+
+    row="| ${stamp} | ${kiroVersion} | ${kernels_used} | ${compression} | ${mins}m${secs}s | ${iso_size:-?} | |"
+    btf="${REPO_DIR}/BUILD_TIMES.md"
+
+    if [[ ! -f "${btf}" ]] || ! grep -q '^## ISO Builds$' "${btf}"; then
+        log_warn "BUILD_TIMES.md missing or malformed — skipping time record (would have been: ${row})"
+        return 0
+    fi
+
+    # Insert the new row right after the |--- separator line inside the
+    # ## ISO Builds section. awk gives us a safe in-section anchor.
+    tmp="$(mktemp)"
+    awk -v row="${row}" '
+        /^## ISO Builds$/ { in_section = 1 }
+        /^## / && !/^## ISO Builds$/ { in_section = 0 }
+        { print }
+        /^\|---/ && in_section && !injected { print row; injected = 1 }
+    ' "${btf}" > "${tmp}" && mv "${tmp}" "${btf}"
+
+    log_info "Build time recorded in BUILD_TIMES.md — ${mins}m${secs}s, ${iso_size:-?} ISO"
+}
+
 create_checksums() {
     log_section "Phase 9 — Creating checksums and pkglist"
     cd "${outFolder}"
@@ -573,6 +624,9 @@ create_checksums() {
 # Main
 #####################################################################
 main() {
+    local build_start_epoch
+    build_start_epoch=$(date +%s)
+
     check_not_root
     warn_btrfs
     setup_chaotic
@@ -601,6 +655,8 @@ main() {
     create_checksums
 
     remove_buildfolder "${remove_build_folder}"
+
+    record_build_time
 
     log_success "$(basename "$0") done — ISO is in ${outFolder}"
 }

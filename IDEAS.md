@@ -24,3 +24,7 @@ After `/kiro-ready` returns GO, auto-generate a paste-ready release announcement
 
 ### Build health dashboard — post-build HTML report
 After `mkarchiso` completes, generate a simple static HTML file in `~/kiro-Out/` alongside the ISO that lists: build date, kiro version, NVIDIA driver selected, total package count, ISO size, and all three checksums in one place. A single `xdg-open` command opens it in the browser. Rationale: right now the build information is scattered across terminal output, the pkglist file, and three separate checksum files. A single report page makes it easy to screenshot and share when posting a new release, and gives a quick sanity check that the right driver was injected before uploading.
+
+### Build-time airootfs exec-bit guard
+
+Before calling `mkarchiso`, have `build-the-iso.sh` scan the airootfs for scripts under `*/bin/*` that are missing their exec bit and warn (or abort): `find "$buildFolder/archiso/airootfs" -path "*/bin/*" -type f ! -perm -u+x`. This session burned hours because `kiro-trust-desktop-launchers` shipped `644` — git recorded it `100755`, but the overlay/squashfs did not preserve the bit, and the failure was invisible until the booted ISO. Rationale: a lost exec bit is silent (the file is present, just not runnable) and only bites at runtime on the live system; a one-line pre-build check turns a multi-hour live-VM debug into an instant warning, and nudges toward the durable fixes (pin in `file_permissions`, or invoke via `bash`).

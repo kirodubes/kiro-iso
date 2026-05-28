@@ -4,6 +4,33 @@
 
 ---
 
+## 2026-05-28 — launcher trust moved out of airootfs; kernel selector hardening
+
+### Launcher trust: out of airootfs, into the calamares package
+
+Yesterday's "pre-trust the Install kiro launcher" fix — an airootfs autostart `.desktop` running `/usr/local/bin/kiro-trust-desktop-launchers` — **did not survive a real build**. The airootfs overlay shipped the helper as `644` even though git records it `100755`, so the autostart's `Exec=<script>` couldn't execute it and the "Untrusted application launcher" prompt came right back. The exec bit is simply not reliable through the airootfs overlay.
+
+So the helper is **removed from this repo's airootfs** (`archiso/airootfs/usr/local/bin/kiro-trust-desktop-launchers` deleted), and trust is now delivered by the **`calamares` package** as a **systemd _user_ service** (`kiro-trust-launchers.service`, installed to `~liveuser/.config/systemd/user/` with a shipped `WantedBy` enable symlink). Two deliberate design points:
+
+- **`ExecStart=/bin/bash /usr/local/bin/kiro-trust-desktop-launchers`** — running the script through `bash` makes the exec bit irrelevant, so the lost-`+x` class of bug can't recur.
+- **User service, `default.target`** — the trust action is `gio set metadata::trusted` on liveuser's desktop files, which is per-user via the session bus (a root system service writes to the wrong place). The unit targets **`default.target`** because XFCE on Kiro does **not** activate `graphical-session.target` (verified live: the service was `enabled` but stayed `inactive (dead)`).
+
+The trigger and helper thus leave kiro-iso's airootfs entirely; the calamares package owns the mechanism. (See the calamares PKGBUILD for the unit + symlink.)
+
+### Kernel selector: strict validation + no needless repo scan
+
+Refinements to `select_kernels()` in the build script:
+
+- **Strict `picker=` validation** — an invalid value (e.g. a typo'd `diag`) now fails loudly with `Invalid picker='diag'. Valid options: auto | gum | dialog` instead of silently falling back to gum.
+- **Kernel-name validation** — a mistyped `kernel="…"` is caught up front with `Unknown kernel '<name>'` plus the list of valid names, rather than failing deep inside `mkarchiso`.
+- **No needless repo scan** — `detect_available_kernels` (which probes ~25 packages) no longer runs on every build. A fixed kernel like `linux-lqx` now does just two local-DB lookups to confirm the package + `-headers` exist; the full enumeration runs only for `kernel="ask"` (build the menu) or on a typo (suggest valid names).
+- **`auto` now prefers `dialog`** — `picker="auto"` resolves to dialog (Kiro's branded picker) if present, else gum; `picker="gum"` still forces the truecolor UI.
+
+**Files Modified**
+
+- **[build-scripts/build-the-iso.sh](./build-scripts/build-the-iso.sh)** — picker + kernel validation, `detect_available_kernels` moved out of the fixed-kernel path, `auto` dispatch flipped to dialog-first.
+- **archiso/airootfs/usr/local/bin/kiro-trust-desktop-launchers** — removed (trust now ships via the calamares package).
+
 ## 2026-05-27 — kernel selector: `picker=` toggle + broader dynamic discovery
 
 Two refinements to the `kernel="ask"` selector:

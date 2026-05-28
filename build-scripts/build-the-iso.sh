@@ -98,8 +98,8 @@ desktop="xfce4/ohmychadwm"
 kiroVersion='v26.05.28'
 bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
-kernel="linux-lqx"            # space-separated kernel package(s); "ask" = interactive dialog menu. First = the kernel the live ISO boots.
-picker="auto"                 # auto | gum | dialog — picker UI for kernel="ask" (auto = gum if installed, else dialog)
+kernel="linux-lqx"            # space-separated kernel package(s); "ask" = interactive menu. First = the kernel the live ISO boots.
+picker="auto"                 # auto | gum | dialog — picker UI for kernel="ask" (auto = dialog if installed, else gum)
 chaoticsrepo=true
 clean_pacman_cache="no"       # yes | no
 remove_build_folder="no"      # yes | no — set to yes to clean up after build
@@ -407,13 +407,13 @@ select_kernels() {
         *) log_error "Invalid picker='${picker}'. Valid options: auto | gum | dialog"; exit 1 ;;
     esac
 
-    detect_available_kernels
-
+    # Fixed kernel(s): validate only the named package(s) — no full repo enumeration.
     if [[ "${kernel}" != "ask" ]]; then
         read -ra SELECTED_KERNELS <<< "${kernel}"
         local bad
         for bad in "${SELECTED_KERNELS[@]}"; do
             if ! pacman -Si "${bad}" &>/dev/null || ! pacman -Si "${bad}-headers" &>/dev/null; then
+                detect_available_kernels   # only on a bad name, to suggest valid ones
                 log_error "Unknown kernel '${bad}' — no '${bad}' + '${bad}-headers' in the enabled repos.
 Use kernel=\"ask\" to pick interactively, or one of these:
 $(printf '  %s\n' "${AVAILABLE_KERNELS[@]}")"
@@ -425,18 +425,20 @@ $(printf '  %s\n' "${AVAILABLE_KERNELS[@]}")"
         return 0
     fi
 
+    # kernel="ask": enumerate the kernels the enabled repos offer, for the menu.
+    detect_available_kernels
     if [[ "${#AVAILABLE_KERNELS[@]}" -eq 0 ]]; then
         log_error "No kernels with a matching -headers package found in the enabled repos"
         exit 1
     fi
 
-    # Picker UI for kernel="ask": gum (truecolor Arc Dark) or dialog. "auto" = gum if installed.
+    # Picker UI for kernel="ask": gum (truecolor Arc Dark) or dialog. "auto" = dialog if installed, else gum.
     case "${picker}" in
         gum)
             command -v gum &>/dev/null || { log_error "picker=gum but gum is not installed"; exit 1; }
             _select_kernels_gum ;;
         dialog) _select_kernels_dialog ;;
-        auto)   if command -v gum &>/dev/null; then _select_kernels_gum; else _select_kernels_dialog; fi ;;
+        auto)   if command -v dialog &>/dev/null; then _select_kernels_dialog; else _select_kernels_gum; fi ;;
     esac
 
     if [[ "${#SELECTED_KERNELS[@]}" -eq 0 || -z "${PRIMARY_KERNEL}" ]]; then

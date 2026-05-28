@@ -4,6 +4,21 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-28 — hardened-kernel live ISO (VirtualBox, UEFI) — launcher-trust focus
+
+**Environment:** "Kiro" VirtualBox VM, UEFI. Live ISO built with `kernel="linux-hardened"`. Kernel `7.0.9-hardened1-1-hardened`.
+
+**Boot:** PASS — live hardened kernel boots to the XFCE desktop; `kernels` reports `7.0.9-hardened1-1-hardened`. Validates the kernel-agnostic selector + `kiro_kernel` on the live side for a 4th kernel family.
+
+**Launcher trust (session focus):**
+- airootfs autostart approach found **broken** — helper shipped `644` (lost `+x` through the overlay), so the "Untrusted application launcher" prompt persisted.
+- Reworked to a systemd **user** service shipped via the `calamares` package. Body **proven**: `systemctl --user start kiro-trust-launchers` → launcher trusted → Calamares launches, no prompt.
+- Auto-fire did **not** happen unattended: service `enabled` but `inactive (dead)` — XFCE doesn't activate `graphical-session.target`. **Fix applied** (unit → `default.target`); **pending** verification on a rebuilt/republished calamares ISO.
+
+**Not tested this session:** full Calamares install + `kiro-audit` (focus was launcher trust); hardened install-side (`kiro_kernel` copying `vmlinuz-linux-hardened` to the target) still to confirm.
+
+---
+
 ## 2026-05-25 — v26.05.25 — the test box (bare metal, UEFI, Intel)
 
 **Environment:** the test box — bare-metal Kiro on ASUS STRIX Z270H GAMING, Intel Core i7-7700K, Intel I219-V NIC (e1000e), UEFI/systemd-boot. Kernel `linux-lqx 7.0.10-lqx1-1-lqx`. Installed from the `v26.05.25` ISO (built Mon May 25 14:04 CEST).

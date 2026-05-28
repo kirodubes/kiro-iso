@@ -659,12 +659,13 @@ main() {
     apply_version_bump
     verify_version_sync
 
-    log_section "Phase 2c — Comparing skel .bashrc with edu-shells"
-    log_section "As user ignore this check - for iso building pc"
-    # Informational only — print the colored OK/NOK and keep going regardless.
-    files_are_identical \
-        "${REPO_DIR}/archiso/airootfs/etc/skel/.bashrc" \
-        "${HOME}/EDU/edu-shells/etc/skel/.bashrc-latest" || true
+    if [[ "$(hostname)" == "hq" ]]; then
+        log_section "Phase 2c — Comparing skel .bashrc with edu-shells"
+        # Informational only — print the colored OK/NOK and keep going regardless.
+        files_are_identical \
+            "${REPO_DIR}/archiso/airootfs/etc/skel/.bashrc" \
+            "${HOME}/EDU/edu-shells/etc/skel/.bashrc-latest" || true
+    fi
 
     log_section "Phase 1 — Checking required packages"
     ensure_package archiso

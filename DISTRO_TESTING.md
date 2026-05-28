@@ -4,6 +4,36 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-28 — cachyos+zen, **first bare-metal install, all-green** — real metal (UEFI, Intel desktop + Samsung 860 EVO SSD)
+
+**Environment:** Live ISO `v26.05.28` booted on a bare-metal Intel desktop (UEFI/systemd-boot, Samsung 860 EVO 250GB). Install monitored over SSH from the dev box after `kiro-enable-ssh` on the live session. The Calamares cleanup wave from the morning's VM session carried over cleanly — no `qemu-guest-agent` or `virtualbox-guest-utils` left over after the chroot cleanup.
+
+**Boot + install:** PASS end-to-end. Reboot into `linux-cachyos 7.0.10` is clean; SDDM + XFCE come up; sshd off by default on the installed system (correct).
+
+**Score: 128 PASS / 0 WARN / 0 FAIL** (`kiro-audit`) — **first-ever zero-WARN result**. The long-standing `multilib missing` WARN was removed earlier today (multilib intentionally out of scope for Kiro), so this is the first audit that runs entirely silent. Coverage now includes the full Garuda-imports surface: oomd drop-ins (system + user slice), mei/mei_me blacklist, `btusb reset=1`, zswap disabled, NM `unmanaged-lo`, sysctl baseline (8 values), resolved mDNS off (avahi owns mDNS), key-file permissions, cgroup delegation, ananicy-cpp, firewalld, logrotate.timer, ZRAM 4G zstd, all 10 udev rules.
+
+**Boot time (kiro-audit info):** firmware 13.6s + loader 5.4s + kernel 2.1s + userspace 4.0s = **25.2s total**. Firmware dominates on bare metal as expected (vs ~1s on a VM).
+
+**Failed units: 0. NIC noise: 0. Calamares Python tracebacks: 0.** Only first-boot baseline noise: `alsactl restore` exit 19 on card0/card1 (no saved state yet — normal on a freshly-installed system), `bluetoothd` hci0 default-config, `gkr-pam: unable to locate daemon control file` (well-known SDDM/gnome-keyring cosmetic).
+
+**Fixes from earlier sessions that held on bare metal:**
+- Cmdline-dedup ([kiro-calamares-config](../kiro-calamares-config) `8195c9f`) — bootloader audit clean, no duplicate `rw root=UUID=`.
+- `cups.socket` enabled by Calamares (2026-05-26 fix) — socket active, service inactive-until-triggered as designed.
+- `logrotate.timer` enabled by Calamares (2026-05-26) — file-based log rotation persists across reboot.
+- `firewalld` default-on (2026-05-25 ufw→firewalld swap) — `active`+`enabled`, zone `public`.
+- `linux-cachyos` boot default, `linux-zen` fallback — both kernels installed, both initramfs files generated, both systemd-boot loader entries written.
+- `kiro-enable-ssh` flow: `pacman -Sy` + openssh reinstall + firewalld rule add (firewalld correctly logged `ALREADY_ENABLED: ssh` since the rule was already present in the default zone).
+
+**Post-install actions performed during the session:**
+- `pacman -Syu` picked up `archlinux-tweak-tool-gtk4-git 368→370` + `exfatprogs 1.4.0→1.4.1`. 1 pending update remains.
+- `kiro-enable-ssh` to make the installed system reachable for follow-up syscheck.
+
+**Hardware quirks (informational only, none actionable):** SGX disabled in BIOS; MDS / MMIO Stale Data / VMSCAPE SMT mitigation advisories at boot (standard Intel/SMT); Samsung 860 EVO kernel ATA quirks auto-applied (`noncqtrim`, `zeroaftertrim`, `noncqonati`, `nolpmonati`); `intel_pmc_core` BAR-overlap notice (common Intel platform-driver chatter).
+
+**Verdict:** Bare-metal milestone unlocked. The 2026-05-28 cachyos+zen ISO is now proven on both VirtualBox and real Intel desktop hardware, with a strictly cleaner audit than every prior VM run. The "two physical machines to test next" item from the prior entry is now half-cleared — one more bare-metal pass would close it.
+
+---
+
 ## 2026-05-28 — cachyos+zen, **fixes verified** — VirtualBox VM (UEFI, Intel i7-10700K)
 
 **Environment:** Same "Kiro" VirtualBox VM, UEFI/systemd-boot. New ISO built after [kiro-calamares-config](/home/erik/KIRO/kiro-calamares-config) commits `8195c9f` (multi-kernel install fixes: cmdline dedup + mkinitcpio churn cut) and `b49668c` (.gitignore for makepkg artifacts), plus [calamares-3.4.2.r4.g841b478-6](/home/erik/KIRO-PKG-BUILD/calamares-3.4.2.r4.g841b478-6/) package carrying the bootloader/main.py `list()` defensive copy. Calamares `3.4.3.20260528-841b4785-dirty`. Host: erik-virtualbox.

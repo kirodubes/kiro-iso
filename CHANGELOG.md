@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-05-28 — squashfs compression L6 → L3 (faster unpackfs phase)
+
+### What changed
+
+One-line change in [archiso/profiledef.sh](archiso/profiledef.sh) (line 19): the squashfs build options swapped `-Xcompression-level 6` for `-Xcompression-level 3`. The old L6 line is preserved as a commented fallback right above the new line, so reverting is one-line.
+
+### Why
+
+`unpackfs` (the squashfs extract during Calamares install) is the dominant cost on slow disks — easily ~2 min of the install. zstd decompression speed scales inversely with compression level; dropping L6 → L3 typically yields 2-3× faster extraction at the cost of ~5-10% ISO size growth. For a once-downloaded-many-times-installed artifact that trade is worthwhile.
+
+### Benefit observed
+
+ISO size: 5.9 GB → **6.1 GB** (+200 MB, ~3.4% growth — on the low end of the predicted 5-10%). Unpackfs phase on the VirtualBox test install measured at **2 min 13 s** (total install 3 min 4 s). Direct head-to-head against the prior L6 baseline on the same VM has not been run yet; the size impact is confirmed at the cost predicted, and the option is in place for further benchmarking.
+
+### Files
+
+- [archiso/profiledef.sh](archiso/profiledef.sh)
+
+---
+
 ## 2026-05-28 — KIRO-VS-GARUDA.md analysis added
 
 ### What changed

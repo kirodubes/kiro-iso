@@ -112,6 +112,14 @@ resolve_ssh() {
 
 # Pulls four newline-separated fields from the target:
 #   first_ts | last_ts | iso_version | mkinitcpio_passes
+#
+# first_ts uses the first "Starting job .+ ( 1 / N )" marker — that's the
+# canonical "user clicked Install" event, since Calamares only emits
+# numbered job lines once the install pipeline actually starts. Using the
+# very first timestamped line would instead measure Calamares-app-launch
+# (welcome screen) → end-of-install, which includes the time the user
+# spent reading/clicking through the wizard. Fallback to the very first
+# timestamp on the unlikely chance the marker isn't present.
 fetch_facts() {
     local ssh_cmd="$1"
     ${ssh_cmd} '
@@ -119,8 +127,12 @@ fetch_facts() {
             echo "ERROR: /var/log/Calamares.log not present on this target" >&2
             exit 1
         fi
-        first_ts=$(grep -oE "^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}" /var/log/Calamares.log | head -1)
-        last_ts=$( grep -oE "^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}" /var/log/Calamares.log | tail -1)
+        first_ts=$(grep -E "Starting job .+\( 1 / [0-9]+ \)" /var/log/Calamares.log | head -1 \
+                   | grep -oE "^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}")
+        if [[ -z "${first_ts}" ]]; then
+            first_ts=$(grep -oE "^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}" /var/log/Calamares.log | head -1)
+        fi
+        last_ts=$(grep -oE "^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}" /var/log/Calamares.log | tail -1)
         iso_release=$(grep -oP "^ISO_RELEASE=\K.*" /etc/dev-rel 2>/dev/null || echo "?")
         mkinitcpio_passes=$(grep -c "==> Building image" /var/log/Calamares.log || true)
         printf "%s\n%s\n%s\n%s\n" "${first_ts}" "${last_ts}" "${iso_release}" "${mkinitcpio_passes}"

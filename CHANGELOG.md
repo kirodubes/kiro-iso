@@ -4,6 +4,62 @@
 
 ---
 
+## 2026-05-29 — Sync committed skel `.bashrc` with the renamed kiro-* helpers
+
+**What Changed**
+
+Updated the committed **[archiso/airootfs/etc/skel/.bashrc](archiso/airootfs/etc/skel/.bashrc)** so its aliases point at the renamed `kiro-*` helper scripts instead of the old `edu-*` names (and dropped the dead `rvariety`/`rkmix`/`rconky` aliases, whose `edu-remove-*` scripts were removed, not renamed). This is purely a sync change — at build time `build-the-iso.sh` fetches the live `.bashrc-latest` from `erikdubois/edu-shells` into the build tree, so the *shipped* `.bashrc` always comes from edu-shells. The point of this edit is the **Phase 2c consistency check** (`files_are_identical` against the local edu-shells `.bashrc-latest`): without it, that check would print NOK once edu-shells is pushed with the renamed aliases. Real fix lives in (and must be pushed from) `edu-shells`.
+
+**Technical Details**
+
+- Renames (old → new): `edu-which-vga` → `kiro-which-vga`; `edu-fix-pacman-databases-and-keys` → `kiro-fix-pacman-keys` (7 alias variants); `edu-fix-pacman-conf` → `kiro-fix-pacman-conf`; `edu-fix-pacman-gpg-conf` → `kiro-fix-gpg-conf`; `edu-fix-archlinux-servers` → `kiro-fix-mirrors`; `edu-probe` → `kiro-probe`. File still parses clean (`bash -n`).
+
+**Files Modified**
+
+- [archiso/airootfs/etc/skel/.bashrc](archiso/airootfs/etc/skel/.bashrc)
+
+---
+
+## 2026-05-29 — Live ISO boot now shows the K splash too
+
+**What Changed**
+
+Completed the boot-splash story: the `kiro-logo` Plymouth splash now renders during the **live ISO boot**, not just on the installed system. Until now Plymouth was present and themed on the ISO but never drew at live boot, because the live environment was missing the two prerequisites Plymouth needs — the `plymouth` initramfs hook and the `splash` kernel parameter. Both were only added to the *installed* target (by the `kiro_plymouth` Calamares module + the bootloader module). This change adds them to the live boot path as well.
+
+**Technical Details**
+
+- **[archiso/airootfs/etc/mkinitcpio.conf](archiso/airootfs/etc/mkinitcpio.conf)** — inserted the `plymouth` hook right after `udev` in the live `HOOKS` line (same position the `kiro_plymouth` Calamares module uses on the target). `kms` is already present, so KMS is ready before Plymouth draws. `mkarchiso` rebuilds the live initramfs at build time, so no manual `mkinitcpio` run is needed.
+- **`quiet splash`** added to the **KMS** boot entries across all three bootloaders. Plymouth needs *both* `quiet` and `splash` or it falls back to the text details theme:
+  - systemd-boot (**[archiso/efiboot/loader/entries/](archiso/efiboot/loader/entries/)**): `01-archiso-linux`, `02-nvidianouveau`, `04-fallback-zen` (these already had `quiet loglevel=3`, so only `splash` was added).
+  - GRUB (**[archiso/grub/grub.cfg](archiso/grub/grub.cfg)**) and syslinux (**[archiso/syslinux/archiso_sys-linux.cfg](archiso/syslinux/archiso_sys-linux.cfg)**): these had neither token, so `quiet splash` was appended to the matching free / NVIDIA / zen-fallback entries.
+- **`03-nomodeset` is intentionally left untouched** in every bootloader. With `nomodeset` there is no KMS, so Plymouth cannot render graphically — leaving that entry bare keeps the safe-graphics fallback verbose and reliable.
+- Theme selection is unchanged — `kiro-logo` is still set at `mkarchiso` time by the `plymouth-theme-kiro-logo` package's `.install`. This change only makes the live boot actually *display* it.
+
+**Files Modified**
+
+- [archiso/airootfs/etc/mkinitcpio.conf](archiso/airootfs/etc/mkinitcpio.conf)
+- [archiso/efiboot/loader/entries/01-archiso-linux.conf](archiso/efiboot/loader/entries/01-archiso-linux.conf)
+- [archiso/efiboot/loader/entries/02-nvidianouveau.conf](archiso/efiboot/loader/entries/02-nvidianouveau.conf)
+- [archiso/efiboot/loader/entries/04-fallback-zen.conf](archiso/efiboot/loader/entries/04-fallback-zen.conf)
+- [archiso/grub/grub.cfg](archiso/grub/grub.cfg)
+- [archiso/syslinux/archiso_sys-linux.cfg](archiso/syslinux/archiso_sys-linux.cfg)
+
+---
+
+## 2026-05-29 — Kiro boot splash now ships on the ISO
+
+**What Changed**
+
+Added `plymouth-theme-kiro-logo` to [archiso/packages.x86_64](archiso/packages.x86_64) (new PLYMOUTH section). Its `depends=('plymouth')` pulls plymouth onto the ISO automatically, so installed systems get the animated "self-assembling K" boot splash out of the box. Mirrored into the `kiro-iso-next` tree.
+
+**Technical Details**
+
+- The package's `.install` runs `plymouth-set-default-theme kiro-logo` at `mkarchiso` time, writing `Theme=kiro-logo` into the airootfs `/etc/plymouth/plymouthd.conf`; `unpackfs` copies that to the target before the initramfs is built. No `-R` is used (correct — Calamares' `initcpio` job is the single source of truth for the target rebuild).
+- The `plymouth` hook is added to the target's `mkinitcpio.conf` by the new `kiro_plymouth` Calamares module (see kiro-calamares-config CHANGELOG); the `splash` kernel param is auto-appended by the `bootloader` module when plymouth is present. Splash is kernel-agnostic — the single `mkinitcpio -P` builds it into every selected kernel's initramfs.
+
+**Files Modified**
+- `archiso/packages.x86_64`
+
 ## 2026-05-29 — chwd NVIDIA testing on worf + nvidia-390xx is dead on the 7.0 kernel
 
 Test install on **worf** (`erik-p7624`, an Optimus laptop: Intel HD 2nd-gen + NVIDIA **GF108M / GeForce GT 620M**, PCI `10de:0de9`), booted with the **non-free** GRUB option (`driver=nonfree`). Three things came out of it.

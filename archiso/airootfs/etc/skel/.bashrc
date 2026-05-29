@@ -97,7 +97,7 @@ alias unlock="sudo rm /var/lib/pacman/db.lck"
 alias rmpacmanlock="sudo rm /var/lib/pacman/db.lck"
 
 #which graphical card is working
-alias whichvga="/usr/local/bin/edu-which-vga"
+alias whichvga="/usr/local/bin/kiro-which-vga"
 
 #free
 alias free="free -mt"
@@ -279,11 +279,6 @@ alias nalacritty="nano /home/$USER/.config/alacritty/alacritty.toml"
 alias nemptty="sudo $EDITOR /etc/emptty/conf"
 alias nkitty="$EDITOR ~/.config/kitty/kitty.conf"
 
-#removing packages
-alias rvariety="edu-remove-variety"
-alias rkmix="edu-remove-kmix"
-alias rconky="edu-remove-conky"
-
 #reading logs with bat
 alias lcalamares="bat /var/log/Calamares.log"
 alias lpacman="bat /var/log/pacman.log"
@@ -305,16 +300,16 @@ alias fix-keyserver="[ -d ~/.gnupg ] || mkdir ~/.gnupg ; cp /etc/pacman.d/gnupg/
 
 #fixes
 alias fix-permissions="sudo chown -R $USER:$USER ~/.config ~/.local"
-alias keyfix="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias key-fix="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias keys-fix="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias fixkey="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias fixkeys="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias fix-key="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias fix-keys="/usr/local/bin/edu-fix-pacman-databases-and-keys"
-alias fix-pacman-conf="/usr/local/bin/edu-fix-pacman-conf"
-alias fix-pacman-keyserver="/usr/local/bin/edu-fix-pacman-gpg-conf"
-alias fix-archlinux-mirrors="/usr/local/bin/edu-fix-archlinux-servers"
+alias keyfix="/usr/local/bin/kiro-fix-pacman-keys"
+alias key-fix="/usr/local/bin/kiro-fix-pacman-keys"
+alias keys-fix="/usr/local/bin/kiro-fix-pacman-keys"
+alias fixkey="/usr/local/bin/kiro-fix-pacman-keys"
+alias fixkeys="/usr/local/bin/kiro-fix-pacman-keys"
+alias fix-key="/usr/local/bin/kiro-fix-pacman-keys"
+alias fix-keys="/usr/local/bin/kiro-fix-pacman-keys"
+alias fix-pacman-conf="/usr/local/bin/kiro-fix-pacman-conf"
+alias fix-pacman-keyserver="/usr/local/bin/kiro-fix-gpg-conf"
+alias fix-archlinux-mirrors="/usr/local/bin/kiro-fix-mirrors"
 
 #maintenance
 alias big="expac -H M '%m\t%n' | sort -h | nl"
@@ -324,7 +319,7 @@ alias big="expac -H M '%m\t%n' | sort -h | nl"
 alias unhblock="hblock -S none -D none"
 
 #systeminfo
-alias probe="sudo edu-probe"
+alias probe="sudo kiro-probe"
 alias sysfailed="systemctl list-units --failed"
 
 #shutdown or reboot

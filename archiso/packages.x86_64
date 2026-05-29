@@ -279,6 +279,7 @@ ttf-ubuntu-font-family
 
 ###themes
 
+kvantum
 kvantum-qt5
 
 ###utilities
@@ -380,6 +381,12 @@ yay-git
 
 calamares
 kiro-calamares-config
+
+###########################################################################
+####                               PLYMOUTH
+###########################################################################
+
+plymouth-theme-kiro-logo
 
 adobe-source-han-sans-jp-fonts
 adobe-source-han-sans-kr-fonts
@@ -535,6 +542,9 @@ tuned-ppd
 vte4
 pciutils
 sysz
+
+cachyos-keyring
+cachyos-mirrorlist
 
 ###########################################################################
 ####                           PERSONAL_REPO aka LOCAL REPO

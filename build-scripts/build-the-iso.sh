@@ -323,6 +323,7 @@ prepopulate_keyring() {
     sudo pacman-key --gpgdir "${keyring_dir}" --init
     sudo pacman-key --gpgdir "${keyring_dir}" --populate archlinux
     sudo pacman-key --gpgdir "${keyring_dir}" --populate chaotic
+    sudo pacman-key --gpgdir "${keyring_dir}" --populate cachyos
     log_info "Keyring prepopulation complete"
 }
 

@@ -4,6 +4,9 @@
 
 ## Up Next
 
+- **Test the chwd nvidia-open DKMS patch end-to-end on a modern NVIDIA GPU** — _added 2026-05-29._ The patch (chwd 1.21.0-4, `[nvidia-open-dkms]` profile → `nvidia-open-dkms` + per-kernel `-headers` instead of prebuilt `${kernel}-nvidia-open`) is confirmed *present and correct* on worf, but worf's GT 620M routes to nouveau so the profile never fired. Need a box with a modern NVIDIA card that chwd selects `nvidia-open-dkms` for, then verify on the installed system: `nvidia-open-dkms` + the right `-headers` installed, DKMS status `installed` (not just `added`), `nvidia-smi` works, and **no** `linux-cachyos-nvidia-open`.
+- **Decide whether to drop `nvidia_driver=390xx` (and 470xx) — they can't build on the 7.0 kernel** — _added 2026-05-29._ `nvidia-390xx-dkms 390.157` fails to compile (`'screen_info' undeclared`, removed from modern kernels), so any card routed to the 390xx path gets a driverless system; nouveau is the correct driver for those Fermi cards (chwd already routes them there). Verify `nvidia-470xx-dkms` against the 7.0 kernel; if it also fails, remove both options from [build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh) `inject_nvidia_packages()` and consider dropping/deprioritizing the matching chwd profiles so they never select a non-buildable driver.
+
 ## Backlog
 
 ## Done

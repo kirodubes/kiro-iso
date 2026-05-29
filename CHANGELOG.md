@@ -4,6 +4,30 @@
 
 ---
 
+## 2026-05-29 — chwd NVIDIA testing on worf + nvidia-390xx is dead on the 7.0 kernel
+
+Test install on **worf** (`erik-p7624`, an Optimus laptop: Intel HD 2nd-gen + NVIDIA **GF108M / GeForce GT 620M**, PCI `10de:0de9`), booted with the **non-free** GRUB option (`driver=nonfree`). Three things came out of it.
+
+### chwd behaved correctly — and our DKMS patch shipped
+
+The Calamares log confirms chwd ran (`Kernel parameter 'driver' = nonfree` → `chwd --autoconfigure`) and made the right calls per device: `intel` for the iGPU and **`nouveau` for the GT 620M**. chwd's device database classifies that Fermi card as a nouveau card, *not* a 390xx card, so it never tried to install a proprietary NVIDIA driver — it pulled `nouveau-fw` + mesa/opencl and finished cleanly. The installed system runs on Intel `i915` + Xorg `modesetting`; the display is healthy.
+
+The installed box carries **`chwd 1.21.0-4`** (our patched build) and its `/var/lib/chwd/db/pci/graphic_drivers/profiles.toml` shows the **patched** `[nvidia-open-dkms]` block — `echo "nvidia-open-dkms"` + per-kernel `-headers`, with the old `${kernel}-nvidia-open` prebuilt logic gone. So the chwd DKMS patch built correctly and reached the ISO. `linux-cachyos-nvidia-open` is not installed.
+
+**Caveat — still untested end-to-end:** worf does *not* exercise the patch, because its card went to nouveau, so the `nvidia-open-dkms` profile never fired. Confirming the patch *in action* (installs `nvidia-open-dkms` + headers, never `linux-cachyos-nvidia-open`) needs a **modern NVIDIA GPU** that chwd routes to that profile.
+
+### nvidia-390xx (390.157) cannot build on Kiro's 7.0 kernel
+
+Manually installing `nvidia-390xx-dkms 390.157` on worf left DKMS at `added` (never built); `nvidia-smi` then reports "couldn't communicate with the NVIDIA driver". A forced `dkms build` fails with:
+
+```
+nvidia/os-interface.c:1136: error: 'screen_info' undeclared
+```
+
+`screen_info` was removed from modern kernels; the EOL 390 branch still references it. **The legacy 390 driver is therefore non-viable on Kiro's kernel** — for Fermi-class cards like the GT 620M, **nouveau is the only working driver**, which is exactly what chwd picks. (worf was left as-is; no cleanup applied.)
+
+**Implication:** the `nvidia_driver=390xx` option in **[build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh)** and chwd's `nvidia-dkms-390xx` profile are effectively dead on the 7.0 kernel — any card routed there would get a driverless system (now non-fatal at install, but still no proprietary driver). `nvidia-dkms-470xx` is likely the same and needs verifying. See TODO.
+
 ## 2026-05-28 — Hardware-aware install via **chwd** (synced from `kiro-iso-next`)
 
 Mirror of the same-date `kiro-iso-next` change. The chwd Calamares integration validated in `kiro-iso-next` + `kiro-calamares-config-next` is now ready for production: this commit syncs the four package additions to `archiso/packages.x86_64` so the live ISO carries everything `kiro-calamares-config`'s new `chwd` Calamares module needs at install time + leaves on the target for post-install rerun via `sudo chwd -a`.

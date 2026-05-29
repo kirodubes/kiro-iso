@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-05-29 — Dark Calamares installer: ship KiroDark Kvantum theme (mirrored from beta)
+
+**What Changed**
+
+Promoted from `kiro-iso-next` after a confirmed install + reboot. The Calamares installer now renders dark (navy + sky-blue, matching the website). The ISO ships a custom **KiroDark** Kvantum theme for root, which the installer (run as root via pkexec) picks up via `-style kvantum`.
+
+**Technical Details**
+
+- New: `airootfs/root/.config/Kvantum/KiroDark/{KiroDark.kvconfig,KiroDark.svg}` + `kvantum.kvconfig` (`theme=KiroDark`). KiroDark = ArcDark remapped to Kiro's navy/sky-blue palette, fully opaque, white button text.
+- `packages.x86_64`: added `kvantum` (qt6 style) explicitly — was only present as a dependency of `kvantum-qt5`; Calamares is Qt6 and needs the qt6 Kvantum style.
+- Paired with `kiro-calamares-config` (dark branding) and the production `calamares` package launcher change (`-style kvantum`, wrapper removed). `kiro_final` strips the theme from the installed system.
+
+**Files Modified**
+- `archiso/airootfs/root/.config/Kvantum/KiroDark/KiroDark.kvconfig` (new)
+- `archiso/airootfs/root/.config/Kvantum/KiroDark/KiroDark.svg` (new)
+- `archiso/airootfs/root/.config/Kvantum/kvantum.kvconfig` (new)
+- `archiso/packages.x86_64`
+
+---
+
 ## 2026-05-29 — Sync committed skel `.bashrc` with the renamed kiro-* helpers
 
 **What Changed**

@@ -4,7 +4,6 @@ A rolling release log of what's actually different between Kiro ISO builds — k
 
 Related docs:
 
-- [LIQUORIX.md](./LIQUORIX.md) — why we ship the Liquorix kernel.
 - [DISTRO_TESTING.md](./DISTRO_TESTING.md) — per-build manual test matrix.
 - [KIRO-VS-PRISM.md](./KIRO-VS-PRISM.md) — security/config baseline comparison with Prism.
 

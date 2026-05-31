@@ -530,6 +530,7 @@ capitaine-cursors
 chwd
 claude-code
 cpuid
+dracula-colors-xfce4-terminal
 irqbalance
 glances
 hblock
@@ -545,6 +546,8 @@ sysz
 
 cachyos-keyring
 cachyos-mirrorlist
+
+
 
 ###########################################################################
 ####                           PERSONAL_REPO aka LOCAL REPO

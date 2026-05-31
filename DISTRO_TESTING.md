@@ -4,6 +4,22 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-29 — chwd NVIDIA routing on worf (nonfree path) — **PARTIAL: routing PASS, `nvidia-open-dkms` path untested** — real metal (Optimus laptop, UEFI)
+
+**Environment:** Test install on **worf** (`erik-p7624`), an Optimus laptop — Intel HD (2nd-gen) iGPU + NVIDIA **GF108M / GeForce GT 620M** (Fermi, PCI `10de:0de9`). Booted with the **non-free** GRUB entry (`driver=nonfree`). Transcribed into the test log from the `bdca88b` findings so the chwd integration shipping in production has a logged test (was previously only in the kiro-iso CHANGELOG).
+
+**chwd routing — PASS.** Calamares log confirms `Kernel parameter 'driver' = nonfree` → `chwd --autoconfigure`, which made the right per-device calls: `intel` for the iGPU and **`nouveau` for the GT 620M**. chwd's device DB classifies that Fermi card as nouveau (not 390xx), so it never attempted a proprietary driver — pulled `nouveau-fw` + mesa/opencl and finished cleanly. Installed system runs Intel `i915` + Xorg `modesetting`; display healthy.
+
+**Patched chwd shipped — PASS (by inspection).** Installed box carries **`chwd 1.21.0-4`** (our patched build); `/var/lib/chwd/db/pci/graphic_drivers/profiles.toml` shows the patched `[nvidia-open-dkms]` block (`nvidia-open-dkms` + per-kernel `-headers`, old `${kernel}-nvidia-open` prebuilt logic gone). `linux-cachyos-nvidia-open` not installed.
+
+**KNOWN GAP — `nvidia-open-dkms` proprietary path NOT exercised.** worf's Fermi card routed to nouveau, so the `nvidia-open-dkms` profile never fired. The modern-NVIDIA + nonfree scenario (chwd selects `nvidia-open-dkms`, DKMS **builds** not just `added`, `nvidia-smi` works, no `linux-cachyos-nvidia-open`) is confirmed present/correct in config but **never run end-to-end**. Needs a box with a modern NVIDIA GPU that chwd routes to that profile. **Open at launch — documented limitation; install is non-fatal (nouveau fallback), and `nvidia-open-dkms` is known to build on 7.0 kernels.**
+
+**KNOWN DEAD — `nvidia-390xx` (390.157) cannot build on the 7.0 kernel.** Manual DKMS build fails `nvidia/os-interface.c:1136: error: 'screen_info' undeclared` (removed from modern kernels); the EOL 390 branch is non-viable. For Fermi-class cards, **nouveau is the only working driver** — which is what chwd picks. The `nvidia_driver=390xx` ISO option + chwd `nvidia-dkms-390xx` profile are effectively dead; `470xx` likely the same (verify). A card routed there gets a driverless (non-fatal) system. See MASTER_TODO §1.
+
+**Verdict:** chwd integration itself is sound and tested for the nouveau/Intel cases. The proprietary `nvidia-open-dkms` install is shipped-but-unverified — a known, documented launch limitation, not a brick risk.
+
+---
+
 ## 2026-05-28 — cachyos+zen, **first bare-metal install, all-green** — real metal (UEFI, Intel desktop + Samsung 860 EVO SSD)
 
 **Environment:** Live ISO `v26.05.28` booted on a bare-metal Intel desktop (UEFI/systemd-boot, Samsung 860 EVO 250GB). Install monitored over SSH from the dev box after `kiro-enable-ssh` on the live session. The Calamares cleanup wave from the morning's VM session carried over cleanly — no `qemu-guest-agent` or `virtualbox-guest-utils` left over after the chroot cleanup.

@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-05-31 — Three NVIDIA boot options: proprietary modern / proprietary auto-detect
+
+**What Changed**
+- The single NVIDIA boot entry split into two, across all three bootloaders (systemd-boot, GRUB, syslinux): **"NVIDIA proprietary, modern"** (`driver=nonfree`) keeps the baked `nvidia-open-dkms` with no chwd — the proven path for Turing / RTX-20-series+ cards; and a new **"NVIDIA proprietary, auto-detect"** (`driver=nonfreechwd`) that runs chwd to pick the right driver for any card. The open entry is unchanged (`driver=free`, "open source: AMD / Intel").
+
+**Why**
+- Modern-NVIDIA users get a chwd-free express lane to the baked driver (proven on real hardware), while the chwd path stays available for older cards. The driver-mode logic lives in [kiro-calamares-config](../kiro-calamares-config); this repo just adds/relabels the boot entries.
+
+**Files Modified**
+- `archiso/efiboot/loader/entries/02-nvidianouveau.conf` (relabel) + `02b-nvidiachwd.conf` (new)
+- `archiso/grub/grub.cfg`, `archiso/syslinux/archiso_sys-linux.cfg`
+
 ## 2026-05-29 — Dark Calamares installer: ship KiroDark Kvantum theme (mirrored from beta)
 
 **What Changed**

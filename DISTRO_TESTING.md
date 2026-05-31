@@ -4,6 +4,44 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-31 — 3-mode NVIDIA driver: `nonfree` (UEFI) + `nonfreechwd` (BIOS) installs verified on VM; real-NVIDIA conflict case still pending
+
+After the staleness clearance below was written, two functional changes shipped on 2026-05-31:
+the **3-mode NVIDIA driver** (`free` / `nonfree` / `nonfreechwd` — boot-menu entries plus the
+`kiro_remove_nvidia` + `chwd` gating in kiro-calamares-config) and the **kiro-skell split**
+(edu-system-files; a user maintenance command, not boot/install logic).
+
+Per-path status of the NVIDIA modes:
+
+- **`driver=free`** (strip NVIDIA → mesa, open stack) — proven (2026-05-28 bare-metal baseline).
+- **`driver=nonfree`** (keep the baked `nvidia-open-dkms`, no chwd) — proven on real modern NVIDIA hardware,
+  and **VM install PASS (UEFI/systemd-boot, 2026-05-31).** `kiro_remove_nvidia` logged "Keeping NVIDIA packages
+  … (baked nvidia-open-dkms)" → SKIPPED; `chwd` logged "Skipping chwd because 'driver=nonfree'". nvidia kept,
+  chwd not run — exactly as designed.
+- **`driver=nonfreechwd`** (chwd `--autoconfigure`) — **VM install PASS (logic verified).** First test on a
+  VirtualBox guest, new ISO (UUID `2026-05-31-13-03-36`), "NVIDIA proprietary, auto-detect" entry; the
+  updated `kiro-calamares-config` modules were confirmed baked in. From `/root/.cache/calamares/session.log`:
+  `kiro_remove_nvidia` fired on `nonfreechwd` → `pacman -Rns --noconfirm nvidia-open-dkms nvidia-utils
+  nvidia-settings` removed them (-131.99 MiB) → `Remove NVIDIA packages: SUCCESS`; then `chwd
+  --autoconfigure` ran (`Start chwd` → `End chwd`, no `chwd-failed`/conflict). Confirms the remove-then-chwd
+  clean-slate ordering works. **Still pending:** the NVIDIA *card* conflict case (chwd → `nvidia-open-dkms`
+  on a modern card, or → `470xx`/`390xx` on an older one) — a VM routes to the `virtualbox` profile, so no
+  NVIDIA driver was installed; worf (Fermi) can only route to nouveau, never exercise this. Needs a real
+  modern/mid NVIDIA box.
+
+**Unrelated finding (not a blocker) — installed default kernel differs by firmware path:** the
+**UEFI/systemd-boot** install defaults to **linux-cachyos** (correct, matches policy); the **BIOS/GRUB**
+install defaults to **linux-zen** (booted system reported `7.0.10-zen1-1-zen`). cachyos should be the
+post-install default on both — GRUB-path-only ordering issue, tracked for a post-launch fix. Both kernels
+install and boot fine; this is a default-selection nit, not a failure.
+
+**Verdict:** the 3-mode gating is **verified on VM** — `nonfree` (UEFI: nvidia kept, chwd skipped) and
+`nonfreechwd` (BIOS: nvidia removed, chwd ran clean), with `free` per the 2026-05-28 baseline. **The one
+remaining open verification** is chwd's proprietary NVIDIA install on real hardware (modern card →
+`nvidia-open-dkms`, older → `470xx`/`390xx`) — a VM can't exercise it and worf (Fermi) can't either.
+
+---
+
 ## 2026-05-31 — v26.05.31 staleness clearance — no functional changes since 2026-05-28 test
 
 All commits to `kiro-iso`, `kiro-calamares-config`, and `edu-system-files` since the 2026-05-28 bare-metal test (128 PASS / 0 WARN / 0 FAIL) are cosmetic only: trailing newline fixes on efiboot entries and `services-systemd.conf`, plus the version bump to `v26.05.31`. No shipped config, package list, or installer logic changed. The 2026-05-28 test result stands as the functional baseline for this release.

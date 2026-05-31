@@ -662,10 +662,15 @@ main() {
 
     if [[ "$(hostname)" == "hq" ]]; then
         log_section "Phase 2c — Comparing skel .bashrc with edu-shells"
-        # Informational only — print the colored OK/NOK and keep going regardless.
-        files_are_identical \
-            "${REPO_DIR}/archiso/airootfs/etc/skel/.bashrc" \
-            "${HOME}/EDU/edu-shells/etc/skel/.bashrc-latest" || true
+        local skel_bashrc="${REPO_DIR}/archiso/airootfs/etc/skel/.bashrc"
+        local edu_bashrc_latest="${HOME}/EDU/edu-shells/etc/skel/.bashrc-latest"
+        # When they differ, pull the new .bashrc-latest in and write it over .bashrc.
+        if ! files_are_identical "${skel_bashrc}" "${edu_bashrc_latest}"; then
+            if [[ -f "${edu_bashrc_latest}" ]]; then
+                cp "${edu_bashrc_latest}" "${skel_bashrc}"
+                status_ok "${GREEN}file copied from edu-shell${RESET}"
+            fi
+        fi
     fi
 
     log_section "Phase 1 — Checking required packages"

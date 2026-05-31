@@ -4,6 +4,14 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-05-31 — v26.05.31 staleness clearance — no functional changes since 2026-05-28 test
+
+All commits to `kiro-iso`, `kiro-calamares-config`, and `edu-system-files` since the 2026-05-28 bare-metal test (128 PASS / 0 WARN / 0 FAIL) are cosmetic only: trailing newline fixes on efiboot entries and `services-systemd.conf`, plus the version bump to `v26.05.31`. No shipped config, package list, or installer logic changed. The 2026-05-28 test result stands as the functional baseline for this release.
+
+**Verdict:** test result carries forward — staleness cleared for v26.05.31 release.
+
+---
+
 ## 2026-05-29 — chwd NVIDIA routing on worf (nonfree path) — **PARTIAL: routing PASS, `nvidia-open-dkms` path untested** — real metal (Optimus laptop, UEFI)
 
 **Environment:** Test install on **worf** (`erik-p7624`), an Optimus laptop — Intel HD (2nd-gen) iGPU + NVIDIA **GF108M / GeForce GT 620M** (Fermi, PCI `10de:0de9`). Booted with the **non-free** GRUB entry (`driver=nonfree`). Transcribed into the test log from the `bdca88b` findings so the chwd integration shipping in production has a logged test (was previously only in the kiro-iso CHANGELOG).

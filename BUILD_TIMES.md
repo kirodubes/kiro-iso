@@ -8,6 +8,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-06-01 05:42 | v26.06.01 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m24s | 6.3G | |
 | 2026-05-31 16:51 | v26.05.31 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m21s | 6.3G | |
 | 2026-05-31 15:11 | v26.05.31 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m52s | 6.3G | |
 | 2026-05-31 14:53 | v26.05.31 | linux-cachyos linux-zen | zstd L3 -b 1M | 8m21s | 6.3G | |
@@ -39,6 +40,9 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-06-01 07:45 | v26.06.01 | 192.168.1.9 | 3m47s | 2 | bare-metal install |
+| 2026-06-01 07:27 | v26.06.01 | 192.168.1.14 | 6m1s | 2 | riker reinstall test |
+| 2026-06-01 07:23 | v26.06.01 | 192.168.1.16 | 5m53s | 2 | worf — MEDION P7624, BIOS, nouveau |
 | 2026-05-28 19:27 | v26.05.28 | picard (bare metal) | 3m11s | 2 | fresh install — kiro-audit 130/0/0 |
 | 2026-05-28 15:57 | v26.05.28 | riker (bare metal) | 3m12s | 2 | post-ppd-pin fix |
 | 2026-05-28 10:55 | v26.05.28 | riker (bare metal) | 123m28s* | 2 | second physical machine; *duration includes wizard-UI time (mkinitcpio pass count is the relevant install-execution metric — 2 passes, identical to post-fix VM) |

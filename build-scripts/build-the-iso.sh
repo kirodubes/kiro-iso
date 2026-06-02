@@ -280,7 +280,7 @@ prepare_build_tree() {
     find "${skel_dir}" -mindepth 1 -delete 2>/dev/null || true
 
     echo "Fetching latest .bashrc..."
-    wget -q "https://raw.githubusercontent.com/erikdubois/edu-shells/refs/heads/main/etc/skel/.bashrc-latest" \
+    wget -q "https://raw.githubusercontent.com/kirodubes/kiro-shells/refs/heads/main/etc/skel/.bashrc-latest" \
         -O "${skel_dir}/.bashrc" \
         || { log_error "Failed to download .bashrc from edu-shells"; exit 1; }
 

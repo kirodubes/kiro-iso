@@ -282,7 +282,7 @@ prepare_build_tree() {
     echo "Fetching latest .bashrc..."
     wget -q "https://raw.githubusercontent.com/kirodubes/kiro-shells/refs/heads/main/etc/skel/.bashrc-latest" \
         -O "${skel_dir}/.bashrc" \
-        || { log_error "Failed to download .bashrc from edu-shells"; exit 1; }
+        || { log_error "Failed to download .bashrc from kiro-shells"; exit 1; }
 
     echo "Refreshing packages.x86_64..."
     cp -f "${REPO_DIR}/archiso/packages.x86_64" "${PACKAGES_FILE}"
@@ -633,20 +633,20 @@ main() {
     verify_version_sync
 
     if [[ "$(hostname)" == "hq" ]]; then
-        log_section "Phase 2c — Refreshing skel .bashrc from edu-shells"
+        log_section "Phase 2c — Refreshing skel .bashrc from kiro-shells"
         local skel_dir="${REPO_DIR}/archiso/airootfs/etc/skel"
         local skel_bashrc="${skel_dir}/.bashrc"
         local skel_bashrc_latest="${skel_dir}/.bashrc-latest"
-        local edu_bashrc_latest="${HOME}/EDU/edu-shells/etc/skel/.bashrc-latest"
+        local edu_bashrc_latest="${HOME}/KIRO/kiro-shells/etc/skel/.bashrc-latest"
         # Pull the latest .bashrc-latest in, drop the old .bashrc, then promote the
-        # fresh copy into its place so skel always ships the current edu-shells .bashrc.
+        # fresh copy into its place so skel always ships the current kiro-shells .bashrc.
         if [[ -f "${edu_bashrc_latest}" ]]; then
             cp "${edu_bashrc_latest}" "${skel_bashrc_latest}"
             rm -f "${skel_bashrc}"
             mv "${skel_bashrc_latest}" "${skel_bashrc}"
-            status_ok "${GREEN}.bashrc refreshed from edu-shells${RESET}"
+            status_ok "${GREEN}.bashrc refreshed from kiro-shells${RESET}"
         else
-            log_warn "edu-shells .bashrc-latest not found at ${edu_bashrc_latest}"
+            log_warn "kiro-shells .bashrc-latest not found at ${edu_bashrc_latest}"
         fi
     fi
 

@@ -102,7 +102,7 @@ git_pull() {
 }
 
 update_skel_bashrc() {
-    local src="/home/erik/EDU/edu-shells/etc/skel/.bashrc-latest"
+    local src="/home/erik/KIRO/kiro-shells/etc/skel/.bashrc-latest"
     local dest="${SCRIPT_DIR}/archiso/airootfs/etc/skel/.bashrc"
 
     if [[ ! -f "${src}" ]]; then
@@ -110,7 +110,7 @@ update_skel_bashrc() {
         return 0
     fi
 
-    log_section "Updating skel .bashrc from edu-shells"
+    log_section "Updating skel .bashrc from kiro-shells"
     cp -f "${src}" "${dest}"
     log_success "skel .bashrc updated"
 }

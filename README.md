@@ -225,13 +225,13 @@ kiro-iso/
 
 - **Chaotic AUR**: Precompiled packages from Arch User Repository
 - **Nemesis Repository** (custom): Educational configurations and customizations
-  - `edu-dot-files-git`: Pre-configured shell and application settings
-  - `edu-xfce-git`: XFCE4 customization package
-  - `edu-shells-git`: Custom shell configurations
-  - `edu-rofi-git` + `edu-rofi-themes-git`: Application launcher with themes
-  - `edu-polybar-git`: Custom status bar
+  - `kiro-dot-files`: Pre-configured shell and application settings
+  - `kiro-xfce`: XFCE4 customization package
+  - `kiro-shells`: Custom shell configurations
+  - `kiro-rofi` + `kiro-rofi-themes`: Application launcher with themes
+  - `kiro-polybar`: Custom status bar
   - `ohmychadwm-git`: Tiling window manager with integrated menu
-  - `edu-variety-config-git`: Wallpaper manager presets
+  - `kiro-variety-config`: Wallpaper manager presets
 - **AUR Helpers**: `paru-git`, `yay-git`
 - **Utilities**: `downgrade` (package downgrading)
 
@@ -242,7 +242,7 @@ KIRO packages are available via:
 ```ini
 [kiro_repo]
 SigLevel = Never
-Server = https://kirodubes.github.io/$repo/$arch
+Server = https://erikdubois.github.io/$repo/$arch
 ```
 
 ---

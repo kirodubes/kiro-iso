@@ -86,13 +86,13 @@ kiro-iso/
 #### AUR & Custom Repositories
 - **Chaotic AUR**: Precompiled packages from AUR
 - **Nemesis Repo** (custom): Educational customizations
-  - `edu-dot-files-git`: Configuration and dotfiles management
-  - `edu-xfce-git`: XFCE customizations
-  - `edu-shells-git`: Custom shell configurations
-  - `edu-rofi-git`, `edu-rofi-themes-git`: Application launcher
-  - `edu-polybar-git`: Custom statusbar
+  - `kiro-dot-files`: Configuration and dotfiles management
+  - `kiro-xfce`: XFCE customizations
+  - `kiro-shells`: Custom shell configurations
+  - `kiro-rofi`, `kiro-rofi-themes`: Application launcher
+  - `kiro-polybar`: Custom statusbar
   - `ohmychadwm-git`: Modern tiling window manager with integrated menu and keybindings
-  - `edu-variety-config-git`: Wallpaper manager presets
+  - `kiro-variety-config`: Wallpaper manager presets
 - **Package managers**: `paru-git`, `yay-git` (AUR helpers)
 - **Downgrade**: Safely downgrade packages if needed
 
@@ -195,9 +195,9 @@ Server = https://kirodubes.github.io/$repo/$arch
 
 ---
 
-## Integration with edu-dot-files
+## Integration with kiro-dot-files
 
-**`edu-dot-files-git`** is a foundational package in the KIRO ISO build process that provides:
+**`kiro-dot-files`** is a foundational package in the KIRO ISO build process that provides:
 
 - **Dotfiles Framework**: Pre-configured hidden configuration files for shells, editors, and applications
 - **Environment Setup**: Consistent environment variables and PATH management
@@ -205,7 +205,7 @@ Server = https://kirodubes.github.io/$repo/$arch
 - **Installation Integration**: Automatically deployed during Calamares installation
 - **Educational Value**: Demonstrates best practices for Linux configuration management
 
-The `edu-dot-files-git` package from the Nemesis repo is **integrated into the ISO build process** at the package level and is installed during installation via Calamares modules. This ensures that all users start with a well-configured system environment out of the box, maintaining consistency across different installations while remaining fully customizable.
+The `kiro-dot-files` package from the Nemesis repo is **integrated into the ISO build process** at the package level and is installed during installation via Calamares modules. This ensures that all users start with a well-configured system environment out of the box, maintaining consistency across different installations while remaining fully customizable.
 
 ---
 

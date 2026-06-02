@@ -57,7 +57,7 @@ The script manipulates `packages.x86_64` in the build folder to inject the chose
 
 The build pipeline:
 1. `build-the-iso.sh` copies `archiso/` into `~/kiro-build/archiso/`
-2. Fetches latest `.bashrc` from `erikdubois/edu-shells` into `airootfs/etc/skel/`
+2. Fetches latest `.bashrc` from `erikdubois/kiro-shells` into `airootfs/etc/skel/`
 3. Pre-populates the pacman GPG keyring (archlinux + chaotic) in the build tree
 4. Injects the correct NVIDIA packages into the package list
 5. Calls `mkarchiso` to squash and produce the ISO
@@ -101,7 +101,7 @@ A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARC
 - `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` — **added**. Enforces `600 root:cups` on CUPS config files at boot via `systemd-tmpfiles`.
 - No firewall — **by design**. `iptables` is installed but intentionally has no rules.
 - `virtualbox-guest-utils` / `vboxservice` — **kept intentionally** for testing convenience, despite modules not loading on `linux-lqx` without DKMS.
-- `vm.overcommit_memory = 1` — **safe**: ZRAM is always active via `zram-generator` + config from `edu-system-files-git` (`zstd`, `min(ram/2, 4GB)`, priority 100).
+- `vm.overcommit_memory = 1` — **safe**: ZRAM is always active via `zram-generator` + config from `kiro-system-files` (`zstd`, `min(ram/2, 4GB)`, priority 100).
 
 ## VirtualBox SSH Scripts
 
@@ -112,9 +112,9 @@ Three helper scripts live in `~/DATA/arcolinux-nemesis/scripts/`:
 
 VirtualBox scripts auto-configure NAT port forwarding (`VBoxManage controlvm natpf1` for running VMs, `modifyvm --natpf1` for stopped VMs) and handle `sshpass` + `known_hosts` cleanup automatically. The metal script just pings first then connects.
 
-## kiro-audit (edu-system-files-git)
+## kiro-audit (kiro-system-files)
 
-`audit.sh` was removed from this repo — the canonical version is `kiro-audit` in `edu-system-files-git`, installed to `/usr/local/bin/kiro-audit` on every Kiro system. Run with `sudo kiro-audit`.
+`audit.sh` was removed from this repo — the canonical version is `kiro-audit` in `kiro-system-files`, installed to `/usr/local/bin/kiro-audit` on every Kiro system. Run with `sudo kiro-audit`.
 
 Current checks (as of 2026-05-19): kernel, microcode, mkinitcpio, audio stack, Calamares cleanup, SSH override absent, kiro_final config, MAKEFLAGS CPU count, pacman repos, desktop environments, SDDM, user groups, systemd services, ZRAM, key file permissions, CUPS permissions, sysctl security baseline (8 values), failed units, ISO version, NVIDIA, bootloader, boot time/updates, package integrity.
 

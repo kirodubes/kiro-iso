@@ -533,6 +533,7 @@ sysz
 
 cachyos-keyring
 cachyos-mirrorlist
+kiro-calamares-tweak-tool
 
 ###########################################################################
 ####                           PERSONAL_REPO aka LOCAL REPO

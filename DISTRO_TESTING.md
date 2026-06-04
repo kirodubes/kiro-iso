@@ -4,6 +4,40 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-04 — Production ISO: three install modes (unencrypted / LUKS-ext4 / LUKS-btrfs) all PASS on VM
+
+Tested the new **production** `kiro-iso` across three VirtualBox guests in parallel, covering the disk-layout matrix Calamares offers. All three booted into the installed system and pass `kiro-audit` clean (0 WARN / 0 FAIL):
+
+| VM | Disk layout | Root unlock | kiro-audit |
+|----|-------------|-------------|------------|
+| `Kiro-normal`  | unencrypted, `sda2` → ext4 root | n/a | **132 PASS / 0 / 0** |
+| `Kiro-E-ext4`  | LUKS: `sda2` → `crypto_LUKS` → ext4 root | passphrase | **132 PASS / 0 / 0** |
+| `Kiro-E-btrfs` | LUKS: `sda2` → `crypto_LUKS` → btrfs root (subvols incl. `/.snapshots`, `/var/cache`); **separate encrypted swap** on `sda3` → `crypto_LUKS` → swap | passphrase | **133 PASS / 0 / 0** |
+| `Kiro-E-xfs`   | LUKS: `sda2` → `crypto_LUKS` → xfs root; **separate encrypted swap** on `sda3` → `crypto_LUKS` → swap | passphrase | **133 PASS / 0 / 0** |
+| `Kiro-E-jfs`   | LUKS: `sda2` → `crypto_LUKS` → jfs root (zram swap only) | passphrase | **132 PASS / 0 / 0** |
+
+(The five baseline counts above are pre-`check_disk_format`; with that section added the same installs read 133/137/139/138/137 — see the follow-up note below.)
+
+Notes:
+- **LUKS version: LUKS2** on every encrypted container (both VMs, root **and** swap), confirmed via `cryptsetup luksDump`. Cipher `aes-xts-plain64`, 512-bit key, PBKDF **argon2id** (1 GiB memory cost) — modern Calamares defaults, not legacy LUKS1/PBKDF2.
+- The btrfs-encrypted install lays down **two LUKS2 containers** — one for the btrfs root, a separate one for swap — both unlock and mount correctly. The `/.snapshots` subvolume is present (Calamares pre-stages the Kiro btrfs layout); snapshot stack remains opt-in via ATT (audit PASS, expected default).
+- The btrfs run audits at **133** vs 132 for the two ext4 runs — the +1 is the two btrfs-specific checks (`/.snapshots` mounted + snapshot-stack-opt-in) replacing the single "root is ext4, not btrfs" check.
+- No encryption-specific failures: no boot-time unlock errors, no failed units, package integrity intact on all three.
+
+**Verdict:** encrypted (ext4 + btrfs) and unencrypted production installs all verified on VM.
+
+**Follow-up shipped same day:** `kiro-audit` gained a `check_disk_format` section (kiro-system-files) that now asserts the encryption directly — LUKS2 per container, `sd-encrypt`/`encrypt` initramfs hook, `/crypto_keyfile.bin` 600 root:root, active dm-crypt mapping — plus INFO lines reporting the chosen root fstype/cipher. `kiro-report` got a matching `section_encryption` (root fs · LUKS2/N-containers · encrypted-swap yes/no), redaction-safe. Re-verified live on **all five VMs** with the new section: normal-ext4 133, LUKS-ext4 137, LUKS-btrfs 139, LUKS-xfs 138, LUKS-jfs 137 — all 0 WARN / 0 FAIL. Both checks read the root fstype generically, so xfs and jfs work with no fs-specific code. `/kiro-syscheck` inherits the asserts via its existing kiro-audit call.
+
+**Bare-metal confirmation (two real machines, same v26.06.04 ISO):**
+- **picard** — tested across two reinstalls, both **0 WARN / 0 FAIL**, "all checks passed":
+  - unencrypted ext4 → **134 PASS** (`check_disk_format` reports `ext4 (unencrypted)`);
+  - reinstalled btrfs-encrypted (LUKS2 root + separate encrypted swap) → **148 PASS** (LUKS2 ×2, `sd-encrypt` hook, keyfile 600, 2 dm-crypt mappings; snapshot stack opt-in installed & passing). kiro-report: `btrfs · LUKS2 (2 containers) · encrypted swap yes`, 0 UUID leaks.
+- **riker** (`192.168.1.14`, **encrypted** ext4-on-LUKS2 + separate encrypted swap, 2 containers) — **139 PASS / 0 WARN / 0 FAIL**, "all checks passed". On real hardware the encryption asserts all pass (LUKS2 ×2, `sd-encrypt` hook, `/crypto_keyfile.bin` 600 root:root, 2 active dm-crypt mappings); kiro-report shows `ext4 · LUKS2 (2 containers) · encrypted swap yes` with 0 raw UUIDs after redaction.
+
+This **closes the bare-metal encrypted gap** — full-disk LUKS is now verified on real hardware, not just in VMs. No VM-artifact caveat on either box. Encrypted layouts now proven across ext4/btrfs/xfs/jfs (VM) plus encrypted-ext4 on metal (riker).
+
+---
+
 ## 2026-05-31 — 3-mode NVIDIA driver: `nonfree` (UEFI) + `nonfreechwd` (BIOS) installs verified on VM; real-NVIDIA conflict case still pending
 
 After the staleness clearance below was written, two functional changes shipped on 2026-05-31:

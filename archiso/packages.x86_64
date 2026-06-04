@@ -259,9 +259,9 @@ inkscape
 lshw
 meld
 numlockx
+obs-studio
 qbittorrent
 scrot
-simplescreenrecorder-git
 vlc
 vlc-plugins-all
 
@@ -456,9 +456,9 @@ chaotic-mirrorlist
 
 #ckb-next-git
 arc-gtk-theme
-archlinux-logout-gtk4-git
-archlinux-tweak-tool-gtk4-git
-alacritty-tweak-tool-git
+archlinux-logout-gtk4
+archlinux-tweak-tool-gtk4
+alacritty-tweak-tool
 kiro-arc-dawn
 kiro-arc-kde
 kiro-dot-files
@@ -491,7 +491,7 @@ xcolor
 ###########################################################################
 
 alacritty
-ohmychadwm-git
+ohmychadwm
 fastcompmgr-git
 feh
 gcc
@@ -534,9 +534,9 @@ sysz
 cachyos-keyring
 cachyos-mirrorlist
 kiro-calamares-tweak-tool
+scx-manager
 
 ###########################################################################
 ####                           PERSONAL_REPO aka LOCAL REPO
 ###########################################################################
 
-#kiro-dummy-git

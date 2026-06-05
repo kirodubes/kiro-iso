@@ -1,0 +1,72 @@
+# Kiro ISO — June 2026 builds, what changed and why
+
+Four ISOs shipped in June (`.01 .02 .04 .05`). For each: why it was worth a new ISO,
+what functionality it added, and the package moves behind it. Newest first.
+
+## v26.06.05 — June 5 (current)
+**Why a new ISO:** validated the full disk-encryption matrix — **LUKS2** ext4 / btrfs / xfs / jfs installs all unlock and pass `kiro-audit` clean (0 WARN / 0 FAIL) — and swaps in better default apps.
+- **Better screen recording:** **OBS Studio** replaces SimpleScreenRecorder.
+- **CPU scheduler control:** **scx-manager** added — switch sched-ext schedulers at runtime.
+- **Apps ship as proper repo packages:** dropped the build-from-source `-git` suffix on `archlinux-tweak-tool-gtk4`, `archlinux-logout-gtk4`, `alacritty-tweak-tool`, and `ohmychadwm`.
+- **Packages:** + `obs-studio`, + `scx-manager`; − `simplescreenrecorder-git`, − `lastpass`.
+
+## v26.06.04 — June 4
+**Why a new ISO:** adds the Calamares tweaking tool to the installer toolset and moves the shell baseline onto the renamed repo.
+- **Calamares Tweak Tool (CTT):** `kiro-calamares-tweak-tool` ships for use during install (stripped from the final installed system).
+- **Shell source moved:** the build now fetches the skel `.bashrc` from `kirodubes/kiro-shells` instead of `erikdubois/edu-shells`.
+- **Packages:** + `kiro-calamares-tweak-tool`.
+
+## v26.06.02 — June 2
+**Why a new ISO:** finishes the de-brand at the package level — the installed system now pulls **Kiro-named** packages instead of the old `edu-*` ones.
+- **No behaviour change, new identity:** same configs and defaults, but every Kiro config package is renamed `edu-* → kiro-*` and pulled from the Kiro repos; legacy commented-out `edu-*` WM/theme entries cleaned out of the list.
+- **Packages (16 renamed):** `kiro-system-files`, `kiro-shells`, `kiro-dot-files`, `kiro-rofi` + `kiro-rofi-themes`, `kiro-sddm-simplicity`, `kiro-powermenu`, `kiro-polybar`, `kiro-xfce`, `kiro-variety-config`, `kiro-arc-dawn`, `kiro-arc-kde`, and the five `kiro-neo-candy-*` themes.
+
+## v26.06.01 — June 1 (baseline)
+**Why a new ISO:** first June build — locks in the late-May kernel-agnostic overhaul as the new default.
+- **Kernel-agnostic end to end:** default kernel is now **linux-cachyos**, with **linux-zen** selectable as a fallback right in the boot menu; a new `kiro_kernel` Calamares module installs every kernel the medium ships.
+- **GPU just works:** `chwd` auto-detects the card at install, with three NVIDIA boot options (modern / auto-detect / open) so old and new cards both boot.
+- **Polished install:** dark **KiroDark** installer matching the website, and the animated Kiro "K" splash now draws from the moment the live ISO boots.
+- **Live-ISO ergonomics:** the desktop "Install kiro" launcher is pre-trusted (no "untrusted application" prompt), and `kiro-enable-ssh` actually works on the live medium.
+- **Packages:** + `linux-cachyos` + `linux-zen`; drops `linux-lqx` and the third-party Liquorix repo.
+
+<!--
+=============================================================================
+HOW THIS FILE IS GENERATED — re-run this each release (e.g. alongside
+/kiro-website-release), then commit + push so the website button shows the
+latest. The commit messages are just "update" (up.sh quick-push), so the
+truth is in the diffs, not the log.
+
+1. Map each shipped version to the commit that bumped it. The version is set
+   in archiso/profiledef.sh at build time (Phase 2), so its history IS the
+   list of builds:
+       git log -p --since=<start-date> -- archiso/profiledef.sh | grep -E "^commit|iso_version="
+
+2. For each consecutive pair of build commits, stat-diff the WHOLE tree but
+   exclude the per-build noise (version string, mirrorlist, build metrics):
+       git diff --stat <prev> <curr> -- . \
+         ':(exclude)archiso/profiledef.sh' \
+         ':(exclude)archiso/airootfs/etc/dev-rel' \
+         ':(exclude)BUILD_TIMES.md'
+   What's left points you at the files that actually changed — almost always
+   archiso/packages.x86_64 and build-scripts/build-the-iso.sh.
+
+3. Read the real line-level changes for those files:
+       git diff <prev> <curr> -- archiso/packages.x86_64        # + / - packages
+       git diff <prev> <curr> -- build-scripts/build-the-iso.sh # kernel knob, repo sources
+   Cross-check DISTRO_TESTING.md for the "why we shipped it" (what was validated)
+   and WHAT-CHANGED-TO-THE-ISO.md for the prose behind a feature wave.
+
+4. Turn each diff into ONE block per version, answering three things from the
+   END-USER's point of view (not the dev's):
+       - Why a new ISO: the one reason it was worth shipping.
+       - What functionality it added: what the user can now do / notice.
+       - Packages: the + / - moves (but never ONLY packages).
+   Hard-filter: keep what a user FEELS (drivers, kernel, installer, apps).
+   Drop dev/build/brand-internal noise (template conformance, isoLabel fixes,
+   version-sync checks) and validations-that-aren't-changes. A pure
+   version-bump + mirrorlist build gets NO entry — let the filter collapse it.
+
+5. Order newest FIRST (most recent build at the top, under the intro). Keep
+   blocks short; a build with one real selling point gets one line.
+=============================================================================
+-->

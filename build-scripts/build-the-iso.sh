@@ -208,19 +208,6 @@ check_not_root() {
     fi
 }
 
-warn_btrfs() {
-    if lsblk -f | grep -q btrfs; then
-        log_warn "Btrfs filesystem detected.
-This script may cause issues on Btrfs. Make backups before continuing.
-Press CTRL+C to stop now."
-        for i in $(seq 10 -1 1); do
-            echo -ne "Continuing in ${i} seconds... \r"
-            sleep 1
-        done
-        echo
-    fi
-}
-
 preflight_checks() {
     # Fail fast before the long mkarchiso run: not enough disk, or no network,
     # both surface here with a clear message instead of dying mid-build.
@@ -682,7 +669,6 @@ main() {
     build_start_epoch=$(date +%s)
 
     check_not_root
-    warn_btrfs
     preflight_checks
     setup_chaotic
     setup_cachyos

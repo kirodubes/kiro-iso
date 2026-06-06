@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-06-06 — Remove the Btrfs warning + 10-second countdown from the build
+
+**What Changed**
+- Deleted the **`warn_btrfs()`** function and its call in `main()` in `build-the-iso.sh`. It used to scan `lsblk -f` for a Btrfs filesystem and, when found, print a "Btrfs filesystem detected" warning followed by a forced 10-second CTRL+C countdown before the build could continue.
+
+**Why**
+- The warning was a relic of an older concern that no longer applies — the build does not touch host filesystems in a way that endangers Btrfs, so the alarm and the mandatory 10-second stall just slowed every build on a Btrfs host with no real benefit.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`
+
 ## 2026-06-06 — Refresh pacman databases in Phase 0 instead of inside `setup_cachyos`
 
 **What Changed**

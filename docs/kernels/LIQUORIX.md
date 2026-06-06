@@ -129,7 +129,7 @@ For a desktop-first ISO targeting a tiling-WM-savvy audience, `linux-lqx` wins o
 
 ## Validation — what we tested on real hardware
 
-The sections above are the *why*. This is the *proof*: the kernel-specific results pulled from every boot/install test we ran. Liquorix was trialled on the `kiro-iso-next` track first, then promoted to the stable `kiro-iso` build on **2026-05-19** once these passed. Full per-build logs (including non-kernel checks) live in [DISTRO_TESTING.md](./DISTRO_TESTING.md); this table is the kernel summary.
+The sections above are the *why*. This is the *proof*: the kernel-specific results pulled from every boot/install test we ran. Liquorix was trialled on the `kiro-iso-next` track first, then promoted to the stable `kiro-iso` build on **2026-05-19** once these passed. Full per-build logs (including non-kernel checks) live in [DISTRO_TESTING.md](../../DISTRO_TESTING.md); this table is the kernel summary.
 
 | Build            | Hardware                  | `linux-lqx`  | Boot | Kernel-specific result                                                                                          |
 |------------------|---------------------------|--------------|------|----------------------------------------------------------------------------------------------------------------|

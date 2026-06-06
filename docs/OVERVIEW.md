@@ -209,4 +209,4 @@ The `kiro-dot-files` package from the Nemesis repo is **integrated into the ISO 
 
 ---
 
-**For more information**: See [README.md](README.md) and the YouTube tutorials referenced in the project documentation.
+**For more information**: See [README.md](../README.md) and the YouTube tutorials referenced in the project documentation.

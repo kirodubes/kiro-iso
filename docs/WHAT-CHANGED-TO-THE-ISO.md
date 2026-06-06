@@ -4,8 +4,8 @@ A rolling release log of what's actually different between Kiro ISO builds — k
 
 Related docs:
 
-- [DISTRO_TESTING.md](./DISTRO_TESTING.md) — per-build manual test matrix.
-- [KIRO-VS-PRISM.md](./KIRO-VS-PRISM.md) — security/config baseline comparison with Prism.
+- [DISTRO_TESTING.md](../DISTRO_TESTING.md) — per-build manual test matrix.
+- [KIRO-VS-PRISM.md](./comparisons/KIRO-VS-PRISM.md) — security/config baseline comparison with Prism.
 
 ---
 
@@ -56,11 +56,11 @@ The same pass also formalised the **kernel-agnostic rule**: every system tweak s
 
 ### Build observability — `BUILD_TIMES.md` + Calamares timing
 
-The build script now records each ISO build's wall-clock duration into [BUILD_TIMES.md](./BUILD_TIMES.md), and a sibling `record-install-time.sh` records Calamares install durations. Both are scoped to the build/test host (`record_build_time` is gated on `hostname=hq` so collaborators' machines don't dirty the file). It's a small thing but the per-build numbers immediately make it visible when a build slows down — a useful regression signal that didn't exist before.
+The build script now records each ISO build's wall-clock duration into [BUILD_TIMES.md](../BUILD_TIMES.md), and a sibling `record-install-time.sh` records Calamares install durations. Both are scoped to the build/test host (`record_build_time` is gated on `hostname=hq` so collaborators' machines don't dirty the file). It's a small thing but the per-build numbers immediately make it visible when a build slows down — a useful regression signal that didn't exist before.
 
 ### Validated on real hardware
 
-The kernel-agnostic build pipeline was validated on the `-next` track first — built ISOs with single-CachyOS and multi-kernel (`linux-lts` + `linux-zen`), installed and booted both, confirmed `kiro_kernel` lays down every kernel's image, initramfs and intact headers — then mirrored to production. The `linux-cachyos` + `linux-zen` swap itself was validated on the same test box used for prior releases. Detailed per-build matrix in [DISTRO_TESTING.md](./DISTRO_TESTING.md).
+The kernel-agnostic build pipeline was validated on the `-next` track first — built ISOs with single-CachyOS and multi-kernel (`linux-lts` + `linux-zen`), installed and booted both, confirmed `kiro_kernel` lays down every kernel's image, initramfs and intact headers — then mirrored to production. The `linux-cachyos` + `linux-zen` swap itself was validated on the same test box used for prior releases. Detailed per-build matrix in [DISTRO_TESTING.md](../DISTRO_TESTING.md).
 
 ### Sources
 
@@ -120,7 +120,7 @@ The shipped tree no longer carries ArcoLinux brand assets:
 
 ### Validated on real hardware
 
-The firewalld enablement and the ATT changes (Network-page firewall controls + the Dev-page distro / kernel-hook / microcode fixes) were rebuilt and tested on the test box this cycle. Kernel/power-profile and installer fixes are tracked in [DISTRO_TESTING.md](./DISTRO_TESTING.md).
+The firewalld enablement and the ATT changes (Network-page firewall controls + the Dev-page distro / kernel-hook / microcode fixes) were rebuilt and tested on the test box this cycle. Kernel/power-profile and installer fixes are tracked in [DISTRO_TESTING.md](../DISTRO_TESTING.md).
 
 ### Sources
 
@@ -149,7 +149,7 @@ Headline: kernel swap, audio-stack swap, brand-new diagnostic toolchain, securit
 
 ### Kernel & boot
 
-- Default kernel is now **`linux-lqx`** (Liquorix). See [LIQUORIX.md](./LIQUORIX.md) for the rationale: BFQ, MuQSS, desktop responsiveness, gaming/audio latency, eight cited studies.
+- Default kernel is now **`linux-lqx`** (Liquorix). See [LIQUORIX.md](./kernels/LIQUORIX.md) for the rationale: BFQ, MuQSS, desktop responsiveness, gaming/audio latency, eight cited studies.
 - Calamares: `kiro-calamares-config/unpackfs2.conf` installs `linux-lqx`. The production config was promoted from `-next` on 2026-05-19.
 - `kiro-calamares-config-next` got mkinitcpio HOOKS fixed — replaces archiso hooks and adds the `resume` hook so suspend-to-swap works.
 - GRUB / syslinux / loopback configs updated to `vmlinuz-linux-lqx` + `initramfs-linux-lqx.img` across both production and `-next`.
@@ -158,7 +158,7 @@ Headline: kernel swap, audio-stack swap, brand-new diagnostic toolchain, securit
 ### PipeWire audio stack
 
 - Live ISO and installed system both ship `pipewire` + `wireplumber` + `pipewire-pulse` instead of PulseAudio.
-- Migration rationale in [PIPEWIRE-MIGRATION.md](../kiro-iso-next/PIPEWIRE-MIGRATION.md) (lives in `kiro-iso-next`).
+- Migration rationale in [PIPEWIRE-MIGRATION.md](../../kiro-iso-next/PIPEWIRE-MIGRATION.md) (lives in `kiro-iso-next`).
 - ohmychadwm volume keys switched from `amixer` to `pamixer` to match.
 - `linux-lqx` follow-up: removed `stateful_codec` from `snd_hda_intel` options — that parameter doesn't exist in the lqx kernel.
 
@@ -186,7 +186,7 @@ In-tree `audit.sh` scripts in both `kiro-iso` and `kiro-iso-next` were removed o
 - **PAM** — `system-auth` shipped with `audit=0` on `pam_faillock.so` lines; pam_faillock errors suppressed on kernels without audit support; the conflicting `etc/pam.d/system-auth` from earlier builds removed (pambase ownership conflict).
 - **udev** — `ENV{DEVTYPE}` instead of bare `DEVTYPE` in the input-optimisation rule; backwards `DEVTYPE` audit logic fixed.
 - **HID autosuspend** — chmod +x added, dmesg-nopasswd sudoers entry added, then the whole `udev-hid-autosuspend` callout removed because systemd 254+ blocks `/usr/local/bin/` callouts from udev.
-- **Comparison baseline** — [KIRO-VS-PRISM.md](./KIRO-VS-PRISM.md) added: side-by-side Kiro vs Prism security-config comparison so each decision is defensible.
+- **Comparison baseline** — [KIRO-VS-PRISM.md](./comparisons/KIRO-VS-PRISM.md) added: side-by-side Kiro vs Prism security-config comparison so each decision is defensible.
 
 ### Installer & build polish
 
@@ -200,7 +200,7 @@ In-tree `audit.sh` scripts in both `kiro-iso` and `kiro-iso-next` were removed o
 
 ### Validated on real hardware
 
-NVIDIA boot + DKMS, BIOS/syslinux boot path, suspend-to-swap, headset reconnect (PipeWire), microcode cleanup post-install, PipeWire as default audio stack — all signed off in [DISTRO_TESTING.md](./DISTRO_TESTING.md).
+NVIDIA boot + DKMS, BIOS/syslinux boot path, suspend-to-swap, headset reconnect (PipeWire), microcode cleanup post-install, PipeWire as default audio stack — all signed off in [DISTRO_TESTING.md](../DISTRO_TESTING.md).
 
 ### Sources
 

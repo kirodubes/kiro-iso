@@ -4,6 +4,25 @@
 
 ---
 
+## 2026-06-06 — Declutter repo root: move docs into `docs/` + drop stray `BEST_PRACTICES.md`
+
+**What Changed**
+- Moved **15 documentation files** off the repo root into a structured **`docs/`** tree (via `git mv`, so history is preserved):
+  - `docs/` — `BYOI.md`, `OVERVIEW.md`, `WHAT-CHANGED-TO-THE-ISO.md`, `PIPEWIRE-MIGRATION.md`
+  - `docs/kernels/` — `KERNEL_CHOICE_FOR_KIRO.md`, `KERNEL_COMPARISON.md`, `ARCH-KERNELS-BUILD-CONFIG-SCORECARD.md`, `CHATGPT-KERNEL-STUDY.md`, `GEMINI-KERNEL-STUDY.md`, `comparison-usage-kernels.md`, `LIQUORIX.md`
+  - `docs/comparisons/` — `KIRO-VS-ARCH.md`, `KIRO-VS-CACHYOS.md`, `KIRO-VS-GARUDA.md`, `KIRO-VS-PRISM.md`
+- Removed **`BEST_PRACTICES.md`** — a 166 KB stray copy of the Kiro-HQ best-practices file that did not belong in this repo (the canonical copy lives in Kiro-HQ; nothing here linked to it).
+- Fixed every internal markdown link affected by the move — `README.md` → `docs/BYOI.md`, the relative links inside `docs/OVERVIEW.md`, `docs/WHAT-CHANGED-TO-THE-ISO.md`, and `docs/kernels/LIQUORIX.md`, and the historical links in this CHANGELOG. A link-resolution pass confirmed **zero** broken targets introduced by the reorg.
+
+**Why**
+- The root had grown to **22 `.md` files** — mostly kernel-research studies and `KIRO-VS-*` comparisons — burying the actual entry points. The root now holds only the 6 files that belong there (`README`, `CHANGELOG`, `CLAUDE`, `LICENSE`, plus the tooling-bound `RELEASES.md` / `DISTRO_TESTING.md` / `BUILD_TIMES.md`) and the three scripts (`build.sh`, `setup.sh`, `up.sh`).
+- Files that other tooling reads/writes at fixed paths were deliberately **left at root**: `RELEASES.md` (feeds the website "Release notes" button), `DISTRO_TESTING.md` (`/kiro-ready`, `/kiro-check`), and `BUILD_TIMES.md` (`record-install-time.sh`).
+- No effect on the ISO — these are repo docs only; the build pipeline references none of them.
+
+**Files Modified**
+- 15 docs relocated under `docs/` (renames); `BEST_PRACTICES.md` deleted
+- Link fixes: `README.md`, `CHANGELOG.md`, `docs/OVERVIEW.md`, `docs/WHAT-CHANGED-TO-THE-ISO.md`, `docs/kernels/LIQUORIX.md`
+
 ## 2026-06-06 — One-command build (`./build.sh`) + host-prep extracted to a sourced helper (mirrored from `-next`)
 
 **What Changed**
@@ -240,7 +259,7 @@ LIQUORIX.md is retained as a historical record of the prior kernel era; a header
 - [archiso/grub/loopback.cfg](archiso/grub/loopback.cfg)
 - [archiso/airootfs/etc/mkinitcpio.d/linux.preset](archiso/airootfs/etc/mkinitcpio.d/linux.preset)
 - [archiso/airootfs/etc/mkinitcpio.d/kiro](archiso/airootfs/etc/mkinitcpio.d/kiro)
-- [LIQUORIX.md](LIQUORIX.md) (historical-note banner)
+- [LIQUORIX.md](docs/kernels/LIQUORIX.md) (historical-note banner)
 
 ---
 
@@ -268,7 +287,7 @@ ISO size: 5.9 GB → **6.1 GB** (+200 MB, ~3.4% growth — on the low end of the
 
 ### What changed
 
-New comparison document [`KIRO-VS-GARUDA.md`](KIRO-VS-GARUDA.md), joining the `KIRO-VS-ARCH` / `KIRO-VS-CACHYOS` / `KIRO-VS-PRISM` series. SSH-based inspection of Garuda Mokka's tuning footprint, scored against `edu-system-files`.
+New comparison document [`KIRO-VS-GARUDA.md`](docs/comparisons/KIRO-VS-GARUDA.md), joining the `KIRO-VS-ARCH` / `KIRO-VS-CACHYOS` / `KIRO-VS-PRISM` series. SSH-based inspection of Garuda Mokka's tuning footprint, scored against `edu-system-files`.
 
 ### Why
 
@@ -276,7 +295,7 @@ Reference distros are checked quarterly so good ideas don't drift past us. This 
 
 ### Files
 
-- [KIRO-VS-GARUDA.md](KIRO-VS-GARUDA.md) (new)
+- [KIRO-VS-GARUDA.md](docs/comparisons/KIRO-VS-GARUDA.md) (new)
 
 ---
 
@@ -422,11 +441,11 @@ Docs-only day, all centred on the kernel story. No build artifacts affected, no 
 
 ### LIQUORIX.md — validation summary consolidated
 
-[LIQUORIX.md](./LIQUORIX.md) is now the single kernel reference. Added a **"Validation — what we tested on real hardware"** section that consolidates the kernel-specific findings previously scattered across [DISTRO_TESTING.md](./DISTRO_TESTING.md), TODO.md, and WHAT-CHANGED-TO-THE-ISO.md. The new section carries a per-build table (the four `linux-lqx` validation builds spanning `7.0.9` → `7.0.10`) plus a checklist of what each kernel-relevant test confirmed: UEFI/systemd-boot and BIOS/syslinux boot paths, `mkarchiso` boot-image generation (`vmlinuz-linux-lqx` + `linux-lqx.preset`, stock `linux.preset` removed), `nvidia-open-dkms` DKMS compile against `linux-lqx-headers` with `driver=nonfree` boot on real NVIDIA hardware, S3 suspend / S4 hibernate-resume on bare metal, and kernel boot-phase timings. The kernel content itself was already fully promoted to production and byte-identical to the beta track; what was missing was a single place to *read* the kernel story end-to-end, evidence beside the argument.
+[LIQUORIX.md](./docs/kernels/LIQUORIX.md) is now the single kernel reference. Added a **"Validation — what we tested on real hardware"** section that consolidates the kernel-specific findings previously scattered across [DISTRO_TESTING.md](./DISTRO_TESTING.md), TODO.md, and WHAT-CHANGED-TO-THE-ISO.md. The new section carries a per-build table (the four `linux-lqx` validation builds spanning `7.0.9` → `7.0.10`) plus a checklist of what each kernel-relevant test confirmed: UEFI/systemd-boot and BIOS/syslinux boot paths, `mkarchiso` boot-image generation (`vmlinuz-linux-lqx` + `linux-lqx.preset`, stock `linux.preset` removed), `nvidia-open-dkms` DKMS compile against `linux-lqx-headers` with `driver=nonfree` boot on real NVIDIA hardware, S3 suspend / S4 hibernate-resume on bare metal, and kernel boot-phase timings. The kernel content itself was already fully promoted to production and byte-identical to the beta track; what was missing was a single place to *read* the kernel story end-to-end, evidence beside the argument.
 
 ### KERNEL_COMPARISON.md added + reconciled with LIQUORIX.md
 
-A new four-way kernel comparison ([KERNEL_COMPARISON.md](./KERNEL_COMPARISON.md) — Arch `linux` vs `linux-cachyos` vs `linux-cachyos-bore` vs Liquorix) was added and cross-checked against LIQUORIX.md. Two corrections came out of that:
+A new four-way kernel comparison ([KERNEL_COMPARISON.md](./docs/kernels/KERNEL_COMPARISON.md) — Arch `linux` vs `linux-cachyos` vs `linux-cachyos-bore` vs Liquorix) was added and cross-checked against LIQUORIX.md. Two corrections came out of that:
 
 - **Package identity.** The comparison described Kiro's kernel as the upstream `linux-liquorix` Debian/Ubuntu binary (repo/curl install). Kiro actually ships **`linux-lqx`** — the Chaotic-AUR build of the same patchset. Renamed `linux-liquorix` → `linux-lqx` throughout and rewrote the install-story prose to reflect the Chaotic-AUR prebuilt-binary path.
 - **Stock scheduler.** The comparison correctly lists Arch stock as **EEVDF** (the mainline scheduler since 6.6); LIQUORIX.md still said **CFS**. Fixed CFS → EEVDF in LIQUORIX.md (TL;DR, scheduler study, and performance verdict) and softened the "throughput-biased" framing to "fairness-oriented."
@@ -557,21 +576,21 @@ The `tuned` package does NOT list `ppd_base_profile` in its pacman `Backup` arra
 
 ## 2026-05-21 — Add WHAT-CHANGED-TO-THE-ISO.md (rolling release log)
 
-**What changed.** New top-level doc [WHAT-CHANGED-TO-THE-ISO.md](./WHAT-CHANGED-TO-THE-ISO.md) added — a rolling, user-facing release log that explains what's actually different between Kiro ISO builds (kernel, audio stack, defaults, calamares, security baseline, tooling). Updated monthly or per significant release; new entries land at the top. First entry covers the 2026-05-17 → 2026-05-21 release window: Liquorix kernel default, PipeWire migration, new `kiro-*` diagnostic toolchain in `edu-system-files`, security hardening pass (live-ISO SSH lockdown, CUPS 0600, sysctl tightening, PAM, udev, BFQ), installer mkinitcpio HOOKS fix + resume hook, version-scheme cleanup, edu-chadwm drop.
+**What changed.** New top-level doc [WHAT-CHANGED-TO-THE-ISO.md](./docs/WHAT-CHANGED-TO-THE-ISO.md) added — a rolling, user-facing release log that explains what's actually different between Kiro ISO builds (kernel, audio stack, defaults, calamares, security baseline, tooling). Updated monthly or per significant release; new entries land at the top. First entry covers the 2026-05-17 → 2026-05-21 release window: Liquorix kernel default, PipeWire migration, new `kiro-*` diagnostic toolchain in `edu-system-files`, security hardening pass (live-ISO SSH lockdown, CUPS 0600, sysctl tightening, PAM, udev, BFQ), installer mkinitcpio HOOKS fix + resume hook, version-scheme cleanup, edu-chadwm drop.
 
 **Why.** Users browsing the repo had no single place to see "what's new in this release" — the CHANGELOG is implementation-focused and not pitched at end users, and the per-feature docs (LIQUORIX.md, PIPEWIRE-MIGRATION.md, KIRO-VS-PRISM.md) each cover one thing in depth. The new doc is the elevator-pitch level, with links down into the deep dives. Designed to be the script source for monthly video walkthroughs as well.
 
 **Files modified.**
-- [WHAT-CHANGED-TO-THE-ISO.md](./WHAT-CHANGED-TO-THE-ISO.md) (new)
+- [WHAT-CHANGED-TO-THE-ISO.md](./docs/WHAT-CHANGED-TO-THE-ISO.md) (new)
 
 ## 2026-05-21 — User-facing LIQUORIX.md rewrite
 
-**What changed.** [LIQUORIX.md](./LIQUORIX.md) rewritten from a pre-decision "should we switch?" study into a user-facing "why we ship Liquorix" doc. New structure: TL;DR comparison table; what-you'll-feel summary; eight study sections (scheduler, HZ, preemption, memory/IO, security parity, modules, DKMS, update cadence); performance verdict; honest trade-offs (Chaotic-AUR supply chain, no LTS variant); five-file change-set table for forkers; looking-ahead notes (NVIDIA hygiene, LTS fallback, rEFInd, `linux-kiro-lqx` separation).
+**What changed.** [LIQUORIX.md](./docs/kernels/LIQUORIX.md) rewritten from a pre-decision "should we switch?" study into a user-facing "why we ship Liquorix" doc. New structure: TL;DR comparison table; what-you'll-feel summary; eight study sections (scheduler, HZ, preemption, memory/IO, security parity, modules, DKMS, update cadence); performance verdict; honest trade-offs (Chaotic-AUR supply chain, no LTS variant); five-file change-set table for forkers; looking-ahead notes (NVIDIA hygiene, LTS fallback, rEFInd, `linux-kiro-lqx` separation).
 
 **Why.** The doc was written before the kernel switch landed. By the time `linux-lqx` was actually shipping in `archiso/packages.x86_64`, `efiboot/loader/entries/*.conf`, `syslinux/*.cfg`, and `kiro-calamares-config/.../unpackfs2.conf`, the doc still asked an already-answered question. Reframing it to "we shipped this, here's the reasoning" makes it useful to readers (potential Kiro users, forkers, anyone evaluating distros) instead of just to past-Erik.
 
 **Files modified.**
-- [LIQUORIX.md](./LIQUORIX.md)
+- [LIQUORIX.md](./docs/kernels/LIQUORIX.md)
 
 ## 2026-05-19 — Deep source-vs-VM verification + duplicate config cleanup
 

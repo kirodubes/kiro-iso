@@ -96,8 +96,10 @@ install_chaotic_packages() {
     log_info "Fetching latest package URLs from Chaotic-AUR"
 
     local keyring_pkg mirrorlist_pkg
-    keyring_pkg=$(curl -s "${base_url}" | grep -oP "chaotic-keyring-[0-9][^\"]+\.pkg\.tar\.zst" | sort -V | tail -n 1)
-    mirrorlist_pkg=$(curl -s "${base_url}" | grep -oP "chaotic-mirrorlist-[0-9][^\"]+\.pkg\.tar\.zst" | sort -V | tail -n 1)
+    # -L: the geo-mirror 303-redirects to a regional mirror; without it curl
+    # returns an empty body and the filename parse silently comes back empty.
+    keyring_pkg=$(curl -sL "${base_url}" | grep -oP "chaotic-keyring-[0-9][^\"]+\.pkg\.tar\.zst" | sort -V | tail -n 1)
+    mirrorlist_pkg=$(curl -sL "${base_url}" | grep -oP "chaotic-mirrorlist-[0-9][^\"]+\.pkg\.tar\.zst" | sort -V | tail -n 1)
 
     if [[ -z "${keyring_pkg}" || -z "${mirrorlist_pkg}" ]]; then
         log_error "Failed to resolve one or more package filenames from ${base_url}"

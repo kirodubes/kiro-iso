@@ -100,7 +100,7 @@ A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARC
 - `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` — **kept intentionally**. The `sshd_config.d/` directory must have at least one file or archiso won't create it on the live ISO, causing errors. The file enables root SSH for the live session; `kiro_final` removes it from the installed system. Confirmed absent post-install.
 - `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` — **added**. Enforces `600 root:cups` on CUPS config files at boot via `systemd-tmpfiles`.
 - No firewall — **by design**. `iptables` is installed but intentionally has no rules.
-- `virtualbox-guest-utils` / `vboxservice` — **kept intentionally** for testing convenience, despite modules not loading on `linux-lqx` without DKMS.
+- `virtualbox-guest-utils` / `vboxservice` — **kept intentionally** for testing convenience, despite the guest modules needing DKMS against the shipped kernel headers (`linux-cachyos` / `linux-zen`) to load.
 - `vm.overcommit_memory = 1` — **safe**: ZRAM is always active via `zram-generator` + config from `kiro-system-files` (`zstd`, `min(ram/2, 4GB)`, priority 100).
 
 ## VirtualBox SSH Scripts

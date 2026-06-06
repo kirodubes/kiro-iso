@@ -256,6 +256,13 @@ packages and fetch the latest .bashrc. Check your network and re-run."
             exit 1
         fi
     done
+
+    # Refresh pacman sync databases before any repo-dependent step. On a fresh
+    # host (e.g. a just-installed CachyOS) the sync DBs may not be populated yet,
+    # which breaks the later keyring/package installs. Runs on every host since
+    # setup_cachyos short-circuits where the cachyos repo is already present.
+    log_info "Refreshing pacman databases"
+    sudo pacman -Sy
 }
 
 clean_cache() {

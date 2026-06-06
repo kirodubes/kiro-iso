@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-06-06 — Refresh pacman databases in Phase 0 instead of inside `setup_cachyos`
+
+**What Changed**
+- Moved the `sudo pacman -Sy` database refresh out of **`setup_cachyos()`** in `host-prep.sh` and into the end of **`preflight_checks()`** (Phase 0) in `build-the-iso.sh`, where it now runs unconditionally on every host.
+
+**Why**
+- On a freshly installed host (the trigger was a just-installed **CachyOS** box) the pacman sync databases may not be populated yet, which breaks the later keyring and package installs. The refresh had been placed inside `setup_cachyos`, but that function short-circuits with an early `return` whenever `cachyos-keyring` + `cachyos-mirrorlist` are already present — which is exactly the case on CachyOS — so the line never ran on the system that needed it. Where it *did* run it was also redundant, since the preceding `pacman -Sy --needed ...` had already refreshed the databases.
+- Putting a single unconditional `pacman -Sy` at the end of Phase 0 guarantees the sync DBs are populated before any repo-dependent step, on any Arch-based host.
+
+**Files Modified**
+- `build-scripts/host-prep.sh`
+- `build-scripts/build-the-iso.sh`
+
 ## 2026-06-06 — Stop publishing `.claude/` (including memory) to GitHub
 
 **What Changed**

@@ -99,4 +99,5 @@ EOF_CACHYOS
     sudo pacman -Sy --needed --noconfirm cachyos-keyring cachyos-mirrorlist
 
     log_success "cachyos-keyring and cachyos-mirrorlist installed"
+    sudo pacman -Sy
 }

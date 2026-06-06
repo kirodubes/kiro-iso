@@ -8,11 +8,11 @@
 
 **What Changed**
 - Removed the root **`build.sh`** wrapper added earlier today. It was only a thin, template-conformant shim that `cd`'d into `build-scripts/` and ran `build-the-iso.sh` — it carried no build logic of its own (host-prep lives in `host-prep.sh`, sourced by `build-the-iso.sh`), so the indirection earned nothing.
-- The build command is once again the documented, direct one: **`cd build-scripts && bash build-the-iso.sh`**.
+- The build command is once again the documented, direct one: **`cd build-scripts && ./build-the-iso.sh`**.
 - Updated **`README.md`** (Build Workflow block) and **`build-scripts/BYOI.md`** (all nine `./build.sh` references → `./build-the-iso.sh`) to use the correct script name.
 
 **Why**
-- A wrapper whose entire body is `cd build-scripts && bash build-the-iso.sh` adds a layer to maintain (and to keep byte-identical with `-next`) without simplifying anything for the builder. One canonical script is clearer than two.
+- A wrapper whose entire body is `cd build-scripts && ./build-the-iso.sh` adds a layer to maintain (and to keep byte-identical with `-next`) without simplifying anything for the builder. One canonical script is clearer than two.
 
 **Files Modified**
 - `build.sh` (removed)

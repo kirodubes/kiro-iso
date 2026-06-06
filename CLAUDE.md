@@ -21,7 +21,7 @@ A single command does everything — version bump and build are merged:
 
 ```bash
 # Build the ISO (run as normal user — script calls sudo internally)
-cd build-scripts && bash build-the-iso.sh
+cd build-scripts && ./build-the-iso.sh
 ```
 
 - The script bumps the version (`vYY.MM.DD`) as its **Phase 2**, before the build, gated by the `bump_version` flag in the config block (default `yes`). Set `bump_version="no"` for a same-day rebuild of the currently-pinned version.

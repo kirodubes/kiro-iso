@@ -103,9 +103,18 @@ picker="auto"                 # auto | dialog | gum — picker UI for kernel="as
 chaoticsrepo=true
 clean_pacman_cache="no"       # yes | no
 remove_build_folder="no"      # yes | no — set to yes to clean up after build
+build_location="home"         # home | local — home = build in $HOME; local = build beside the cloned repo
 
-buildFolder="${HOME}/kiro-build"
-outFolder="${HOME}/kiro-Out"
+if [[ "${build_location}" == "local" ]]; then
+    # Build/out folders sit next to the clone (one level above the repo) so the
+    # work stays inside the directory you chose to clone into, not your $HOME root.
+    PARENT_PATH="$(cd -- "${REPO_DIR}/.." && pwd)"
+    buildFolder="${PARENT_PATH}/kiro-build"
+    outFolder="${PARENT_PATH}/kiro-Out"
+else
+    buildFolder="${HOME}/kiro-build"
+    outFolder="${HOME}/kiro-Out"
+fi
 isoLabel="kiro-${kiroVersion}-x86_64.iso"
 PACKAGES_FILE="${buildFolder}/archiso/packages.x86_64"
 

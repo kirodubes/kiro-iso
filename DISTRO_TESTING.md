@@ -4,6 +4,22 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-06 — Release GO: fresh full install from `kiro-v26.06.06` ISO — 134 PASS / 0 / 0
+
+Ran `/kiro-ready` against the production `kiro-v26.06.06` ISO and did a clean end-to-end install from the live medium into a VirtualBox guest (UEFI/systemd-boot, unencrypted ext4 root). All release gates green → **GO, "you are ready to release."**
+
+| Stage | Result |
+|-------|--------|
+| **Live-ISO** kiro-audit | 108 PASS / 6 WARN / **22 FAIL** — all expected live-medium state (kernels in squashfs, calamares present-to-install-from, ppd/tuned pins applied at install, archiso leftovers). Not blockers. |
+| **Installed** kiro-audit | **134 PASS / 0 WARN / 0 FAIL** — "all checks passed". |
+| Sysctl staleness verify | `/etc/sysctl.d/99-kiro-optimizations.conf` md5 `d6394931…` on the installed system is **byte-identical to `kiro-system-files@5cf21bf` HEAD** — confirms the 2026-06-06 sysctl reshuffle shipped and is tested, not stale. |
+
+`/kiro-ready` full tally: 5 repos clean+pushed; no §1/§3 P1 TODO blockers; iso↔iso-next drift all intentional (`-next`/`-nemesis` package variants + a comment reflow in `partition.conf`); production ISO (built 08:13) postdates the latest non-doc commit (07:31, version-bump trio only); name-leakage scan **0 Tier-1/Tier-3** (only Tier-4 maintainer-script hygiene). `kiro-system-files 26.06-15` installed.
+
+**Verdict:** production `v26.06.06` verified release-ready by full install. This supersedes the post-upgrade syscheck below as the stronger same-day evidence.
+
+---
+
 ## 2026-06-06 — `kiro-system-files 26.06-15` post-upgrade syscheck on `Kiro-normal` VM — clean
 
 Ran `/kiro-syscheck` against the `Kiro-normal` VirtualBox guest after upgrading **`kiro-system-files 26.06-14 → 26.06-15`** (`pacman -Syu`, hooks ran clean) on the freshly-installed v26.06.06 ISO (built same day 07:28, unencrypted ext4 root, systemd-boot/UEFI). The change is fully healthy — nothing in the journal, audit, or unit state traces back to it, and every artifact the package ships verified present and correct.

@@ -1,3 +1,2 @@
 .codex/
-.claude/*
-!.claude/memory/
+.claude/

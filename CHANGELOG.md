@@ -4,7 +4,9 @@
 
 ---
 
-## 2026-06-06 — Mirror the risk-tier `packages.x86_64` reorg from `-next` + drop paid app
+## 2026-06-06 — v26.06.06 — risk-tier `packages.x86_64` reorg from `-next` + drop paid app
+
+**Release** — production ISO **`kiro-v26.06.06`** built and verified release-ready. Headline change: **`spotify` removed** — a paid streaming app has no place on the community ISO. `/kiro-ready` returned **GO** (5 repos clean+pushed, no P1 blockers, no iso↔iso-next drift, name-leakage 0 Tier-1/3) and a clean **full install** passed `kiro-audit` **134 / 0 / 0**, with the shipped `kiro-system-files 26.06-15` sysctl config verified byte-identical to source. See [DISTRO_TESTING.md](DISTRO_TESTING.md).
 
 **What Changed**
 - Reorganized **`archiso/packages.x86_64`** into the same **three risk tiers** now used on `kiro-iso-next` (FROZEN / KIRO CORE / USER-CHANGEABLE), grouped by function within each tier, with banner comments that make the "never remove" packages unmistakable and push the freely-editable apps to the end.

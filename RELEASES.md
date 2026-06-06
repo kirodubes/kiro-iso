@@ -1,9 +1,16 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Four ISOs shipped in June (`.01 .02 .04 .05`). For each: why it was worth a new ISO,
+Five ISOs shipped in June (`.01 .02 .04 .05 .06`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.05 — June 5 (current)
+## v26.06.06 — June 6 (current)
+**Why a new ISO:** drops a paid app and gives the package list a clear, tiered structure — so the ISO is easy to read, fork and rebuild (the groundwork for the upcoming "build your own ISO" guide).
+- **No paid apps pre-installed:** **Spotify removed** — a paid streaming service doesn't belong pre-loaded on a community ISO.
+- **Keybindings cheatsheet on board:** `kiro-keybindings` is now an explicit package on the list — the auto-detecting, searchable shortcut reference (Super+K) for the desktop and tiling managers.
+- **Readable package list:** `packages.x86_64` is reorganized into risk tiers (never-remove core vs freely-editable apps), so anyone cloning the repo can see at a glance what's safe to change; seven commented-out "suggestion" entries were pruned to cut noise.
+- **Packages:** − `spotify`; + `kiro-keybindings` (explicit).
+
+## v26.06.05 — June 5
 **Why a new ISO:** validated the full disk-encryption matrix — **LUKS2** ext4 / btrfs / xfs / jfs installs all unlock and pass `kiro-audit` clean (0 WARN / 0 FAIL) — and swaps in better default apps.
 - **Better screen recording:** **OBS Studio** replaces SimpleScreenRecorder.
 - **CPU scheduler control:** **scx-manager** added — switch sched-ext schedulers at runtime.

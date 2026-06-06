@@ -96,9 +96,11 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #####################################################################
 desktop="xfce4/ohmychadwm"
 kiroVersion='v26.06.06'
+
 bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
 kernel="linux-cachyos linux-zen"   # space-separated kernel package(s); "ask" = interactive menu. First = the kernel the live ISO boots.
+
 picker="auto"                 # auto | dialog | gum — picker UI for kernel="ask" (auto = dialog if installed, else gum)
 chaoticsrepo=true
 clean_pacman_cache="no"       # yes | no

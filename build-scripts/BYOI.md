@@ -56,7 +56,7 @@ GitHub. You can ignore it.)*
 
 ## 4. Build it
 
-From inside the `kiro-iso` folder, run one command:
+From inside the `kiro-iso/build-scripts` folder, run one command:
 
 ```bash
 ./build.sh
@@ -73,17 +73,19 @@ That's the whole build. Here's what happens while it runs:
 
 Lots of text scrolls past. That's normal. Leave it running.
 
+You will see error-messages - that is normal too.
+
 ---
 
 ## 5. Optional: tweak it before building
 
 You don't have to change anything — the defaults are good. But if you want to, open
-`build-scripts/build-the-iso.sh` and look at the **config block** near the top:
+`build-scripts/build-the-iso.sh` and look at the **Build configuration** near the top:
 
 ```bash
+bump_version="yes"                 # auto-set the version to today's date
 nvidia_driver="open"               # open | 580xx | 390xx  (NVIDIA driver set)
 kernel="linux-cachyos linux-zen"   # which kernel(s) to include; first = the one it boots
-bump_version="yes"                 # auto-set the version to today's date
 ```
 
 | Setting | What it does | Leave it as |
@@ -167,8 +169,6 @@ This is the fun part. The ISO is *yours* to change:
   there lands at `/` on the built ISO.
 - **Pick a different kernel or NVIDIA driver:** see §5.
 
-Want the long version with explanations on video? See the
-[Kiro YouTube series](https://www.youtube.com/watch?v=3jdKH6bLgUE&list=PLlloYVGq5pS71UubmlKjjw131PjixMIjW).
 
 > **Coming later:** a clickable GTK app — *Kiro ISO Builder* — that runs this whole process in
 > a window and fixes common host problems for you with one click. For now, `./build.sh` is all

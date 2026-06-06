@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-06-06 — Mirror the risk-tier `packages.x86_64` reorg from `-next` + drop paid app
+
+**What Changed**
+- Reorganized **`archiso/packages.x86_64`** into the same **three risk tiers** now used on `kiro-iso-next` (FROZEN / KIRO CORE / USER-CHANGEABLE), grouped by function within each tier, with banner comments that make the "never remove" packages unmistakable and push the freely-editable apps to the end.
+- Removed **`spotify`** — a paid streaming app has no place on the community ISO that ships to users.
+- Pruned the trailing commented-out "uncomment-to-enable" optionals (`#flat-remix`, `#colloid-cursors-git`, `#dex`, `#ckb-next-git`, `#discord`, `#telegram-desktop`, `#tlp`) — personal-taste suggestions that belong in the arcolinux-nemesis post-install scripts.
+- Kept production's plain package names (**`calamares`**, **`kiro-calamares-config`**, **`kiro-calamares-tweak-tool`**, **`plymouth-theme-kiro-logo`**) — no `-next`/`-nemesis` variants on production.
+
+**Why**
+- The list gave no signal telling a builder which packages are load-bearing vs safe to edit. Tiering makes the blast radius explicit. The structure was proven on `-next` first (build succeeded, files verified) before mirroring here, per the test-in-next-first rule.
+- Built from the `-next` file with the four production name swaps, then a **token-set diff** confirmed the only deltas from the previously-validated production list were the intended ones: `spotify` removed (active) and the 7 commented optionals removed — **zero** other packages lost, added, or toggled. Build-script anchors (`nvidia-*`, `linux-cachyos`/`-headers`) stay at column 0.
+- Result: **396 active** packages (was 397), 36 commented (was 43). Production and `-next` now differ by exactly the four by-design Calamares/Plymouth name pairs and nothing else.
+
+**Files Modified**
+- `archiso/packages.x86_64`
+
+---
+
 ## 2026-05-31 — Three NVIDIA boot options: proprietary modern / proprietary auto-detect
 
 **What Changed**

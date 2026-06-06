@@ -1,3 +1,28 @@
+#############################################################################
+#                                                                           #
+#   KIRO-ISO-NEXT  —  packages.x86_64                                        #
+#                                                                           #
+#   Organized into 3 risk tiers so it is clear what a user may safely       #
+#   change without breaking the ISO build / boot / install.                 #
+#                                                                           #
+#     TIER 1  FROZEN ............ never remove (breaks build/boot/install)  #
+#     TIER 2  KIRO CORE ......... change only if you know what you're doing #
+#     TIER 3  USER-CHANGEABLE ... safe to add or remove freely              #
+#                                                                           #
+#   Within each tier packages are grouped by function. Commented (#) lines  #
+#   are deliberately-disabled options kept for reference — uncomment to use.#
+#                                                                           #
+#############################################################################
+
+
+#############################################################################
+#  TIER 1 — FROZEN — DO NOT REMOVE                                          #
+#  Removing any of these breaks the ISO build, the live boot, or Calamares. #
+#############################################################################
+
+###  ARCHISO BASE — upstream archiso packages.x86_64
+###  Preserved verbatim in upstream order. DO NOT REORDER OR PRUNE.
+###  (this block mirrors upstream archiso so it stays diff-able)
 alsa-utils
 amd-ucode
 arch-install-scripts
@@ -126,7 +151,7 @@ xdg-utils
 xfsprogs
 xl2tpd
 
-###archiso-extra
+###  ARCHISO EXTRA — extra firmware/tooling on top of the archiso base
 aic94xx-firmware
 dialog
 dnsutils
@@ -138,15 +163,14 @@ upd72020x-fw
 wd719x-firmware
 wget
 
-###xorg
-xorg-server
-xorg-apps
-xorg-xinit
-
-###video
+###  GRAPHICS / XORG — live session display stack
+mesa
 xf86-input-elographics
-#xf86-input-evdev
 xf86-input-libinput
+xorg-apps
+xorg-server
+xorg-xinit
+#xf86-input-evdev
 #xf86-input-vmmouse
 #xf86-input-void
 #xf86-video-amdgpu
@@ -157,311 +181,199 @@ xf86-input-libinput
 #xf86-video-openchrome
 #xf86-video-vesa
 #xf86-video-vmware
-mesa
 
-###hardware video support
+###  NVIDIA — MANAGED BY build-the-iso.sh — do NOT hand-edit these lines
+###  (the build script deletes + re-injects them based on nvidia_driver=)
 nvidia-open-dkms
-nvidia-utils
 nvidia-settings
+nvidia-utils
 #mesa-utils
 
-###base-devel
+###  BUILD ESSENTIALS
 base-devel
+gcc
+make
 
-###virtual box or vmware
+###  REPO KEYRINGS + MIRRORLISTS — build fails without these
+cachyos-keyring
+cachyos-mirrorlist
+chaotic-keyring
+chaotic-mirrorlist
+
+###  INSTALLER / CALAMARES — the installer and its install-time helpers
+calamares
+chwd
+hwdetect
+kiro-calamares-config
+kiro-calamares-tweak-tool
+mkinitcpio-firmware
+mkinitcpio-openswap
+os-prober
+pacman-hook-kernel-install
+plymouth-theme-kiro-logo
+
+###  LIVE-ENV GUEST TOOLS  (open-vm-tools / qemu-guest-agent live in ARCHISO BASE)
 virtualbox-guest-utils
 
-###packages for dual boot
-os-prober
+###  DISPLAY MANAGER — boot to the login screen
+accountsservice
+sddm-git
 
-###audio
+###  DEFAULT SESSION — the shipped desktop (XFCE4 + Ohmychadwm)
+ohmychadwm
+xfce4
+xfce4-goodies
+
+
+#############################################################################
+#  TIER 2 — KIRO CORE / SYSTEM                                              #
+#  Won't break the build, but removing these cripples core OS function or   #
+#  strips the Kiro identity. Change only if you know what you're doing.     #
+#############################################################################
+
+###  AUDIO — PipeWire stack
 alsa-firmware
-alsa-plugins
 alsa-lib
+alsa-plugins
 gst-libav
+gst-plugin-pipewire
 gst-plugins-bad
 gst-plugins-base
 gst-plugins-good
 gst-plugins-ugly
-gst-plugin-pipewire
 gstreamer
 libdvdcss
+pamixer
+pavucontrol
 pipewire
 pipewire-alsa
 pipewire-audio
 pipewire-pulse
 wireplumber
-pamixer
-pavucontrol
 
-###bluetooth
+###  BLUETOOTH
 blueberry
 bluez
 bluez-libs
 bluez-utils
 
-###network
+###  NETWORK
 avahi
-nss-mdns
+hblock
 mobile-broadband-provider-info
-networkmanager
 network-manager-applet
+networkmanager
 networkmanager-openconnect
 networkmanager-openvpn
 networkmanager-pptp
 networkmanager-vpnc
+nss-mdns
 
-###file management
+###  FILE MANAGEMENT / GVFS
 gvfs
 gvfs-afc
+gvfs-dnssd
 gvfs-gphoto2
 gvfs-mtp
 gvfs-nfs
 gvfs-smb
-gvfs-dnssd
+libmtp
 mtpfs
 udiskie
 udisks2
 xdg-user-dirs
 
-###printers
+###  PRINTING / SCANNING
 cups
 cups-filters
 cups-pdf
 ghostscript
 gsfonts
 gutenprint
+simple-scan
 system-config-printer
 
-###tumbler
-tumbler
+###  THUMBNAILS — tumbler + thumbnailers
 ffmpegthumbnailer
 freetype2
 libgsf
 libopenraw
 poppler-glib
 poppler-qt5
+tumbler
 
-#########################################################################
-#                  SOFTWARE FROM ARCH LINUX REPOSITORIES
-#########################################################################
-
-###applications
-chromium
-dmenu
-firefox
-galculator
-gcolor3
-gimp
-hw-probe
-imagemagick
-inkscape
-lshw
-meld
-numlockx
-obs-studio
-qbittorrent
-scrot
-vlc
-vlc-plugins-all
-
-lm_sensors
-
-###fonts
-adobe-source-sans-fonts
-noto-fonts
-ttf-dejavu
-ttf-droid
-ttf-hack
-ttf-roboto
-ttf-roboto-mono
-ttf-ubuntu-font-family
-
-###themes
-
-kvantum
-kvantum-qt5
-
-###utilities
-arandr
-bash-completion
-baobab
-bat
-catfish
-cronie
-dconf-editor
-#dex
-#discord
-duf
-evince
-expac
-file-roller
-firewalld
-firewall-config
-git
-gnome-disk-utility
+###  DESKTOP INTEGRATION — polkit / portals / keyring
 gnome-keyring
-gnome-screenshot
-gparted
-gpick
-hardinfo2
-hwinfo
-libmtp
-laptop-detect
-lsb-release
-plocate
-nomacs
-oh-my-zsh-git
-p7zip
-pkgfile
-playerctl
 polkit
 polkit-gnome
-qt5ct
-simple-scan
-#telegram-desktop
-#tlp
-tree
-unace
-unrar
-unzip
-upower
 xapp
 xdg-desktop-portal-gtk
-yt-dlp
-zenity
+
+###  THEMING ENGINES
+kvantum
+kvantum-qt5
+lxappearance
+qt5ct
+vte4
+
+###  SYSTEM TUNING / SERVICES
+ananicy-cpp
+cachyos-ananicy-rules-git
+cronie
+firewall-config
+firewalld
+irqbalance
+scx-manager
+sysz
+timeshift
+tuned
+tuned-ppd
+upower
 zram-generator
+
+###  OHMYCHADWM RUNTIME — tools the shipped Ohmychadwm session needs to work
+alacritty
+dmenu
+fastcompmgr-git
+feh
+flameshot-git
+maim
+numlockx
+picom-git
+playerctl
+redshift
+rofi
+scrot
+sxhkd
+volctl
+xautolock
+xclip
+xcolor
+xorg-xsetroot
+
+###  SHELL / TERMINAL ENV
+bash-completion
+dracula-colors-xfce4-terminal
+fastfetch-git
+fish
+lolcat
+oh-my-zsh-git
+ttf-jetbrains-mono-nerd
+ttf-meslo-nerd-font-powerlevel10k
+unifetch
 zsh
 zsh-completions
 zsh-syntax-highlighting
 
-###########################################################################
-#                           REPOS
-###########################################################################
-
-###applications
-vivaldi
-vivaldi-ffmpeg-codecs
-
-###cursors
-bibata-cursor-theme
-
-###icons
-numix-icon-theme-git
-numix-circle-icon-theme-git
-sardi-icons
-surfn-icons-git
-
-###tools
-mkinitcpio-openswap
-
-###utilities
-appstream
-archlinux-tools
-downgrade
-fastfetch-git
-font-manager
-gittyup
-hardcode-fixer-git
-inxi
-mintstick
-paru-git
-python-pyparted
-python-pywal
-rate-mirrors
-sublime-text-4
-the_silver_searcher
-unifetch
-visual-studio-code-bin
-yay-git
-
-###########################################################################
-####                               CALAMARES
-###########################################################################
-
-calamares
-kiro-calamares-config
-
-###########################################################################
-####                               PLYMOUTH
-###########################################################################
-
-plymouth-theme-kiro-logo
-
-adobe-source-han-sans-jp-fonts
-adobe-source-han-sans-kr-fonts
-adobe-source-han-sans-cn-fonts
-
-###########################################################################
-####                           DISPLAY MANAGERS
-###########################################################################
-
-accountsservice
-sddm-git
-
-###########################################################################
-####                           DESKTOP MANAGERS
-###########################################################################
-
-xfce4
-xfce4-goodies
-
-###########################################################################
-####                       APPS
-###########################################################################
-
-brave-bin
-btop
-devtools
-fd
-fish
-inetutils
-menulibre
-mkinitcpio-firmware
-most
-mugshot
-namcap
-noto-fonts-emoji
-pacmanlogviewer
-pacquery
-python-pylint
-resources
-ripgrep
-ripgrep-all
-shortwave
-sparklines-git
-spotify
-time
-tldr
-ttf-ms-fonts
-ttf-font-awesome
-variety
-vimix-cursors
-yad
-
-###########################################################################
-####                               CHAOTICS AUR
-###########################################################################
-
-#flat-remix
-#colloid-cursors-git
-beautyline
-candy-icons-git
-chaotic-keyring
-chaotic-mirrorlist
-
-###########################################################################
-####                               NEMESIS REPO
-###########################################################################
-
-#ckb-next-git
+###  KIRO BRANDING / IDENTITY — the kiro-* config + branded look
+alacritty-tweak-tool
 arc-gtk-theme
 archlinux-logout-gtk4
 archlinux-tweak-tool-gtk4
-alacritty-tweak-tool
 kiro-arc-dawn
 kiro-arc-kde
 kiro-dot-files
+kiro-keybindings
 kiro-neo-candy-arc
 kiro-neo-candy-arc-mint-grey
 kiro-neo-candy-arc-mint-red
@@ -476,66 +388,151 @@ kiro-shells
 kiro-system-files
 kiro-variety-config
 kiro-xfce
-flameshot-git
-neo-candy-icons-git
-pacman-hook-kernel-install
-pamac-aur
-speedtest-cli
-ttf-material-design-iconic-font
-wttr
-xcolor
+sparklines-git
 
-###########################################################################
-####                               NEMESIS REPO
-###########################################################################
-
-alacritty
-ohmychadwm
-fastcompmgr-git
-feh
-gcc
-lolcat
-lxappearance
-maim
-make
-ncdu
-picom-git
-redshift
-rofi
-sxhkd
-ttf-jetbrains-mono-nerd
-ttf-meslo-nerd-font-powerlevel10k
-volctl
-xautolock
-xclip
-xorg-xsetroot
-
-ananicy-cpp
-cachyos-ananicy-rules-git
+###  ICONS / CURSORS / THEMES — default Kiro look
+beautyline
+bibata-cursor-theme
+candy-icons-git
 capitaine-cursors
-chwd
-claude-code
-cpuid
-dracula-colors-xfce4-terminal
-irqbalance
-glances
-hblock
-hwdetect
-libgepub
+neo-candy-icons-git
+numix-circle-icon-theme-git
+numix-icon-theme-git
+sardi-icons
+surfn-icons-git
+ttf-material-design-iconic-font
+vimix-cursors
+
+###  FONTS  (CJK + ttf-ms-fonts are safe to drop if you don't need them)
+adobe-source-han-sans-cn-fonts
+adobe-source-han-sans-jp-fonts
+adobe-source-han-sans-kr-fonts
+adobe-source-sans-fonts
+noto-fonts
+noto-fonts-emoji
+ttf-dejavu
+ttf-droid
+ttf-font-awesome
+ttf-hack
+ttf-ms-fonts
+ttf-roboto
+ttf-roboto-mono
+ttf-ubuntu-font-family
+
+
+#############################################################################
+#  TIER 3 — USER-CHANGEABLE / OPTIONAL                                      #
+#  Safe to add or remove. Edit freely — none of these affect the build.    #
+#############################################################################
+
+###  WEB BROWSERS
+brave-bin
+chromium
+firefox
+vivaldi
+vivaldi-ffmpeg-codecs
+
+###  MEDIA / GRAPHICS
+gcolor3
+gimp
+gpick
+imagemagick
+inkscape
+nomacs
+obs-studio
 peek
-timeshift
-tuned
-tuned-ppd
-vte4
+shortwave
+variety
+vlc
+vlc-plugins-all
+
+###  PRODUCTIVITY / EDITORS
+baobab
+catfish
+evince
+file-roller
+galculator
+gnome-disk-utility
+gnome-screenshot
+gparted
+meld
+qbittorrent
+sublime-text-4
+visual-studio-code-bin
+
+###  CLI UTILITIES
+bat
+btop
+duf
+fd
+glances
+most
+ncdu
+ripgrep
+ripgrep-all
+speedtest-cli
+the_silver_searcher
+tldr
+tree
+wttr
+yt-dlp
+
+###  SYSTEM INFO / DIAGNOSTICS
+cpuid
+hardinfo2
+hw-probe
+hwinfo
+inxi
+lm_sensors
+lshw
 pciutils
-sysz
+resources
 
-cachyos-keyring
-cachyos-mirrorlist
-kiro-calamares-tweak-tool
-scx-manager
+###  PACKAGE / SYSTEM TOOLS
+appstream
+archlinux-tools
+devtools
+downgrade
+expac
+hardcode-fixer-git
+namcap
+pacmanlogviewer
+pacquery
+pamac-aur
+paru-git
+pkgfile
+python-pylint
+python-pyparted
+python-pywal
+rate-mirrors
+time
+yay-git
 
-###########################################################################
-####                           PERSONAL_REPO aka LOCAL REPO
-###########################################################################
+###  ARCHIVE TOOLS
+p7zip
+unace
+unrar
+unzip
 
+###  DESKTOP / MISC EXTRAS
+arandr
+claude-code
+dconf-editor
+font-manager
+git
+gittyup
+inetutils
+laptop-detect
+libgepub
+lsb-release
+menulibre
+mintstick
+mugshot
+plocate
+yad
+zenity
+
+#############################################################################
+#  PERSONAL_REPO / LOCAL REPO                                               #
+#  Add packages from your own local repo below (empty by default).         #
+#############################################################################

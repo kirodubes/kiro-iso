@@ -7,8 +7,9 @@
 ## 2026-06-06 — Declutter repo root: move docs into `docs/` + drop stray `BEST_PRACTICES.md`
 
 **What Changed**
-- Moved **15 documentation files** off the repo root into a structured **`docs/`** tree (via `git mv`, so history is preserved):
-  - `docs/` — `BYOI.md`, `OVERVIEW.md`, `WHAT-CHANGED-TO-THE-ISO.md`, `PIPEWIRE-MIGRATION.md`
+- Moved **15 documentation files** off the repo root (via `git mv`, so history is preserved) — 14 into a structured **`docs/`** tree, and the build guide beside the build scripts:
+  - `build-scripts/` — `BYOI.md` (the Build-Your-Own-ISO guide lives next to `build.sh` / `build-the-iso.sh`)
+  - `docs/` — `OVERVIEW.md`, `WHAT-CHANGED-TO-THE-ISO.md`, `PIPEWIRE-MIGRATION.md`
   - `docs/kernels/` — `KERNEL_CHOICE_FOR_KIRO.md`, `KERNEL_COMPARISON.md`, `ARCH-KERNELS-BUILD-CONFIG-SCORECARD.md`, `CHATGPT-KERNEL-STUDY.md`, `GEMINI-KERNEL-STUDY.md`, `comparison-usage-kernels.md`, `LIQUORIX.md`
   - `docs/comparisons/` — `KIRO-VS-ARCH.md`, `KIRO-VS-CACHYOS.md`, `KIRO-VS-GARUDA.md`, `KIRO-VS-PRISM.md`
 - Removed **`BEST_PRACTICES.md`** — a 166 KB stray copy of the Kiro-HQ best-practices file that did not belong in this repo (the canonical copy lives in Kiro-HQ; nothing here linked to it).

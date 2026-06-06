@@ -63,7 +63,7 @@ KIRO comes pre-loaded with:
 
 ## Building KIRO
 
-> **New to building ISOs?** Start with **[BYOI.md](docs/BYOI.md)** — a step-by-step "Build Your Own
+> **New to building ISOs?** Start with **[BYOI.md](build-scripts/BYOI.md)** — a step-by-step "Build Your Own
 > ISO" guide that assumes zero prior experience. The summary below is the quick version.
 
 ### Requirements

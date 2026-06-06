@@ -158,7 +158,7 @@ Headline: kernel swap, audio-stack swap, brand-new diagnostic toolchain, securit
 ### PipeWire audio stack
 
 - Live ISO and installed system both ship `pipewire` + `wireplumber` + `pipewire-pulse` instead of PulseAudio.
-- Migration rationale in [PIPEWIRE-MIGRATION.md](../../kiro-iso-next/PIPEWIRE-MIGRATION.md) (lives in `kiro-iso-next`).
+- Migration rationale in [PIPEWIRE-MIGRATION.md](../../kiro-iso-next/docs/PIPEWIRE-MIGRATION.md) (lives in `kiro-iso-next`).
 - ohmychadwm volume keys switched from `amixer` to `pamixer` to match.
 - `linux-lqx` follow-up: removed `stateful_codec` from `snd_hda_intel` options — that parameter doesn't exist in the lqx kernel.
 

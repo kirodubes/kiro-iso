@@ -59,7 +59,7 @@ GitHub. You can ignore it.)*
 From inside the `kiro-iso/build-scripts` folder, run one command:
 
 ```bash
-./build.sh
+./build-the-iso.sh
 ```
 
 That's the whole build. Here's what happens while it runs:
@@ -94,7 +94,7 @@ kernel="linux-cachyos linux-zen"   # which kernel(s) to include; first = the one
 | `kernel` | Which Linux kernel(s) the ISO carries | the default |
 | `bump_version` | Whether to stamp today's date as the version | `yes` |
 
-Save the file, then run `./build.sh`.
+Save the file, then run `./build-the-iso.sh`.
 
 ---
 
@@ -138,8 +138,8 @@ keys. There are four extra software sources:
 |------------|------------------|--------------|
 | `kiro_repo` | Kiro's own packages | None — it's just a public web address |
 | `nemesis_repo` | Themes, shells, configs | None — public web address |
-| `chaotic-aur` | Pre-built community packages | Done **automatically** by `./build.sh` |
-| `cachyos` | The `linux-cachyos` kernel | Done **automatically** by `./build.sh` |
+| `chaotic-aur` | Pre-built community packages | Done **automatically** by `./build-the-iso.sh` |
+| `cachyos` | The `linux-cachyos` kernel | Done **automatically** by `./build-the-iso.sh` |
 
 So the honest answer to "what access do we need?" is: just an internet connection.
 
@@ -150,12 +150,12 @@ So the honest answer to "what access do we need?" is: just an internet connectio
 | Symptom | Fix |
 |---------|-----|
 | `No space left on device` | Free up ~15 GB; the build writes to `~/kiro-build` and `~/kiro-Out` |
-| Downloads fail / time out | Check your internet; re-run `./build.sh` (it picks back up cleanly) |
+| Downloads fail / time out | Check your internet; re-run `./build-the-iso.sh` (it picks back up cleanly) |
 | `mkarchiso: command not found` | You're not on an Arch-based system — build inside an Arch VM (see §2) |
-| A keyring / signature error | Re-run `./build.sh`; it refreshes the Chaotic and CachyOS keyrings |
-| "do not run as root" | Run `./build.sh` as your **normal** user, not with `sudo` in front |
+| A keyring / signature error | Re-run `./build-the-iso.sh`; it refreshes the Chaotic and CachyOS keyrings |
+| "do not run as root" | Run `./build-the-iso.sh` as your **normal** user, not with `sudo` in front |
 
-If a run dies partway, just run `./build.sh` again — it rebuilds from a clean slate each time.
+If a run dies partway, just run `./build-the-iso.sh` again — it rebuilds from a clean slate each time.
 
 ---
 
@@ -171,7 +171,7 @@ This is the fun part. The ISO is *yours* to change:
 
 
 > **Coming later:** a clickable GTK app — *Kiro ISO Builder* — that runs this whole process in
-> a window and fixes common host problems for you with one click. For now, `./build.sh` is all
+> a window and fixes common host problems for you with one click. For now, `./build-the-iso.sh` is all
 > you need.
 
 ---

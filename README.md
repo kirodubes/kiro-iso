@@ -77,8 +77,8 @@ KIRO comes pre-loaded with:
 
 ```bash
 # One command does everything — host prep, version bump, and build are merged
-# (run as your normal user from the repo root; the script calls sudo internally)
-./build.sh
+# (run as your normal user; the script calls sudo internally)
+cd build-scripts && bash build-the-iso.sh
 ```
 
 The build bumps the version (`vYY.MM.DD`) across all version files as its **Phase 2**, gated by the `bump_version="yes"` flag in the config block — set it to `no` for a same-day rebuild of the currently-pinned version. Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.

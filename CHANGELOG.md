@@ -4,6 +4,41 @@
 
 ---
 
+## 2026-06-06 — Drop root `build.sh` wrapper; build entry point is `build-scripts/build-the-iso.sh`
+
+**What Changed**
+- Removed the root **`build.sh`** wrapper added earlier today. It was only a thin, template-conformant shim that `cd`'d into `build-scripts/` and ran `build-the-iso.sh` — it carried no build logic of its own (host-prep lives in `host-prep.sh`, sourced by `build-the-iso.sh`), so the indirection earned nothing.
+- The build command is once again the documented, direct one: **`cd build-scripts && bash build-the-iso.sh`**.
+- Updated **`README.md`** (Build Workflow block) and **`build-scripts/BYOI.md`** (all nine `./build.sh` references → `./build-the-iso.sh`) to use the correct script name.
+
+**Why**
+- A wrapper whose entire body is `cd build-scripts && bash build-the-iso.sh` adds a layer to maintain (and to keep byte-identical with `-next`) without simplifying anything for the builder. One canonical script is clearer than two.
+
+**Files Modified**
+- `build.sh` (removed)
+- `README.md`, `build-scripts/BYOI.md`
+
+## 2026-06-06 — Build hardening for clean Arch hosts: Chaotic 303-redirect fix, portable `$HOSTNAME` gate, Phase 0 preflight, `parallel_downloads` floor
+
+**What Changed**
+- **`get-pacman-repos-keys-and-mirrors.sh`** — the two filename-discovery calls now use **`curl -sL`** instead of `curl -s`. The Chaotic-AUR geo-mirror (`geo-mirror.chaotic.cx`) now answers with an **HTTP 303 redirect** to a regional mirror; `curl` does not follow redirects without `-L`, so the body came back empty, the `chaotic-keyring-*` / `chaotic-mirrorlist-*` parse matched nothing, and under `set -euo pipefail` the script died at the assignment **before** reaching its own friendly "Failed to resolve" guard — i.e. it exited silently with no error banner. `wget` (used for the actual package download) already follows redirects, so only the two `curl` parse lines needed fixing.
+- **`build-the-iso.sh` — portable hostname gate.** The two `$(hostname)` checks (the `hq`-only skel `.bashrc` refresh in `main()`, and the `record_build_time` gate) now use the bash builtin **`$HOSTNAME`**. A minimal Arch host has no `hostname` binary (`inetutils` is not in `base`), so `$(hostname)` printed `command not found` to stderr on every clean-host build. Behavior is preserved (both gates still only fire on `hq`); the noise and fragility are gone.
+- **`build-the-iso.sh` — new Phase 0 preflight (`preflight_checks`).** Before any of the long work, the build now fails fast with a clear message when **disk is low** (checks the least-free of `buildFolder` / `outFolder` against a 15 G minimum) or **there is no network** (probes `archlinux.org` and `github.com` with `wget --spider`). Previously a low-disk or offline host only surfaced the problem deep inside `mkarchiso`.
+- **`build-the-iso.sh` — new `parallel_downloads` parameter.** A config-block knob (default `10`) that sets pacman `ParallelDownloads` in the **build-tree** `archiso/pacman.conf` (the file `mkarchiso` uses for the airootfs install — the one that governs the big package download), edited per-build so the committed repo file is never touched. It behaves as a **floor**: it only *raises* an active value that is lower than the target, or *enables* an inactive/commented/absent setting, and it **never lowers** a higher shipped value. When it does change something it alerts with an orange `log_warn`; a no-op is a quiet `log_info`.
+
+**Why**
+- `host-prep.sh` claims the build is "self-contained on any Arch-based host," but that path had never been exercised on a genuinely clean (non-`hq`) Arch box. Doing so surfaced two real breakages — the missing `hostname` binary and, more importantly, the Chaotic mirror's new 303 redirect, which fully blocked the build. Both are now fixed and the claim is verified.
+- The preflight turns two common late failures (no space, no network) into immediate, legible errors.
+- `ParallelDownloads` only meaningfully affects build speed when set in `archiso/pacman.conf`; exposing it as a floor lets a slow/stock host be sped up without ever regressing the value the repo already ships (currently `12`).
+
+**Verification**
+- Full end-to-end build on a clean, vanilla Arch host produced **`kiro-v26.06.06-x86_64.iso` (6.1 G)** with sha1/sha256/md5 + pkglist and **zero** errors. Phase 0 preflight ran green; the build sailed past the Chaotic fetch that the `curl -sL` fix unblocked. (`parallel_downloads` lands on the *next* build — that ISO was produced at the shipped `12`.)
+- `parallel_downloads` floor logic dry-tested across all four states: active-12 → unchanged, active-5 → raised to 10, commented → enabled at 10, absent → added at 10.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh` — `$HOSTNAME` gate (×2), `preflight_checks` (Phase 0), `parallel_downloads` param + floor block in `prepare_build_tree`
+- `build-scripts/get-pacman-repos-keys-and-mirrors.sh` — `curl -s` → `curl -sL` (×2)
+
 ## 2026-06-06 — Declutter repo root: move docs into `docs/` + drop stray `BEST_PRACTICES.md`
 
 **What Changed**

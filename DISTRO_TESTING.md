@@ -4,6 +4,32 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-06 — `kiro-system-files 26.06-15` post-upgrade syscheck on `Kiro-normal` VM — clean
+
+Ran `/kiro-syscheck` against the `Kiro-normal` VirtualBox guest after upgrading **`kiro-system-files 26.06-14 → 26.06-15`** (`pacman -Syu`, hooks ran clean) on the freshly-installed v26.06.06 ISO (built same day 07:28, unencrypted ext4 root, systemd-boot/UEFI). The change is fully healthy — nothing in the journal, audit, or unit state traces back to it, and every artifact the package ships verified present and correct.
+
+| Area | Result |
+|------|--------|
+| **kiro-audit** | **134 PASS / 0 WARN / 0 FAIL** ("all checks passed") |
+| Failed units | 0 (`systemctl --failed` + audit) |
+| Udev rules | all 10 present (60→68); IO schedulers correct |
+| Systemd drop-ins | all 6 kiro drop-ins present (logind/system/journald/coredump/user/oomd) |
+| Power | `ppd_base_profile=performance`, tuned active (`throughput-performance`), ppd inactive |
+| Firewall | firewalld active+enabled, zone `public` |
+| Printing | `cups.socket` enabled+active; `cups.service` inactive-until-triggered (correct) |
+| Log rotation | `logrotate.timer` enabled+active |
+| NIC | clean — zero ethtool/e1000e noise |
+| CachyOS repo | `#[cachyos]` commented out (opt-in, as shipped) |
+| Name leakage | **no Tier-1 leak** — `/etc/skel` and package-owned files clean; the only `/home/erik` hits are `.fehbg` + `/etc/passwd`, expected because this VM's user is literally named `erik` (the caveat case) |
+
+Benign noise only, all pre-existing VM/live artifacts (not regressions from this change): `vboxsf 'tag'` / `vbg err -78` kernel lines, `pktsetup sr0` + `alsactl card0 exit 19` udev workers, `gkr-pam` keyring, Calamares `chcon`/EFI-no-ESP/`autoLoginUser` install-log warnings. One `sddm-helper crashed (exit 1)` appeared at the **reboot boundary** (SIGTERM, reboot.target queued) — transient, the current session logged in fine.
+
+**Source state at test time:** `kiro-system-files` clean (matches deployed 26.06-15); `kiro-iso` only `M BUILD_TIMES.md` (internal build record, not a deploy gap); `kiro-calamares-config` clean.
+
+**Verdict:** `kiro-system-files 26.06-15` verified clean on VM. Note: `/etc/os-release` reads stock "Arch Linux" by design (Kiro builds on Arch, keeps the Arch identity/logo) — not a branding gap.
+
+---
+
 ## 2026-06-04 — Production ISO: three install modes (unencrypted / LUKS-ext4 / LUKS-btrfs) all PASS on VM
 
 Tested the new **production** `kiro-iso` across three VirtualBox guests in parallel, covering the disk-layout matrix Calamares offers. All three booted into the installed system and pass `kiro-audit` clean (0 WARN / 0 FAIL):

@@ -104,6 +104,7 @@ kernel="linux-cachyos linux-zen"   # space-separated kernel package(s); "ask" = 
 picker="auto"                 # auto | dialog | gum — picker UI for kernel="ask" (auto = dialog if installed, else gum)
 chaoticsrepo=true
 clean_pacman_cache="no"       # yes | no
+parallel_downloads="10"       # minimum pacman ParallelDownloads for the ISO install; only raised if shipped value is lower, never lowered
 remove_build_folder="no"      # yes | no — set to yes to clean up after build
 build_location="home"         # home | local — home = build in $HOME; local = build beside the cloned repo
 
@@ -299,6 +300,27 @@ prepare_build_tree() {
     remove_buildfolder yes
     mkdir -p "${buildFolder}"
     cp -r "${REPO_DIR}/archiso" "${buildFolder}/archiso"
+
+    # Pacman ParallelDownloads in the build-tree pacman.conf (the file mkarchiso
+    # uses for the airootfs install) is treated as a floor: raise it to
+    # ${parallel_downloads} only when the shipped value is lower or inactive —
+    # never lower a higher value. Edits only the build copy, never the repo file.
+    local btree_pacman="${buildFolder}/archiso/pacman.conf"
+    local current_pd
+    current_pd=$(grep -oP '^\s*ParallelDownloads\s*=\s*\K[0-9]+' "${btree_pacman}" | head -1)
+    if [[ -z "${current_pd}" ]]; then
+        if grep -qE '^\s*#\s*ParallelDownloads' "${btree_pacman}"; then
+            sed -i "s|^\s*#\s*ParallelDownloads.*|ParallelDownloads = ${parallel_downloads}|" "${btree_pacman}"
+        else
+            sed -i "/^\[options\]/a ParallelDownloads = ${parallel_downloads}" "${btree_pacman}"
+        fi
+        log_warn "ParallelDownloads was inactive in build-tree pacman.conf — enabling it at ${parallel_downloads}"
+    elif (( current_pd < parallel_downloads )); then
+        sed -i "s|^\s*ParallelDownloads.*|ParallelDownloads = ${parallel_downloads}|" "${btree_pacman}"
+        log_warn "Raising ParallelDownloads ${current_pd} -> ${parallel_downloads} in build-tree pacman.conf"
+    else
+        log_info "ParallelDownloads already ${current_pd} (>= ${parallel_downloads}) — leaving it unchanged"
+    fi
 
     log_section "Phase 4 — Refreshing skel and package list"
 

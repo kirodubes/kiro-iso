@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-06-06 — Stop publishing `.claude/` (including memory) to GitHub
+
+**What Changed**
+- `.gitignore` now ignores the whole **`.claude/`** folder (single blanket line), replacing the previous `.claude/*` + `!.claude/memory/` pattern. That old negation was deliberately re-including `.claude/memory/` and pushing it to the public repo.
+- Untracked the **6 `.claude/memory/*.md`** files that had been committed (`git rm -r --cached .claude`). The files remain on disk locally — only their tracking was removed.
+
+**Why**
+- This repo is public. The memory files are Claude working notes and feedback, not part of the ISO, and exposing the internal workflow online has no upside. The authoritative memory already lives at `~/.claude/projects/<slug>/memory/`, so syncing a copy into the repo added nothing. The end-session workflow that used to perform that sync has been retired.
+- Current-tree removal only; the files still exist in prior commit history, which is an accepted state — no history rewrite was performed.
+
+**Files Modified**
+- `.gitignore`
+- `.claude/memory/` (6 files untracked)
+
 ## 2026-06-06 — Drop root `build.sh` wrapper; build entry point is `build-scripts/build-the-iso.sh`
 
 **What Changed**

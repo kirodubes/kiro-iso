@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-06-06 — One-command build (`./build.sh`) + host-prep extracted to a sourced helper (mirrored from `-next`)
+
+**What Changed**
+- Added **`build.sh`** at the repo root as the single entry point for building the ISO — a thin, template-conformant wrapper that hands off to **`build-scripts/build-the-iso.sh`**, so the command is identical on every machine: **`./build.sh`**. A builder no longer needs to know the internal layout or `cd` into `build-scripts/`.
+- Extracted the host-preparation helpers (**`ensure_package`**, **`setup_chaotic`**, and the new **`setup_cachyos`**) out of `build-the-iso.sh` into a new **`build-scripts/host-prep.sh`**, which `build-the-iso.sh` now **sources**. `host-prep.sh` is a function-only library (no `main()`) with a load-once guard, keeping all "make the host ready to build" logic in one place.
+- Wired **`setup_cachyos`** into `main()` alongside `setup_chaotic`. It trusts the CachyOS signing key, enables the `[cachyos]` CDN77 geo-mirror in `/etc/pacman.conf` if absent, and installs `cachyos-keyring` + `cachyos-mirrorlist` — idempotently (already-configured hosts are detected and skipped).
+
+**Why**
+- The build pulls `linux-cachyos` (the default live kernel) from `[cachyos]`, and `prepopulate_keyring` runs `pacman-key --populate cachyos`; a host lacking the cachyos keyring/mirrorlist fails the build. Folding that prep into the sourced helper makes the build **self-contained on any Arch-based host** (Arch, Kiro, EndeavourOS, CachyOS, Garuda) with no manual setup.
+- This mirrors the change proven on **`kiro-iso-next`** (which produced today's working v26.06.06 build). The two ISO build pipelines stay structurally identical so a fix in one ports cleanly to the other. **Note:** `build.sh` and `host-prep.sh` are intentionally byte-identical across both repos for now — a future unified `kiro-iso-builder` is the place to collapse this duplication into a single source of truth.
+
+**Files Modified**
+- `build.sh` (new)
+- `build-scripts/host-prep.sh` (new)
+- `build-scripts/build-the-iso.sh`
+
 ## 2026-06-06 — v26.06.06 — risk-tier `packages.x86_64` reorg from `-next` + drop paid app
 
 **Release** — production ISO **`kiro-v26.06.06`** built and verified release-ready. Headline change: **`spotify` removed** — a paid streaming app has no place on the community ISO. `/kiro-ready` returned **GO** (5 repos clean+pushed, no P1 blockers, no iso↔iso-next drift, name-leakage 0 Tier-1/3) and a clean **full install** passed `kiro-audit` **134 / 0 / 0**, with the shipped `kiro-system-files 26.06-15` sysctl config verified byte-identical to source. See [DISTRO_TESTING.md](DISTRO_TESTING.md).

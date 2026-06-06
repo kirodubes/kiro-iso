@@ -110,6 +110,11 @@ isoLabel="kiro-${kiroVersion}-x86_64.iso"
 PACKAGES_FILE="${buildFolder}/archiso/packages.x86_64"
 
 #####################################################################
+# Host-preparation helpers (ensure_package, setup_chaotic, setup_cachyos)
+#####################################################################
+source "${SCRIPT_DIR}/host-prep.sh"
+
+#####################################################################
 # Functions
 #####################################################################
 apply_version_bump() {
@@ -226,34 +231,8 @@ remove_buildfolder() {
     fi
 }
 
-ensure_package() {
-    local pkg="$1"
-    if ! pacman -Qi "${pkg}" &>/dev/null; then
-        log_warn "${pkg} not installed — installing now"
-        sudo pacman -S --noconfirm "${pkg}"
-    fi
-    if ! pacman -Qi "${pkg}" &>/dev/null; then
-        log_error "${pkg} could not be installed — aborting"
-        exit 1
-    fi
-}
-
-setup_chaotic() {
-    [[ "${chaoticsrepo}" == "true" ]] || return 0
-
-    if pacman -Q chaotic-keyring &>/dev/null && pacman -Q chaotic-mirrorlist &>/dev/null; then
-        log_info "Chaotic keyring and mirrorlist are both installed"
-    else
-        local setup_script="${SCRIPT_DIR}/get-pacman-repos-keys-and-mirrors.sh"
-        if [[ -f "${setup_script}" ]]; then
-            log_warn "Installing chaotic-keyring and chaotic-mirrorlist"
-            bash "${setup_script}"
-        else
-            log_error "Setup script not found: ${setup_script}"
-            exit 1
-        fi
-    fi
-}
+# ensure_package, setup_chaotic and setup_cachyos now live in host-prep.sh
+# (sourced above) so all host-preparation logic stays in one place.
 
 show_overview() {
     log_section "Build overview"
@@ -628,6 +607,7 @@ main() {
     check_not_root
     warn_btrfs
     setup_chaotic
+    setup_cachyos
 
     apply_version_bump
     verify_version_sync

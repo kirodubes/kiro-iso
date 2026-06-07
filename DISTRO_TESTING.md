@@ -4,6 +4,38 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-07 — Production ISO (19:40 rebuild): encrypted + line-3 chwd + new mirror-refresh — 139 PASS / 0 / 0
+
+VM `Kiro-normal` (VirtualBox), installed from the **production `kiro-iso` 19:40 rebuild** (`ISO_BUILD` 19:40) carrying `kiro-calamares-config` **26.06-08**. That package (commit `97a2eb5`) newly brought the **entire chwd online mirror-refresh feature into production** (`_TRUSTED_MIRRORS` / `_ensure_cdn_first` / `_refresh_driver_mirrors` + greppable logging — 83-line add); the earlier 16:23 prod ISO / `26.06-07` had the nvidia fix but no mirror-refresh. The feature was first validated on `-next` (Kiro-E-jfs 390xx) and is here confirmed on production. Full-disk-encrypted layout, boot line 3 `driver=nonfreechwd`. One install exercised four things, all green:
+
+| Target | Result |
+|--------|--------|
+| nvidia removal (line 3) | open stack removed (`nvidia-open-dkms nvidia-settings nvidia-utils`); post-install only `linux-firmware-nvidia` |
+| mirrors update | `chwd: pacman -Sy … OK`; mirrorlists already CDN-led → left unchanged |
+| chwd | `--autoconfigure` ran on `vboxvideo` (VM profile), install completed |
+| encryption | 2× **LUKS2** — root `sda2`→ext4 + encrypted swap `sda3`; `aes-xts-plain64`/`argon2id`; `sd-encrypt` hook; `/crypto_keyfile.bin` 600 root:root; 2 active dm-crypt maps |
+| **kiro-audit** | **139 PASS / 0 WARN / 0 FAIL** |
+
+**New chwd logging validated** (`kiro-calamares-config-next`, this session) — the greppable block renders correctly in a real install:
+```
+chwd: ──────── mirror refresh ────────
+chwd: cachyos-mirrorlist unchanged (already CDN-led or absent)
+chwd: chaotic-mirrorlist unchanged (already CDN-led or absent)
+chwd: pacman -Sy … OK
+chwd: ─────────────────────────────────
+```
+The CDN-lead correctly reports `unchanged` because the ISO's mirrorlists already lead with the trusted CDN (baked by `host-prep.sh`), and `pacman -Sy … OK` shows the sync result. This is the production behaviour now (mirrored to `kiro-calamares-config` 26.06-08 via `97a2eb5`), validated here on a real install.
+
+**Bare-metal confirmation on the 19:40 / `26.06-08` release ISO** (picard + riker reinstalled from it, both Intel HD 630):
+| Box | Boot | nvidia outcome | kiro-audit |
+|-----|------|----------------|------------|
+| **picard** | line 1 `free` | open stack removed (chwd skipped); only `linux-firmware-nvidia` left | **136 PASS / 0 WARN / 0 FAIL** |
+| **riker** | line 2 `nonfree` | baked `nvidia-open-dkms/settings/utils` **kept** (chwd + removal both skipped — correct for nonfree) | **134 PASS / 1 WARN / 0 FAIL** |
+
+riker's single WARN is `nvidia-open-dkms installed but no NVIDIA GPU detected` — **expected/benign**: line 2 deliberately keeps the baked driver, and riker has only an Intel iGPU, so the audit correctly notes the driver is installed-but-unused (the mirror image of worf's line-3 `NVIDIA GPU present but nvidia-open-dkms not installed`). Together with the Kiro-normal encrypted line-3 install above, the 19:40 release ISO is now validated across **all three boot entries (free / nonfree / nonfreechwd) plus full-disk encryption**.
+
+---
+
 ## 2026-06-07 — Release check: fresh full install from `kiro-v26.06.07` ISO — 134 PASS / 0 / 0
 
 Ran `/kiro-ready` against the production `kiro-v26.06.07` ISO (built 16:29) and did a clean end-to-end install from the live medium into the `Kiro-normal` VirtualBox guest (UEFI/systemd-boot, unencrypted ext4 root). Installed-system `kiro-audit`: **134 PASS / 0 WARN / 0 FAIL** ("all checks passed") — same clean baseline as v26.06.06.

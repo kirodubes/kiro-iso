@@ -8,6 +8,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-06-07 19:48 | v26.06.07 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m26s | 6.1G | |
 | 2026-06-07 16:30 | v26.06.07 | linux-cachyos linux-zen | zstd L3 -b 1M | 7m29s | 6.1G | |
 | 2026-06-07 12:13 | v26.06.07 | linux-lts linux-zen | zstd L3 -b 1M | 6m52s | 5.5G | |
 | 2026-06-07 11:07 | v26.06.07 | linux-lts linux-zen | zstd L3 -b 1M | 7m2s | 5.5G | |
@@ -60,6 +61,8 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-06-07 21:00 | v26.06.07 | erik@192.168.1.14 | 3m16s | 2 | line 2 nonfree (nvidia kept), Intel HD630, v26.06.07 19:40/cfg26.06-08 release ISO |
+| 2026-06-07 20:47 | v26.06.07 | erik@192.168.1.9 | 3m30s | 2 | line 1 free, Intel HD630, v26.06.07 19:40/cfg26.06-08 release ISO |
 | 2026-06-01 07:45 | v26.06.01 | picard | 3m47s | 2 | bare-metal install |
 | 2026-06-01 07:27 | v26.06.01 | riker | 6m1s | 2 | riker reinstall test |
 | 2026-06-01 07:23 | v26.06.01 | worf | 5m53s | 2 | MEDION P7624, BIOS, nouveau |

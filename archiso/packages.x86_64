@@ -508,7 +508,6 @@ namcap
 pacmanlogviewer
 pacquery
 pamac-aur
-paru-git
 pkgfile
 python-pyparted
 python-pywal

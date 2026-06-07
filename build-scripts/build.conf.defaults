@@ -5,6 +5,10 @@
 # GUI, so the CLI and the GUI share one source of truth. Edit these by
 # hand or through the GUI — assignments only, no logic.
 #
+# This is the tracked CANONICAL copy. The live build.conf beside it is
+# gitignored: build-the-iso.sh and the GUI seed it from this file on
+# first use, so your local build tweaks never get committed/pushed.
+#
 # kiroVersion is NOT here: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it, so it stays in build-the-iso.sh.
 #####################################################################

@@ -103,9 +103,15 @@ kiroVersion='v26.06.07'
 # verify_version_sync greps it. build.conf is sourced right after it — the
 # derived paths below depend on build_location/kiroVersion — but it never
 # carries the version itself.
+# build.conf is the gitignored live working copy. Seed it from the tracked
+# canonical defaults on first use so local tweaks never get committed.
 if [[ ! -f "${SCRIPT_DIR}/build.conf" ]]; then
-    echo "FATAL: build.conf not found beside build-the-iso.sh (${SCRIPT_DIR}/build.conf)" >&2
-    exit 1
+    if [[ -f "${SCRIPT_DIR}/build.conf.defaults" ]]; then
+        cp "${SCRIPT_DIR}/build.conf.defaults" "${SCRIPT_DIR}/build.conf"
+    else
+        echo "FATAL: neither build.conf nor build.conf.defaults found beside build-the-iso.sh (${SCRIPT_DIR})" >&2
+        exit 1
+    fi
 fi
 source "${SCRIPT_DIR}/build.conf"
 

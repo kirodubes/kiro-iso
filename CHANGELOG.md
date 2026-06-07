@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-06-07 — Stop local build.conf tweaks leaking into the repo (gitignore + defaults)
+
+**What Changed**
+- The live `build-scripts/build.conf` is now **gitignored**; a tracked canonical **`build.conf.defaults`** holds the shipped values.
+- `build-the-iso.sh` seeds `build.conf` from `build.conf.defaults` on first use (replacing the old "FATAL: not found" exit).
+- `unmount-build.sh`'s pre-source `build_location` default changed `local` → `home` to match the canonical default when `build.conf` is briefly absent.
+
+**Why**
+- `build.conf` is both the *shipped default* and the *live working config* the CLI/GUI write during a build. That dual role meant a local test tweak (e.g. `kernel="linux-lts"`) got swept into `up.sh`'s `git add --all` and pushed to the public BYOI repo. Splitting the two — gitignored working copy seeded from a tracked default — makes that class of leak impossible by construction, no scrubbing logic needed. `up.sh` is untouched (its `git add --all` simply skips the ignored file).
+
+**Technical Details**
+- `build.conf` removed from tracking with `git rm --cached` (working copy kept). Cloners get `build.conf.defaults`; the CLI seeds on first build, the `kiro-iso-builder` GUI seeds at startup / after a clone.
+
+**Files Modified**
+- `.gitignore`, `build-scripts/build.conf.defaults` (new), `build-scripts/build.conf` (untracked), `build-scripts/build-the-iso.sh`, `build-scripts/unmount-build.sh`
+
+---
+
 ## 2026-06-07 — Fail-safe: unmount on interrupt, not just before the next build
 
 **What Changed**

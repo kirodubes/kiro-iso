@@ -1,2 +1,5 @@
 .codex/
 .claude/
+
+# Live build config — seeded from build.conf.defaults; never commit local tweaks
+build-scripts/build.conf

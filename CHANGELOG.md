@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-06-07 — Add `[cachyos]` to the host `pacman.conf` so the overwrite never drops it
+
+**What Changed**
+- Added a **`[cachyos]`** repo block to **`build-scripts/pacman.conf`**, using a direct CDN77 geo-mirror (`Server = https://cdn77.cachyos.org/repo/$arch/$repo`) rather than `Include = /etc/pacman.d/cachyos-mirrorlist`.
+
+**Why**
+- `build-scripts/pacman.conf` is the host-side reference that `get-pacman-repos-keys-and-mirrors.sh`'s `configure_pacman_conf()` copies **wholesale** over `/etc/pacman.conf` when setting up Chaotic-AUR. It had no `[cachyos]` block, so on a host that already had the cachyos keyring+mirrorlist installed (e.g. CachyOS, or a previously-built box) but not yet Chaotic, the overwrite **wiped the existing `[cachyos]`** — and `setup_cachyos` then early-returns (keyring already present) and never re-adds it, leaving the build with no cachyos repo for the `linux-cachyos` kernel. Carrying the block in the source file closes that gap; `setup_cachyos`'s `grep -q '^\[cachyos\]'` guard keeps the later append idempotent (it finds this block and skips, so no duplicate).
+- The direct **CDN77 server** (not `Include`) is deliberate: this host config can be written *before* `cachyos-mirrorlist` exists, so it must carry its own working server — exactly the block `setup_cachyos` would otherwise append. An `Include` would point at a missing file on a fresh host and make `pacman -Sy cachyos-mirrorlist` fail with no servers configured. The shipped ISO configs (`archiso/pacman.conf`, `archiso/airootfs/etc/pacman.conf`) keep `Include` because they only run after the mirrorlist package is guaranteed present.
+
+**Files Modified**
+- `build-scripts/pacman.conf`
+
 ## 2026-06-07 — Robust mirror setup: curated geo-CDN mirrorlists + host→curated fallback + an "all green" pre-build gate
 
 **What Changed**

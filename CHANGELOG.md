@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-06-07 — TIER 3 package selection: `apply_package_selection()` + overlay file
+
+**What Changed**
+- Added **`build-scripts/package-selection.conf`** (an exclude list, empty by default) and a new **`apply_package_selection()`** in `build-the-iso.sh` that comments out the listed TIER 3 packages in the build-tree copy of `packages.x86_64`, right after it is copied in.
+
+**Why**
+- Backs the new **Packages** screen in the `kiro-iso-builder` GUI: the user unticks optional apps, the GUI writes them here, and the build leaves them out — without ever editing the tracked `archiso/packages.x86_64` (it stays pristine, same overlay pattern as `build.conf`). Only TIER 3 (USER-CHANGEABLE) packages are eligible; TIER 1/2 are out of scope, so a selection can never break the build.
+
+**Technical Details**
+- The exclusion is a literal whole-line `awk` match (no regex-metachar pitfalls) that only ever prepends `#`, so it can drop an optional package but never add one, and can't touch kernel/nvidia lines (handled separately later). A missing or empty file ships the full TIER 3 set — fully backward compatible.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`, `build-scripts/package-selection.conf` (new)
+
+---
+
 ## 2026-06-07 — Extract kernel discovery into `list-kernels.sh`
 
 **What Changed**

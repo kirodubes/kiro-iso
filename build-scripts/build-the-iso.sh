@@ -365,6 +365,28 @@ prepare_build_tree() {
 
     echo "Refreshing packages.x86_64..."
     cp -f "${REPO_DIR}/archiso/packages.x86_64" "${PACKAGES_FILE}"
+    apply_package_selection
+}
+
+apply_package_selection() {
+    # Comment out the TIER 3 packages the kiro-iso-builder GUI marked for
+    # exclusion in build-scripts/package-selection.conf (one package per line).
+    # Literal whole-line match via awk — no regex metachar pitfalls — and it
+    # only ever prefixes '#', so it can never pull in a package, only drop an
+    # optional one. Missing/empty file = ship the full list (default).
+    local sel="${SCRIPT_DIR}/package-selection.conf"
+    [[ -f "${sel}" ]] || return 0
+    local tmp
+    tmp="$(mktemp)"
+    awk '
+        NR==FNR { line=$0; sub(/#.*/,"",line); gsub(/[ \t]/,"",line)
+                  if (line!="") excl[line]=1; next }
+        { key=$0; sub(/[ \t]+$/,"",key)
+          if (key in excl) print "#" $0; else print $0 }
+    ' "${sel}" "${PACKAGES_FILE}" > "${tmp}" && mv "${tmp}" "${PACKAGES_FILE}"
+    local n
+    n="$(grep -cvE '^[[:space:]]*(#|$)' "${sel}" || true)"
+    log_info "Package selection: applied ${sel##*/} (${n} TIER 3 package(s) excluded)"
 }
 
 prepopulate_keyring() {

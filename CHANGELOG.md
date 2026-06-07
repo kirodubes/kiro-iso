@@ -4,6 +4,25 @@
 
 ---
 
+## 2026-06-07 — Generalize `record-install-time.sh` for any Arch host / any user
+
+**What Changed**
+- Reworked **`record-install-time.sh`** so it no longer hardcodes a single developer's environment. Previously every SSH command was built around a literal `<user>`/`<pw>` password login with personal host shortcuts and a fixed port.
+- **Target syntax** is now generic: `vm` resolves to the VirtualBox NAT default (localhost, port `2022`); any other target is parsed as `[user@]host[:port]` (e.g. `<user>@<host>`, `<host>:2222`). The personal host shortcuts were dropped.
+- **Authentication** defaults to key/agent auth (plain `ssh`). Password auth is now opt-in through the new `--password` flag or the `KIRO_SSH_PASS` env var, with an early guard that aborts with a clear message if the `sshpass` package isn't installed.
+- **New flags** `--user`, `--port`, `--password`; user/port/password resolve highest-precedence-first: the `user@`/`:port` in the target or the flags → the `KIRO_SSH_USER` / `KIRO_SSH_PORT` / `KIRO_SSH_PASS` env vars → built-in defaults (`$USER`, port `22`/`2022`, key auth).
+- Rewrote the `--help` text and the file header to document the new target syntax and resolution order.
+
+**Why**
+- The goal is to let anyone build *and verify* a Kiro ISO on any Arch-based system. The install-timing helper was the one build-scripts file still wired to a specific machine, with a literal SSH password and personal hostnames committed to a public repo — both a usability blocker for other users and a privacy leak. Generalizing the target/auth resolution removes the hardcoded identity while keeping the maintainer's one-word workflow intact: exporting `KIRO_SSH_USER` + `KIRO_SSH_PASS` once restores the `record-install-time.sh vm` shorthand exactly as before.
+
+**Technical Details**
+- `resolve_ssh()` is now a pure command-builder: it parses the `vm` keyword or `[user@]host[:port]` string, then layers flag → env → default for each of user, port, and password, and emits either a key-auth or password-auth SSH command. The package-missing check lives in `main()` (not inside the `$(…)` command substitution) so it can `exit` cleanly.
+- Resolution verified across eight cases (vm key-auth, vm + env user/pass, `user@host`, `user@host:port`, bare host, `--user` override, `--password`, and target-user-beats-env precedence).
+
+**Files Modified**
+- `build-scripts/record-install-time.sh`
+
 ## 2026-06-06 — Remove the Btrfs warning + 10-second countdown from the build
 
 **What Changed**

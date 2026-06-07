@@ -15,10 +15,15 @@ set -euo pipefail
 #
 #   Why: closes the install-time tracking loop. ISO build times are
 #   auto-appended by build-the-iso.sh; install times needed a manual
-#   step until now. Run this after each test install on vm/picard/riker
-#   to keep the table populated with no kiro_final-side change required
+#   step until now. Run this after each test install on any target to
+#   keep the table populated with no kiro_final-side change required
 #   (Calamares.log already timestamps every line — that's the data
 #   source, no package rebuild needed).
+#
+#   Works on any Arch system: the target is given as `vm` (the
+#   VirtualBox NAT default) or `[user@]host[:port]`. SSH user, port and
+#   password resolve from the target/flags, then KIRO_SSH_USER /
+#   KIRO_SSH_PORT / KIRO_SSH_PASS env vars, then sensible defaults.
 #
 #####################################################################
 
@@ -71,15 +76,22 @@ record-install-time.sh — pull Calamares install timing from a target and
 log it to BUILD_TIMES.md.
 
 Usage:
-    bash record-install-time.sh <target> [--notes "free-text"] [--dry-run]
+    bash record-install-time.sh <target> [--user U] [--port P] [--password PW] [--notes "..."] [--dry-run]
 
-Targets (same resolution as /syscheck):
-    vm        → ssh -p 2022 erik@127.0.0.1 (VirtualBox NAT forward)
-    picard    → ssh erik@picard.local
-    riker     → ssh erik@riker.local
-    <host>    → ssh erik@<host>  (any other bare hostname)
+Target:
+    vm                  → 127.0.0.1 on port 2022 (VirtualBox NAT forward default)
+    [user@]host[:port]  → any reachable host (e.g. me@192.168.1.50, box.local:22)
+
+User / port / password resolve highest-precedence first:
+    1. the user@ / :port in the target, or the --user / --port / --password flags
+    2. the KIRO_SSH_USER / KIRO_SSH_PORT / KIRO_SSH_PASS environment variables
+    3. defaults: user=\$USER, port=22 (2022 for the 'vm' keyword), key/agent auth
 
 Options:
+    --user U       SSH user (default: \$USER or KIRO_SSH_USER).
+    --port P       SSH port (default: 22, or 2022 for 'vm').
+    --password PW  Use sshpass with this password instead of key/agent auth.
+                   Requires the 'sshpass' package. Prefer key auth where possible.
     --notes "..."  Free-text column for the table row (e.g. "post-fix",
                    "BIOS install", "with X tweak").
     --dry-run      Print the row that would be inserted, don't modify the file.
@@ -94,20 +106,39 @@ Idempotent? No — re-running prepends another row. Trim duplicates by hand.
 EOF
 }
 
+# Builds the SSH command for a target. Reads opt_user/opt_port/opt_pass set by
+# main, falling back to KIRO_SSH_* env vars and then built-in defaults.
 resolve_ssh() {
-    local target="$1" ssh_cmd
-    case "${target}" in
-        vm)
-            ssh_cmd="sshpass -p erik ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -p 2022 erik@127.0.0.1"
-            ;;
-        picard|riker)
-            ssh_cmd="sshpass -p erik ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 erik@${target}.local"
-            ;;
-        *)
-            ssh_cmd="sshpass -p erik ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 erik@${target}"
-            ;;
-    esac
-    echo "${ssh_cmd}"
+    local target="$1"
+    local t_user="" t_host="" t_port="" default_port=22
+
+    if [[ "${target}" == "vm" ]]; then
+        t_host="127.0.0.1"
+        default_port=2022
+    else
+        local raw="${target}"
+        if [[ "${raw}" == *@* ]]; then
+            t_user="${raw%%@*}"
+            raw="${raw#*@}"
+        fi
+        if [[ "${raw}" == *:* ]]; then
+            t_port="${raw##*:}"
+            raw="${raw%:*}"
+        fi
+        t_host="${raw}"
+    fi
+
+    local user port password
+    user="${t_user:-${opt_user:-${KIRO_SSH_USER:-$USER}}}"
+    port="${t_port:-${opt_port:-${KIRO_SSH_PORT:-$default_port}}}"
+    password="${opt_pass:-${KIRO_SSH_PASS:-}}"
+
+    local ssh_opts="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -p ${port}"
+    if [[ -n "${password}" ]]; then
+        echo "sshpass -p ${password} ssh ${ssh_opts} ${user}@${t_host}"
+    else
+        echo "ssh ${ssh_opts} ${user}@${t_host}"
+    fi
 }
 
 # Pulls four newline-separated fields from the target:
@@ -180,18 +211,29 @@ insert_row() {
 #####################################################################
 main() {
     local target="" notes="" dry_run=false
+    local opt_user="" opt_port="" opt_pass=""
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            -h|--help) show_help; exit 0 ;;
-            --notes)   notes="$2"; shift 2 ;;
-            --dry-run) dry_run=true; shift ;;
-            -*)        log_error "Unknown option: $1"; exit 1 ;;
-            *)         target="$1"; shift ;;
+            -h|--help)  show_help; exit 0 ;;
+            --user)     opt_user="$2"; shift 2 ;;
+            --port)     opt_port="$2"; shift 2 ;;
+            --password) opt_pass="$2"; shift 2 ;;
+            --notes)    notes="$2"; shift 2 ;;
+            --dry-run)  dry_run=true; shift ;;
+            -*)         log_error "Unknown option: $1"; exit 1 ;;
+            *)          target="$1"; shift ;;
         esac
     done
 
     if [[ -z "${target}" ]]; then
         log_error "Missing target argument. Use --help for usage."
+        exit 1
+    fi
+
+    # Password auth needs sshpass; fail early with a clear message if it's missing.
+    if [[ -n "${opt_pass:-${KIRO_SSH_PASS:-}}" ]] && ! command -v sshpass &>/dev/null; then
+        log_error "A password was supplied (--password or KIRO_SSH_PASS) but 'sshpass' is not installed.
+Install it (sudo pacman -S sshpass) or use key-based SSH auth instead."
         exit 1
     fi
 

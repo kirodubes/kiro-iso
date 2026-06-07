@@ -268,10 +268,43 @@ clean_cache() {
     fi
 }
 
+unmount_stale_build_mounts() {
+    # An interrupted mkarchiso leaves bind-mounts (dev/proc/sys/run/tmp/pts/shm/
+    # efivars) under the work dir. They block 'rm -rf', break the next build, and
+    # clutter the file manager. Lazily unmount anything still mounted under
+    # buildFolder — deepest path first — so the folder can be removed cleanly.
+    [[ -d "${buildFolder}" ]] || return 0
+    local target
+    while read -r target; do
+        [[ -n "${target}" ]] || continue
+        log_warn "Unmounting stale build mount: ${target}"
+        sudo umount -R -l "${target}" 2>/dev/null || sudo umount -l "${target}" 2>/dev/null || true
+    done < <(findmnt -rno TARGET 2>/dev/null \
+        | awk -v b="${buildFolder}" 'index($0, b"/") == 1 || $0 == b' | sort -r)
+}
+
+cleanup_on_interrupt() {
+    # Ctrl-C / kill leaves mkarchiso's bind-mounts live under the work dir,
+    # which can wedge the host. Unmount them before exiting so an interrupted
+    # build never leaves the system in a broken state.
+    echo
+    log_warn "Interrupted — unmounting stale build mounts before exit."
+    unmount_stale_build_mounts
+}
+# EXIT catches every exit path — signal, `set -e` failure, or normal end — and
+# is the real net: it's a no-op after a clean build (mkarchiso already unmounted,
+# so findmnt finds nothing) but always unmounts a half-finished one. The INT/TERM
+# traps add the log line and a correct exit code on top. Registered here, after
+# buildFolder is set, so the trap never references it unbound under `set -u`.
+trap unmount_stale_build_mounts EXIT
+trap 'cleanup_on_interrupt; exit 130' INT
+trap 'cleanup_on_interrupt; exit 143' TERM
+
 remove_buildfolder() {
     local action="${1:-no}"
     if [[ "${action}" == "yes" ]]; then
         if [[ -d "${buildFolder}" ]]; then
+            unmount_stale_build_mounts
             status_ok "Build folder present — proceeding to delete"
             log_warn "Deleting build folder: ${buildFolder}"
             sudo rm -rf "${buildFolder}"

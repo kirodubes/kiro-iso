@@ -4,6 +4,39 @@
 
 ---
 
+## 2026-06-07 — Fail-safe: unmount on interrupt, not just before the next build
+
+**What Changed**
+- `build-the-iso.sh` now unmounts on **any** early exit, not just before the next build. An **`EXIT`** trap (`unmount_stale_build_mounts`) is the real net — it fires on a signal-driven exit, a `set -e` build failure, or a normal end, and is a no-op after a clean build (mkarchiso already unmounted, so `findmnt` finds nothing). **`INT`/`TERM`** traps sit on top to add the log line + correct exit code (130/143), so a `Ctrl-C`/`kill` (CLI) or the GUI Stop button's `SIGTERM` cleans up immediately.
+- New standalone **`build-scripts/unmount-build.sh`** with two modes: `check` (read-only, lists stale mounts under the work dir, exit 1 if any — no root) and `clean` (unmounts them, run as root). It derives the work dir exactly like `build-the-iso.sh` (sources `build.conf`, `build_location` local/home, `PKEXEC_UID`-aware home resolution).
+
+**Why**
+- The existing `unmount_stale_build_mounts()` only ran at the **start of the next build**. An interrupted build therefore left mkarchiso's bind-mounts live in the meantime — enough to jam the file manager and, in one case, **freeze the host into a hard reboot**. Cleaning up *at interrupt time* closes that window. `unmount-build.sh` gives the `kiro-iso-builder` GUI (its Stop handler + a new pre-flight check) one shared, dependency-free way to detect and clear the same mounts.
+
+**Technical Details**
+- `unmount-build.sh` reuses the proven `findmnt`→`awk` literal-prefix filter (deepest-first) and `umount -R -l` loop. `check` mode stays exit-code-clean so the GUI can gate its polkit prompt on it. Off-template lean launcher (sibling of `host-prep-run.sh`); listed in `Kiro-HQ/TEMPLATE_EXCLUSIONS.md`.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`, `build-scripts/unmount-build.sh` (new)
+
+---
+
+## 2026-06-07 — Safety: unmount stale build mounts before `rm -rf` (prevents wiping host `/dev`)
+
+**What Changed**
+- Added **`unmount_stale_build_mounts()`** in `build-the-iso.sh`, called from `remove_buildfolder()` right before `sudo rm -rf "${buildFolder}"`. It lazily unmounts (deepest-first) anything still mounted under the build folder.
+
+**Why**
+- mkarchiso bind-mounts the host `/dev`, `/proc`, `/sys`, `/run`, etc. into the work-dir chroot. If a build is **interrupted** (e.g. the GUI is quit mid-build), those bind-mounts are left behind. The next build's `rm -rf "${buildFolder}"` would then **recurse into the bind-mounted `/dev` and delete the real host device nodes** (notably `/dev/null`), breaking the system's shell until reboot — and at minimum it blocked the rebuild with "device busy". Unmounting first makes every build self-heal from a prior interrupted run and removes the foot-gun entirely.
+
+**Technical Details**
+- Targets are found with `findmnt -rno TARGET` filtered to paths under `${buildFolder}` via `awk` (literal prefix match — no regex-metachar issues), sorted reverse so children unmount before parents. Uses `umount -R -l` (recursive, lazy) with a plain `umount -l` fallback; failures are tolerated.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`
+
+---
+
 ## 2026-06-07 — TIER 3 package selection: `apply_package_selection()` + overlay file
 
 **What Changed**

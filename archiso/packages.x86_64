@@ -319,6 +319,7 @@ vte4
 
 ###  SYSTEM TUNING / SERVICES
 ananicy-cpp
+archlinux-tools
 cachyos-ananicy-rules-git
 cronie
 firewall-config
@@ -491,7 +492,6 @@ resources
 
 ###  PACKAGE / SYSTEM TOOLS
 appstream
-archlinux-tools
 devtools
 downgrade
 expac

@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-06-07 — Extract build knobs into `build.conf`; add `host-prep-run.sh` dispatcher
+
+**What Changed**
+- Moved the user-editable configuration block out of **`build-scripts/build-the-iso.sh`** and into a new sourced file, **`build-scripts/build.conf`** (`desktop`, `bump_version`, `nvidia_driver`, `kernel`, `picker`, `chaoticsrepo`, `clean_pacman_cache`, `parallel_downloads`, `remove_build_folder`, `build_location`). `build-the-iso.sh` now `source`s it right after defining `kiroVersion`.
+- Added **`build-scripts/host-prep-run.sh`** — a thin dispatcher that supplies lightweight `log_*` shims, sources `build.conf` and `host-prep.sh`, then runs one named host-prep function (e.g. `host-prep-run.sh setup_cachyos`).
+
+**Why**
+- These changes back the new **`kiro-iso-builder`** GTK4 GUI. `build.conf` is the single source of truth both the CLI and the GUI read and write, so the GUI never has to sed-edit a live script. The dispatcher lets the GUI run a single idempotent fix (`ensure_package` / `setup_chaotic` / `setup_cachyos`) in isolation under `pkexec` — `host-prep.sh` itself requires a caller that provides the `log_*` helpers, which this wrapper does.
+
+**Technical Details**
+- `kiroVersion` deliberately **stays** in `build-the-iso.sh`: `apply_version_bump` (Phase 2) seds it and `verify_version_sync` greps it. `build.conf` never carries the version. The derived paths (`build_location` branch, `isoLabel`, `PACKAGES_FILE`) still sit below the `source` line, unchanged, since `REPO_DIR` is defined far earlier (line 13).
+- `host-prep-run.sh` is intentionally off-template (no banner colours / `on_error` trap / `main()`): it is a sourced-fragment launcher whose only job is to provide the minimal environment `host-prep.sh` needs.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`, `build-scripts/build.conf` (new), `build-scripts/host-prep-run.sh` (new), `CLAUDE.md`
+
+---
+
 ## 2026-06-07 — Add `[cachyos]` to the host `pacman.conf` so the overwrite never drops it
 
 **What Changed**

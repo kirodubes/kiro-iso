@@ -41,11 +41,15 @@ cd build-scripts && ./build-the-iso.sh
 | `archiso/profiledef.sh`          | `iso_label=` and `iso_version=` |
 | `build-scripts/build-the-iso.sh` | `kiroVersion=`                  |
 
-For a same-day rebuild that keeps the currently-pinned version, set `bump_version="no"` in the config block of `build-the-iso.sh`.
+For a same-day rebuild that keeps the currently-pinned version, set `bump_version="no"` in **`build-scripts/build.conf`** (the sourced user-config file — see below).
+
+## Build Config — `build.conf`
+
+The user-editable build knobs (`bump_version`, `nvidia_driver`, `kernel`, `picker`, `chaoticsrepo`, `clean_pacman_cache`, `parallel_downloads`, `remove_build_folder`, `build_location`, `desktop`) live in **`build-scripts/build.conf`**, which `build-the-iso.sh` sources. This is the single source of truth the `kiro-iso-builder` GUI reads and writes too. Edit them there — not in `build-the-iso.sh`. `kiroVersion` is the one exception: it stays in `build-the-iso.sh` because `apply_version_bump` seds it and `verify_version_sync` greps it.
 
 ## Nvidia Driver Selection
 
-In `build-scripts/build-the-iso.sh`, set the `nvidia_driver` variable in the **config block at the top of the file** before building:
+In **`build-scripts/build.conf`**, set the `nvidia_driver` variable before building:
 
 - `open` — nvidia-open-dkms (default, modern GPUs)
 - `580xx` — nvidia-580xx-dkms (legacy)

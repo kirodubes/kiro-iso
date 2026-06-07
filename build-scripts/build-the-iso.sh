@@ -92,21 +92,22 @@ on_error() {
 trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 
 #####################################################################
-# Build configuration — edit these before building
+# Build configuration
+#   User-editable knobs live in build.conf (sourced below) so the CLI
+#   and the kiro-iso-builder GUI share one source of truth. Edit them
+#   there, or through the GUI — not here.
 #####################################################################
-desktop="xfce4/ohmychadwm"
 kiroVersion='v26.06.07'
 
-bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
-nvidia_driver="open"          # open | 580xx | 390xx
-kernel="linux-cachyos linux-zen"   # space-separated kernel package(s); "ask" = interactive menu. First = the kernel the live ISO boots.
-
-picker="auto"                 # auto | dialog | gum — picker UI for kernel="ask" (auto = dialog if installed, else gum)
-chaoticsrepo=true
-clean_pacman_cache="no"       # yes | no
-parallel_downloads="10"       # minimum pacman ParallelDownloads for the ISO install; only raised if shipped value is lower, never lowered
-remove_build_folder="no"      # yes | no — set to yes to clean up after build
-build_location="home"         # home | local — home = build in $HOME; local = build beside the cloned repo
+# kiroVersion stays in THIS file: apply_version_bump (Phase 2) seds it and
+# verify_version_sync greps it. build.conf is sourced right after it — the
+# derived paths below depend on build_location/kiroVersion — but it never
+# carries the version itself.
+if [[ ! -f "${SCRIPT_DIR}/build.conf" ]]; then
+    echo "FATAL: build.conf not found beside build-the-iso.sh (${SCRIPT_DIR}/build.conf)" >&2
+    exit 1
+fi
+source "${SCRIPT_DIR}/build.conf"
 
 if [[ "${build_location}" == "local" ]]; then
     # Build/out folders sit next to the clone (one level above the repo) so the

@@ -418,37 +418,17 @@ inject_nvidia_packages() {
 # build-tree copies to whatever the user picks. Pairs with the calamares
 # kiro_kernel module, which installs whatever kernel(s) the ISO ships.
 #####################################################################
-KERNEL_CANDIDATES=(linux linux-lts linux-zen linux-hardened linux-rt linux-rt-lts linux-mainline)
 CANONICAL_KERNEL="linux-cachyos"   # the kernel token the repo's archiso tree ships by default
 AVAILABLE_KERNELS=()
 SELECTED_KERNELS=()
 PRIMARY_KERNEL=""
 
+# Kernel discovery lives in list-kernels.sh (shared with the kiro-iso-builder
+# GUI's "Detect" button) so the CLI and GUI always agree on what is offerable.
+# It prints the kernels that have a matching -headers package, one per line —
+# the same "only real kernels, no false positives" filter that used to live here.
 detect_available_kernels() {
-    AVAILABLE_KERNELS=()
-    local k
-    for k in "${KERNEL_CANDIDATES[@]}"; do
-        # Only offer a kernel if both it and its -headers exist in the enabled repos
-        # (-headers is required for the DKMS NVIDIA drivers to build).
-        if pacman -Si "${k}" &>/dev/null && pacman -Si "${k}-headers" &>/dev/null; then
-            AVAILABLE_KERNELS+=("${k}")
-        fi
-    done
-
-    # Plus every flavor of the multi-variant families the repos offer — CachyOS,
-    # XanMod, and the pinned-LTS series — discovered dynamically so the list never
-    # goes stale as new flavors land. The "<name>-headers exists" test filters out
-    # non-kernel companion packages (zfs, nvidia, etc.). We deliberately do NOT
-    # match the CPU-microarch builds (linux-x64v*, linux-znver*) or niche kernels
-    # (cjktty, nitrous, tachyon, vfio): low demand, and the microarch ones silently
-    # fail to boot on the wrong CPU level — a bad default for a general ISO.
-    local c
-    while IFS= read -r c; do
-        [[ -z "${c}" || "${c}" == *-headers ]] && continue
-        pacman -Si "${c}-headers" &>/dev/null || continue
-        [[ " ${AVAILABLE_KERNELS[*]} " == *" ${c} "* ]] && continue
-        AVAILABLE_KERNELS+=("${c}")
-    done < <(pacman -Slq 2>/dev/null | grep -E '^(linux-cachyos|linux-xanmod|linux-lts[0-9])' || true)
+    mapfile -t AVAILABLE_KERNELS < <(bash "${SCRIPT_DIR}/list-kernels.sh")
 }
 
 select_kernels() {

@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-06-07 — Extract kernel discovery into `list-kernels.sh`
+
+**What Changed**
+- Moved the kernel-detection logic out of `build-the-iso.sh`'s `detect_available_kernels()` into a new standalone script, **`build-scripts/list-kernels.sh`**, which prints the offerable kernels (one per line) to stdout. `detect_available_kernels()` now just `mapfile`s that output.
+
+**Why**
+- Single source of truth shared with the `kiro-iso-builder` GUI: its **Detect available kernels** button runs the exact same script, so the CLI and GUI can never disagree on which kernels are offerable. The filter is unchanged — a kernel qualifies only if both `<k>` and `<k>-headers` exist (the `-headers` test rejects companion packages like `zfs`/`nvidia` and guarantees the DKMS drivers can build), and CPU-microarch/niche kernels stay excluded.
+
+**Technical Details**
+- `list-kernels.sh` is intentionally off-template: stdout must stay machine-readable (kernel names only, no log/colour banners). Read-only — `pacman -Si`/`-Slq` against the synced DBs, never root.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`, `build-scripts/list-kernels.sh` (new)
+
+---
+
 ## 2026-06-07 — Extract build knobs into `build.conf`; add `host-prep-run.sh` dispatcher
 
 **What Changed**

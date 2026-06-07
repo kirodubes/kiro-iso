@@ -503,7 +503,6 @@ pacquery
 pamac-aur
 paru-git
 pkgfile
-python-pylint
 python-pyparted
 python-pywal
 rate-mirrors

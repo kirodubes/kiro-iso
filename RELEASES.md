@@ -1,9 +1,17 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Five ISOs shipped in June (`.01 .02 .04 .05 .06`). For each: why it was worth a new ISO,
+Six ISOs shipped in June (`.01 .02 .04 .05 .06 .07`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.06 — June 6 (current)
+## v26.06.07 — June 7 (current)
+**Why a new ISO:** you can now build and customize **your own** Kiro ISO — the `kiro-iso-builder` GUI ships on the medium, backed by a beginner-friendly "Build Your Own ISO" guide — and installs are faster and more reliable worldwide thanks to geo-routed CDN mirrors.
+- **Build your own ISO, from a GUI:** `kiro-iso-builder` (GTK4) is on the ISO — pick the kernel, choose the NVIDIA driver, and untick optional apps, then build a personalized Kiro ISO without hand-editing a single file. The new `build-scripts/BYOI.md` walks a first-timer through it end to end (one folder of settings → a bootable `.iso`).
+- **Faster, more reliable installs everywhere:** the shipped mirrorlist drops from **605 worldwide servers to 4 geo-routed CDN mirrors** (plus a curated Chaotic-AUR list), so package downloads during install no longer crawl on a long tail of dead/slow mirrors — fast anywhere on earth with no per-location tuning.
+- **Slim it down after install, too:** the shipped **Arch Linux Tweak Tool** gains a new **Streamline** page — remove the optional apps that came on the ISO, grouped by category, with save/import selection profiles.
+- **Pro-audio ready:** `pipewire-jack` serves the JACK API through PipeWire (no separate daemon), so JACK applications work out of the box.
+- **Packages:** + `kiro-iso-builder`, + `pipewire-jack`, + `7zip` (replaces deprecated `p7zip`); − `python-pylint`.
+
+## v26.06.06 — June 6
 **Why a new ISO:** drops a paid app and gives the package list a clear, tiered structure — so the ISO is easy to read, fork and rebuild (the groundwork for the upcoming "build your own ISO" guide).
 - **No paid apps pre-installed:** **Spotify removed** — a paid streaming service doesn't belong pre-loaded on a community ISO.
 - **Keybindings cheatsheet on board:** `kiro-keybindings` is now an explicit package on the list — the auto-detecting, searchable shortcut reference (Super+K) for the desktop and tiling managers.

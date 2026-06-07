@@ -4,6 +4,38 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-07 — Release check: fresh full install from `kiro-v26.06.07` ISO — 134 PASS / 0 / 0
+
+Ran `/kiro-ready` against the production `kiro-v26.06.07` ISO (built 16:29) and did a clean end-to-end install from the live medium into the `Kiro-normal` VirtualBox guest (UEFI/systemd-boot, unencrypted ext4 root). Installed-system `kiro-audit`: **134 PASS / 0 WARN / 0 FAIL** ("all checks passed") — same clean baseline as v26.06.06.
+
+| Stage | Result |
+|-------|--------|
+| **Live-ISO** boot | clean (hostname `kiro`, `liveuser`) |
+| **Installed** kiro-audit | **134 PASS / 0 WARN / 0 FAIL** |
+| NVIDIA removal on non-NVIDIA HW | driver stack absent post-install (only `linux-firmware-nvidia` firmware remains); `kiro_remove_nvidia` ran, install completed |
+
+**Honest scope note on today's `kiro_remove_nvidia` fix (`kiro-calamares-config@41d9388`):** this install does **NOT** exercise the fix. The normal ISO bakes in the **open** stack under its real package names (`nvidia-open-dkms` / `nvidia-utils` / `nvidia-settings`, `nvidia_driver=open`). On that ISO the old hardcoded-name code and the new discovery code behave identically — both find the three real names and remove them. The bug the fix addresses only triggers on a **390xx/580xx** ISO, where `nvidia-utils` is a *provide* (`nvidia-390xx-utils`) that `pacman -Q` matches but `pacman -Rns` does not. No 390xx/580xx ISO was built or shipped today (`kiro-Out/` holds only `kiro-v26.06.07-x86_64.iso`), so the fix's actual target path remains **untested** — but it is not in this release. The fix lives in the `kiro-calamares-config` *package*, not the `kiro-iso` repo; when a 390xx/580xx ISO is next built, confirm the package carrying `41d9388` is baked in and test that install path then.
+
+**Other `/kiro-ready` gates:** 5 repos' committed code pushed (only doc/internal files uncommitted — `kiro-iso` BUILD_TIMES.md/RELEASES.md, `kiro-iso-next` CHANGELOG.md); no §1/§3 P1 TODO blockers; iso↔iso-next drift all intentional variant pairs (calamares/-next, config/-next, plymouth/-nemesis); production ISO (16:29) postdates latest non-doc commit (15:06); name-leakage scan **0 Tier-1 / 0 Tier-3** (only Tier-2/4 maintainer-script + doc hygiene); CHANGELOG documents the day's changes.
+
+**Bare-metal confirmation — picard (real Intel HD 630, boot line 1 `driver=free`):** clean install from the same `v26.06.07` ISO (`ISO_BUILD` 16:23). `kiro-audit` **135 PASS / 0 WARN / 0 FAIL**. `Calamares.log` shows `kiro_remove_nvidia` running the **new** discovery code: `"Removing NVIDIA packages: nvidia-open-dkms nvidia-settings nvidia-utils"` → `pacman -Rns --noconfirm` removed the open stack in one transaction (~1 GB; dkms removed for both `7.0.11-1-cachyos` and `7.0.11-zen1-1-zen`). Post-install only `linux-firmware-nvidia` remains. Confirms the fixed module runs correctly on metal — but the open stack uses *real* names, so this still does not exercise the 390xx/580xx provide-resolution path.
+
+**Bare-metal confirmation — riker (real Intel HD 630, boot line 1 `driver=free`):** same `v26.06.07` ISO, identical result — `kiro-audit` **135 PASS / 0 WARN / 0 FAIL**; `Calamares.log` shows `driver=free` → `"Removing NVIDIA packages: nvidia-open-dkms nvidia-settings nvidia-utils"` then `"Skipping chwd because 'driver=free'"`. Two independent metal boxes (picard + riker) now confirm the production open ISO.
+
+**Bare-metal — worf (real NVIDIA Fermi GT 620M + Intel iGPU, boot line 3 `driver=nonfreechwd`):** installed from the **production open** `v26.06.07` ISO (confirmed: `390xx` appears **0×** in `Calamares.log`; baked stack removed was `nvidia-open-dkms nvidia-settings nvidia-utils`). `kiro_remove_nvidia` removed the open stack, then chwd ran and routed the Fermi card to **nouveau** (`> Successfully installed intel`; active `i915` + `nouveau`). `kiro-audit` **133 PASS / 2 WARN / 0 FAIL** — the 2 WARN (`NVIDIA GPU present but nvidia-open-dkms not installed`, `nvidia-utils not installed`) are **expected/benign** for a legacy-NVIDIA-on-nouveau box (open driver intentionally removed; Fermi can't use it). This validates the **line-3 nonfreechwd path + chwd nouveau routing on real NVIDIA hardware** — but it is the open stack under real names, so it still does **not** exercise the 390xx/580xx provide-resolution path. **Audit-refinement TODO:** kiro-audit should treat nouveau-on-legacy-NVIDIA as valid instead of warning.
+
+**★ 390xx provide-resolution fix — PROVEN (the decisive test).** VM `Kiro-E-jfs`, installed from the **`kiro-next-v26.06.07`** ISO (`nvidia_driver=390xx`, `ISO_BUILD` 17:42), boot line 3 `driver=nonfreechwd`. `Calamares.log` shows `kiro_remove_nvidia` discovered the baked **390xx** stack by real name and removed it in one transaction:
+```
+"Removing NVIDIA packages: nvidia-390xx-dkms nvidia-390xx-settings nvidia-390xx-utils"
+.. Running ("pacman","-Rns","--noconfirm","nvidia-390xx-dkms","nvidia-390xx-settings","nvidia-390xx-utils")
+nvidia-390xx-dkms 390.157-21  -27.19 MiB ; nvidia-390xx-utils -106.63 MiB ; nvidia-390xx-settings -1.51 MiB  → removed
+```
+**Install completed** (`kiro_final` ran, no abort); post-install only `linux-firmware-nvidia` remains; **`kiro-audit` 134 PASS / 0 WARN / 0 FAIL**. This is exactly the case the old hardcoded code broke: `pacman -Q nvidia-utils` resolved the provide (`nvidia-390xx-utils`) but `pacman -Rns nvidia-utils` could not → `target not found` → `nvidia-remove-failed` → **install aborted**. The fix (`installed_nvidia_stack()` via `pacman -Qq`, removing real variant names) resolves it — confirmed end-to-end on a real 390xx install. (`kiro-calamares-config@41d9388` / `-next@a7bcd09`.) **580xx** variant is the analogous path (same code, same provide mechanism); validate similarly when a 580xx ISO is installed.
+
+**Verdict:** production `v26.06.07` (normal/open ISO) verified release-ready by full install (VM + picard + riker metal + worf metal/line-3). Today's `kiro_remove_nvidia` install-blocking fix is **PROVEN** on the 390xx provide-resolution path (Kiro-E-jfs) — install no longer aborts on 390xx/580xx ISOs; the staleness gate for `41d9388` is cleared by this logged test. 580xx pending the same check.
+
+---
+
 ## 2026-06-06 — Release GO: fresh full install from `kiro-v26.06.06` ISO — 134 PASS / 0 / 0
 
 Ran `/kiro-ready` against the production `kiro-v26.06.06` ISO and did a clean end-to-end install from the live medium into a VirtualBox guest (UEFI/systemd-boot, unencrypted ext4 root). All release gates green → **GO, "you are ready to release."**

@@ -100,3 +100,162 @@ EOF_CACHYOS
 
     log_success "cachyos-keyring and cachyos-mirrorlist installed"
 }
+
+#####################################################################
+# Repository mirror health + fallback
+#
+# Two layers, two policies:
+#   * BUILD HOST  — prefer the user's own pacman mirrors (their PC's
+#     settings); if every one of them is unreachable, fall back to our
+#     curated geo-CDN set so the build still completes on a broken host.
+#   * SHIPPED ISO — always ships the curated geo-CDN mirrorlists committed
+#     under archiso/airootfs/etc/pacman.d/ (handled at the file level, not
+#     here). This function only guards the build host.
+# nemesis_repo / kiro_repo are single GitHub-Pages servers — our own infra,
+# nothing to fall back to, so they are probed for reporting only.
+#####################################################################
+
+# Curated, geo-routed CDN mirrors — fast and complete worldwide. Kept as
+# literal '$repo'/'$arch' templates; _probe_mirror substitutes them.
+KIRO_CURATED_ARCH_MIRRORS=(
+    'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch'
+    'Server = https://fastly.mirror.pkgbuild.com/$repo/os/$arch'
+    'Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch'
+    'Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch'
+)
+KIRO_CURATED_CHAOTIC_MIRRORS=(
+    'Server = https://geo-mirror.chaotic.cx/$repo/$arch'
+    'Server = https://cdn-mirror.chaotic.cx/$repo/$arch'
+)
+
+# _probe_mirror <server-template> <repo> [arch]
+# Substitutes $repo/$arch into the template and HEAD-checks the repo's .db.
+# Returns 0 if reachable. The template may be a bare URL or a "Server = URL".
+_probe_mirror() {
+    local tmpl="${1#Server = }" repo="$2" arch="${3:-x86_64}"
+    local url="${tmpl//\$repo/${repo}}"
+    url="${url//\$arch/${arch}}"
+    url="${url%/}/${repo}.db"
+    wget -q --spider --timeout=8 --tries=1 "${url}"
+}
+
+# _write_curated_list <file> <header> <mirror-array-name>
+_write_curated_list() {
+    local file="$1" header="$2" arrname="$3"
+    local -n arr="${arrname}"
+    [[ -f "${file}" && ! -f "${file}.kiro-bak" ]] && sudo cp "${file}" "${file}.kiro-bak"
+    {
+        printf '##\n## %s\n## Installed by build-the-iso.sh because the host mirrors were unreachable.\n## Original (if any) saved alongside as %s.kiro-bak\n##\n\n' \
+            "${header}" "$(basename "${file}")"
+        printf '%s\n' "${arr[@]}"
+    } | sudo tee "${file}" >/dev/null
+}
+
+# ensure_arch_mirrors — must run BEFORE the host `pacman -Sy`, since mkarchiso
+# and every host-side pacman call resolve [core]/[extra] against this file.
+ensure_arch_mirrors() {
+    local ml="/etc/pacman.d/mirrorlist"
+    log_info "Checking host Arch mirrors (the user's PC settings)"
+
+    local active=()
+    mapfile -t active < <(grep -oP '^\s*Server\s*=\s*\K\S+' "${ml}" 2>/dev/null || true)
+
+    local tmpl
+    for tmpl in "${active[@]:0:5}"; do
+        if _probe_mirror "${tmpl}" core; then
+            status_ok "Host Arch mirrors reachable — using the user's PC mirrorlist"
+            return 0
+        fi
+    done
+
+    log_warn "Host Arch mirrors unreachable or empty — falling back to Kiro curated geo-CDN mirrors"
+    _write_curated_list "${ml}" "Kiro curated Arch mirrors" KIRO_CURATED_ARCH_MIRRORS
+    status_ok "Curated Arch mirrors written to ${ml} (backup: ${ml}.kiro-bak)"
+}
+
+# ensure_chaotic_mirrors — run AFTER setup_chaotic (which creates the file).
+ensure_chaotic_mirrors() {
+    [[ "${chaoticsrepo}" == "true" ]] || return 0
+    local ml="/etc/pacman.d/chaotic-mirrorlist"
+    log_info "Checking host Chaotic-AUR mirrors"
+
+    local active=()
+    mapfile -t active < <(grep -oP '^\s*Server\s*=\s*\K\S+' "${ml}" 2>/dev/null || true)
+
+    local tmpl
+    for tmpl in "${active[@]:0:5}"; do
+        if _probe_mirror "${tmpl}" chaotic-aur; then
+            status_ok "Host Chaotic-AUR mirrors reachable — using the user's PC mirrorlist"
+            return 0
+        fi
+    done
+
+    log_warn "Host Chaotic-AUR mirrors unreachable or empty — falling back to Kiro curated CDN mirrors"
+    _write_curated_list "${ml}" "Kiro curated Chaotic-AUR mirrors" KIRO_CURATED_CHAOTIC_MIRRORS
+    status_ok "Curated Chaotic-AUR mirrors written to ${ml} (backup: ${ml}.kiro-bak)"
+}
+
+# mirror_health_report — the "all green" gate before the long mkarchiso run.
+# Probes one representative server per repo for both the BUILD layer (host
+# mirrors the build pulls from) and the SHIP layer (curated mirrors the ISO
+# carries). Aborts if any REQUIRED repo (Arch, chaotic) is fully unreachable;
+# nemesis/kiro are our own single-server CDNs, so a miss there is a warning.
+mirror_health_report() {
+    log_section "Mirror health check — all repos must be green before building"
+
+    local fail=0 warn=0
+
+    # Build layer — the host mirrorlists mkarchiso actually pulls from.
+    local first_arch first_chaotic
+    first_arch=$(grep -oP '^\s*Server\s*=\s*\K\S+' /etc/pacman.d/mirrorlist 2>/dev/null | head -1)
+    if [[ -n "${first_arch}" ]] && _probe_mirror "${first_arch}" core; then
+        status_ok "Arch  (build/host)   : ${first_arch}"
+    else
+        status_nok "Arch  (build/host)   : ${first_arch:-<none>}"; fail=1
+    fi
+
+    if [[ "${chaoticsrepo}" == "true" ]]; then
+        first_chaotic=$(grep -oP '^\s*Server\s*=\s*\K\S+' /etc/pacman.d/chaotic-mirrorlist 2>/dev/null | head -1)
+        if [[ -n "${first_chaotic}" ]] && _probe_mirror "${first_chaotic}" chaotic-aur; then
+            status_ok "Chaotic (build/host) : ${first_chaotic}"
+        else
+            status_nok "Chaotic (build/host) : ${first_chaotic:-<none>}"; fail=1
+        fi
+    fi
+
+    # Ship layer — the curated mirrors baked into the ISO (sanity-check the
+    # default we ship is actually alive, so we never ship a dead mirrorlist).
+    local m
+    for m in "${KIRO_CURATED_ARCH_MIRRORS[@]}"; do
+        if _probe_mirror "${m}" core; then status_ok "Arch  (shipped curated): ${m#Server = }"; break; fi
+    done
+    if [[ "${chaoticsrepo}" == "true" ]]; then
+        for m in "${KIRO_CURATED_CHAOTIC_MIRRORS[@]}"; do
+            if _probe_mirror "${m}" chaotic-aur; then status_ok "Chaotic (shipped)    : ${m#Server = }"; break; fi
+        done
+    fi
+
+    # Kiro's own single-server repos — warn-only (build-time reachability does
+    # not guarantee install-time, and a GH-Pages blip shouldn't block a build).
+    if _probe_mirror 'Server = https://erikdubois.github.io/$repo/$arch' nemesis_repo; then
+        status_ok "nemesis_repo         : https://erikdubois.github.io"
+    else
+        status_nok "nemesis_repo         : https://erikdubois.github.io (warn)"; warn=1
+    fi
+    if _probe_mirror 'Server = https://kirodubes.github.io/$repo/$arch' kiro_repo; then
+        status_ok "kiro_repo            : https://kirodubes.github.io"
+    else
+        status_nok "kiro_repo            : https://kirodubes.github.io (warn)"; warn=1
+    fi
+
+    if (( fail )); then
+        log_error "A required repository (Arch or Chaotic-AUR) is unreachable — aborting before the build.
+Check your connection and re-run; the host->curated fallback already tried our mirrors."
+        exit 1
+    fi
+    if (( warn )); then
+        log_warn "All required repos green; one or more Kiro CDNs missed (warn-only). Continuing."
+    else
+        log_success "All repositories green"
+    fi
+}

@@ -95,7 +95,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Build configuration — edit these before building
 #####################################################################
 desktop="xfce4/ohmychadwm"
-kiroVersion='v26.06.06'
+kiroVersion='v26.06.07'
 
 bump_version="yes"            # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
 nvidia_driver="open"          # open | 580xx | 390xx
@@ -170,7 +170,7 @@ apply_version_bump() {
 verify_version_sync() {
     # Confirms dev-rel, profiledef.sh and build-the-iso.sh all carry ${kiroVersion}.
     # Matters most for bump_version=no rebuilds, where drift silently survives.
-    log_section "Phase 2b — Verifying version files are in sync"
+    log_section "Phase 3 — Verifying version files are in sync"
 
     local devrel="${REPO_DIR}/archiso/airootfs/etc/dev-rel"
     local profiledef="${REPO_DIR}/archiso/profiledef.sh"
@@ -211,7 +211,7 @@ check_not_root() {
 preflight_checks() {
     # Fail fast before the long mkarchiso run: not enough disk, or no network,
     # both surface here with a clear message instead of dying mid-build.
-    log_section "Phase 0 — Preflight checks (disk space + connectivity)"
+    log_section "Phase 1 — Preflight checks (disk space + connectivity)"
 
     # Disk space — buildFolder and outFolder may live on different filesystems,
     # so check whichever has the least free space against the minimum the build needs.
@@ -243,6 +243,12 @@ packages and fetch the latest .bashrc. Check your network and re-run."
             exit 1
         fi
     done
+
+    # Arch mirror fallback must run BEFORE `pacman -Sy`: the sync below (and
+    # every later host-side pacman call, plus mkarchiso) pulls [core]/[extra]
+    # through the host mirrorlist. Prefer the user's PC mirrors; if they're all
+    # down, swap in our curated geo-CDN set so the build still completes.
+    ensure_arch_mirrors
 
     # Refresh pacman sync databases before any repo-dependent step. On a fresh
     # host (e.g. a just-installed CachyOS) the sync DBs may not be populated yet,
@@ -288,8 +294,37 @@ show_overview() {
     echo "  Out folder   : ${outFolder}"
 }
 
+refresh_skel_bashrc() {
+    # Maintainer-only: on the build host, refresh skel's .bashrc from the local
+    # kiro-shells checkout so the ISO always ships the current shell. No-op (and
+    # no phase number) everywhere else.
+    [[ "${HOSTNAME}" == "hq" ]] || return 0
+
+    log_section "Refreshing skel .bashrc from kiro-shells (maintainer host only)"
+    local skel_dir="${REPO_DIR}/archiso/airootfs/etc/skel"
+    local skel_bashrc="${skel_dir}/.bashrc"
+    local skel_bashrc_latest="${skel_dir}/.bashrc-latest"
+    local edu_bashrc_latest="${HOME}/KIRO/kiro-shells/etc/skel/.bashrc-latest"
+    # Pull the latest .bashrc-latest in, drop the old .bashrc, then promote the
+    # fresh copy into its place so skel always ships the current kiro-shells .bashrc.
+    if [[ -f "${edu_bashrc_latest}" ]]; then
+        cp "${edu_bashrc_latest}" "${skel_bashrc_latest}"
+        rm -f "${skel_bashrc}"
+        mv "${skel_bashrc_latest}" "${skel_bashrc}"
+        status_ok "${GREEN}.bashrc refreshed from kiro-shells${RESET}"
+    else
+        log_warn "kiro-shells .bashrc-latest not found at ${edu_bashrc_latest}"
+    fi
+}
+
+check_required_packages() {
+    log_section "Phase 4 — Checking required packages"
+    ensure_package archiso
+    ensure_package grub
+}
+
 prepare_build_tree() {
-    log_section "Phase 3 — Preparing build tree"
+    log_section "Phase 5 — Preparing build tree"
 
     remove_buildfolder yes
     mkdir -p "${buildFolder}"
@@ -316,7 +351,7 @@ prepare_build_tree() {
         log_info "ParallelDownloads already ${current_pd} (>= ${parallel_downloads}) — leaving it unchanged"
     fi
 
-    log_section "Phase 4 — Refreshing skel and package list"
+    log_section "Phase 6 — Refreshing skel and package list"
 
     local skel_dir="${buildFolder}/archiso/airootfs/etc/skel"
     echo "Clearing skel..."
@@ -332,7 +367,7 @@ prepare_build_tree() {
 }
 
 prepopulate_keyring() {
-    log_section "Phase 5 — Prepopulating pacman keyring"
+    log_section "Phase 7 — Prepopulating pacman keyring"
 
     local keyring_dir="${buildFolder}/archiso/airootfs/etc/pacman.d/gnupg"
     sudo pacman-key --gpgdir "${keyring_dir}" --init
@@ -343,7 +378,7 @@ prepopulate_keyring() {
 }
 
 inject_nvidia_packages() {
-    log_section "Phase 6 — Injecting NVIDIA driver: ${nvidia_driver}"
+    log_section "Phase 8 — Injecting NVIDIA driver: ${nvidia_driver}"
 
     case "${nvidia_driver}" in
         open)
@@ -528,7 +563,7 @@ _select_kernels_dialog() {
 }
 
 apply_kernel() {
-    log_section "Phase 6b — Applying kernel(s): ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
+    log_section "Phase 9 — Applying kernel(s): ${SELECTED_KERNELS[*]} (live boot: ${PRIMARY_KERNEL})"
 
     # packages.x86_64: drop the canonical kernel + headers, then add every selected kernel + its headers
     sed -i "/^${CANONICAL_KERNEL}\$/d;/^${CANONICAL_KERNEL}-headers\$/d" "${PACKAGES_FILE}"
@@ -570,7 +605,7 @@ apply_kernel() {
 }
 
 stamp_build_date() {
-    log_section "Phase 7 — Stamping build date"
+    log_section "Phase 10 — Stamping build date"
     local date_build
     date_build=$(date -d now)
     echo "ISO build on: ${date_build}"
@@ -579,7 +614,7 @@ stamp_build_date() {
 }
 
 build_iso() {
-    log_section "Phase 8 — Running mkarchiso (this takes a while)"
+    log_section "Phase 11 — Running mkarchiso (this takes a while)"
     mkdir -p "${outFolder}"
     cd "${buildFolder}/archiso/"
     sudo mkarchiso -v -w "${buildFolder}" -o "${outFolder}" "${buildFolder}/archiso/"
@@ -647,7 +682,7 @@ record_build_time() {
 }
 
 create_checksums() {
-    log_section "Phase 9 — Creating checksums and pkglist"
+    log_section "Phase 12 — Creating checksums and pkglist"
     cd "${outFolder}"
 
     echo "sha1sum..."
@@ -671,35 +706,20 @@ main() {
     check_not_root
     preflight_checks
     setup_chaotic
+    ensure_chaotic_mirrors
     setup_cachyos
+
+    # "All green" gate — confirm every repo the build/install depends on is
+    # reachable (after the host->curated fallbacks above) before mkarchiso runs.
+    mirror_health_report
 
     apply_version_bump
     verify_version_sync
+    refresh_skel_bashrc
 
-    if [[ "${HOSTNAME}" == "hq" ]]; then
-        log_section "Phase 2c — Refreshing skel .bashrc from kiro-shells"
-        local skel_dir="${REPO_DIR}/archiso/airootfs/etc/skel"
-        local skel_bashrc="${skel_dir}/.bashrc"
-        local skel_bashrc_latest="${skel_dir}/.bashrc-latest"
-        local edu_bashrc_latest="${HOME}/KIRO/kiro-shells/etc/skel/.bashrc-latest"
-        # Pull the latest .bashrc-latest in, drop the old .bashrc, then promote the
-        # fresh copy into its place so skel always ships the current kiro-shells .bashrc.
-        if [[ -f "${edu_bashrc_latest}" ]]; then
-            cp "${edu_bashrc_latest}" "${skel_bashrc_latest}"
-            rm -f "${skel_bashrc}"
-            mv "${skel_bashrc_latest}" "${skel_bashrc}"
-            status_ok "${GREEN}.bashrc refreshed from kiro-shells${RESET}"
-        else
-            log_warn "kiro-shells .bashrc-latest not found at ${edu_bashrc_latest}"
-        fi
-    fi
-
-    log_section "Phase 1 — Checking required packages"
-    ensure_package archiso
-    ensure_package grub
+    check_required_packages
     select_kernels
     show_overview
-
     prepare_build_tree
     prepopulate_keyring
     inject_nvidia_packages
@@ -707,11 +727,8 @@ main() {
     stamp_build_date
     build_iso
     create_checksums
-
     remove_buildfolder "${remove_build_folder}"
-
     record_build_time
-
     log_success "$(basename "$0") done — ISO is in ${outFolder}"
 }
 

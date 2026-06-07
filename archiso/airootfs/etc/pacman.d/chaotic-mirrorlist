@@ -1,0 +1,15 @@
+##
+## Kiro Linux — Chaotic-AUR mirrorlist (curated, robust default)
+##
+## Ships on the live ISO and is copied to the installed system. Kept short on
+## purpose: the two official Chaotic-AUR CDN mirrors, which geo-route each user
+## to their nearest up-to-date datacenter. This overrides the long country list
+## that the chaotic-mirrorlist package would otherwise drop in, for the same
+## reason the Arch mirrorlist is trimmed — fast, complete, no dead-mirror tail.
+##
+
+## Geo mirror — automatic routing to the geographically closest up-to-date mirror
+Server = https://geo-mirror.chaotic.cx/$repo/$arch
+
+## CDN mirror — global content-delivery network (fallback)
+Server = https://cdn-mirror.chaotic.cx/$repo/$arch

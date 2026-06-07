@@ -68,7 +68,7 @@ That's the whole build. Here's what happens while it runs:
 - It sets up the **Chaotic-AUR** and **CachyOS** repositories for you if they aren't already
   there — this is automatic, you don't do anything.
 - It asks for your `sudo` **password** once or twice (typing shows nothing — that's normal).
-- It works through nine phases — version, packages, keyring, kernel, then the big one,
+- It works through twelve numbered phases — version, packages, keyring, kernel, then the big one,
   `mkarchiso`, which actually squashes everything into the ISO.
 
 Lots of text scrolls past. That's normal. Leave it running.

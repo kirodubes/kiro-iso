@@ -4,6 +4,60 @@
 
 ---
 
+## 2026-06-07 — Robust mirror setup: curated geo-CDN mirrorlists + host→curated fallback + an "all green" pre-build gate
+
+**What Changed**
+- **Trimmed the shipped Arch mirrorlist** (`archiso/airootfs/etc/pacman.d/mirrorlist`) from **605 uncommented worldwide servers down to 4 geo-routed CDN mirrors** — `geo.mirror.pkgbuild.com`, `fastly.mirror.pkgbuild.com`, `mirrors.kernel.org`, `mirror.rackspace.com`. This is the list the live ISO carries and Calamares copies to the installed system.
+- **Added a curated Chaotic-AUR mirrorlist** (`archiso/airootfs/etc/pacman.d/chaotic-mirrorlist`, new file) with the two official Chaotic CDNs — `geo-mirror.chaotic.cx` and `cdn-mirror.chaotic.cx`. It overrides the long country list the `chaotic-mirrorlist` package would otherwise drop on the installed system.
+- **Added a build-host mirror fallback** in `host-prep.sh`: `ensure_arch_mirrors` and `ensure_chaotic_mirrors` probe the user's own pacman mirrors first and keep them when they work; only when *every* probed host mirror is unreachable do they swap in Kiro's curated geo-CDN set (backing the original up to `*.kiro-bak`).
+- **Added an "all green" pre-build gate** — `mirror_health_report` probes one representative server per repo (Arch + Chaotic at both the build/host and shipped-curated layers, plus `nemesis_repo` and `kiro_repo`) and prints an `[ OK ]/[ NOK ]` table. The build aborts before `mkarchiso` if a required repo (Arch or Chaotic) is fully unreachable; the two Kiro single-server CDNs are warn-only.
+- **Wired the new steps into `build-the-iso.sh`**: `ensure_arch_mirrors` runs inside preflight *before* `pacman -Sy`; `ensure_chaotic_mirrors` runs right after `setup_chaotic`; `mirror_health_report` runs after the CachyOS setup as the final gate before the build tree is prepared.
+
+**Why**
+- A user reported install failures traced to Arch mirror trouble while building on CachyOS. There are two independent Arch-mirror layers: the **build** pulls `[core]/[extra]` through the *host's* `/etc/pacman.d/mirrorlist` (mkarchiso resolves the `Include` against the host root), while the **install** uses the mirrorlist *shipped in the airootfs*. The shipped list had 605 active servers — pacman spreads `ParallelDownloads` across them, so installs hit a long tail of dead/slow mirrors and crawl or fail. Geo-routed CDNs are fast and complete everywhere on earth without per-location tuning, which is the right default for a worldwide ISO.
+- The fallback encodes the requested policy — *prefer the user's PC mirror settings, fall back to our own curated setup only if those fail* — so a healthy host (e.g. a fresh reflector list) builds against its own fast local mirrors, while a broken/empty host mirrorlist no longer dead-ends the build. `nemesis_repo` and `kiro_repo` are already single GitHub-Pages servers, so they were left as-is and are probed for reporting only.
+
+**Technical Details**
+- `_probe_mirror <server-template> <repo> [arch]` substitutes `$repo`/`$arch` into a `Server =` template and HEAD-checks the repo's `.db` with `wget --spider` (8s timeout, single try); a reachable `.db` is the green signal and the fallback trigger.
+- `_write_curated_list` backs up the existing file to `*.kiro-bak` (once) before writing the curated mirrors via `sudo tee`, so the user's original is recoverable.
+- Curated mirror sets live as `KIRO_CURATED_ARCH_MIRRORS` / `KIRO_CURATED_CHAOTIC_MIRRORS` arrays in `host-prep.sh`, kept in sync with the two shipped airootfs mirrorlists.
+- Verified green end-to-end on the CachyOS build host: all six probe lines returned `[ OK ]` (host Arch + chaotic, shipped curated Arch + chaotic, nemesis, kiro).
+
+**Files Modified**
+- `archiso/airootfs/etc/pacman.d/mirrorlist`
+- `archiso/airootfs/etc/pacman.d/chaotic-mirrorlist` (new)
+- `build-scripts/host-prep.sh`
+- `build-scripts/build-the-iso.sh`
+
+## 2026-06-07 — Pin `pipewire-jack` as the `jack` provider
+
+**What Changed**
+- Added **`pipewire-jack`** to the PipeWire audio block in `archiso/packages.x86_64`.
+
+**Why**
+- Something in the package set pulls in a `jack` dependency, and with both `jack2` and `pipewire-jack` available pacman stopped the build with an interactive provider prompt (defaulting to `jack2`). The ISO already ships the full PipeWire stack, so `pipewire-jack` is the correct provider — it serves the JACK API through PipeWire with no separate daemon, and `jack2` would conflict with PipeWire's JACK integration. Pinning it removes the prompt so the build never stalls (and an automated build can't silently pick the wrong default).
+
+**Files Modified**
+- `archiso/packages.x86_64`
+
+## 2026-06-07 — Restyle build phases: sequential, gap-free numbering in execution order
+
+**What Changed**
+- Renumbered every `log_section "Phase …"` label in **`build-the-iso.sh`** so the phases run **1 → 12 in strict execution order**, with no sub-letters. The old scheme had `Phase 2b`, `2c`, `6b` (confusing — there was never a `2a`) and was also out of order: `main()` ran Phase 2 → 2b → 2c → *then* Phase 1.
+- The maintainer-only `.bashrc` skel-refresh step (former `Phase 2c`) is now an **unnumbered** `log_section`, because it only runs on the maintainer host — numbering it would leave a gap (a "missing Phase") in every other user's build output, which is the exact confusion this change removes.
+- Extracted the two inline blocks left in `main()` into functions — **"Checking required packages"** → `check_required_packages()` (Phase 4), and the maintainer-only skel `.bashrc` refresh → `refresh_skel_bashrc()` (with its `hq` host guard moved inside as an early return). `main()` is now a uniform top-to-bottom list of phase calls with no inlined logic.
+- Updated **`BYOI.md`** ("nine phases" → "twelve numbered phases").
+
+**Why**
+- The phase numbers had drifted as steps were inserted over time, leaving sub-lettered labels and a run order that didn't match the numbers. For a user watching the build scroll past, "Phase 2b" with no "2a", and "Phase 1" appearing after "Phase 2", read as bugs. Sequential, gap-free numbering that matches the actual run order makes the build log self-explanatory. CLAUDE.md's "Phase 2 = version bump" references stay valid since the version bump remains Phase 2.
+
+**Technical Details**
+- New execution order: 1 Preflight · 2 Bump version · 3 Verify version sync · 4 Check required packages · 5 Prepare build tree · 6 Refresh skel + package list · 7 Prepopulate keyring · 8 Inject NVIDIA · 9 Apply kernel(s) · 10 Stamp build date · 11 mkarchiso · 12 Checksums + pkglist. The unnumbered host-setup helpers (`setup_chaotic`, `ensure_chaotic_mirrors`, `setup_cachyos`, `mirror_health_report`) and the maintainer skel-refresh sit between phases without consuming a number.
+
+**Files Modified**
+- `build-scripts/build-the-iso.sh`
+- `build-scripts/BYOI.md`
+
 ## 2026-06-07 — Generalize `record-install-time.sh` for any Arch host / any user
 
 **What Changed**

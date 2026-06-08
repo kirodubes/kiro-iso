@@ -4,6 +4,22 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-08 — Production v26.06.08: GRUB boot-safety + spice-vdagent — 4 installs, both firmware paths, 0 FAIL
+
+Production `kiro-iso` **v26.06.08** (built 15:13) carrying the day's two new features: **`kiro-bootloader-grub` 26.06-04** (self-healing GRUB — pacman hooks re-run `grub-install`/`grub-mkconfig` on grub/kernel updates), **`spice-vdagent` 0.23.0** (QEMU/SPICE host↔guest clipboard), the updated **`kiro-calamares-config`** (`kiro_final`: spice in the `qemu` cleanup profile + combined `kiro-bootloader-grub`+`grub` removal on systemd-boot), and **`kiro-system-files` 26.06-21** (new `kiro-audit` GRUB boot-safety check). Validated across four installs, both firmware paths:
+
+| Target | Firmware | Result |
+|--------|----------|--------|
+| KVM VM (vda) | BIOS / grub | `kiro-bootloader-grub` kept; `kiro-grub-install -> /dev/vda`; both hooks fire on a `grub` reinstall; `spice-vdagent` kept |
+| KVM VM | UEFI / systemd-boot | `grub` + `kiro-bootloader-grub` stripped together; `spice-vdagent` kept (kvm) |
+| **worf** (real metal, MEDION P7624, SATA, Fermi GPU) | BIOS / grub | pkg + both helpers; `kiro-grub-install -> /dev/sda`; **kiro-audit: `PASS GRUB boot-safety hooks installed`** — 134 PASS / 2 WARN / 0 FAIL (the 2 WARN = NVIDIA Fermi on nouveau, expected) |
+| **picard** (real metal, Intel HD630) | UEFI / systemd-boot | `grub` + `kiro-bootloader-grub` + `spice-vdagent` **all stripped**; **kiro-audit 135 / 0 / 0** |
+| **riker** (real metal, Intel HD630) | UEFI / systemd-boot | identical to picard; **kiro-audit 135 / 0 / 0** |
+
+- **Disk auto-detection** proven on `sda` (VirtualBox + worf) and `vda` (QEMU) — never the old hardcoded `/dev/sda`.
+- **Removal correctness** confirmed in `Calamares.log`: on systemd-boot it logs *"systemd-boot detected. Removing GRUB"* (grub + hook pkg together); on bare metal *"Virtualization type: none"* strips all VM profiles (so spice-vdagent goes too); on kvm only vmware+vbox are stripped (spice-vdagent kept).
+- **New `kiro-audit` check** shows `PASS GRUB boot-safety hooks installed` on a real grub system (worf) and stays correctly **silent** on systemd-boot — audit baseline clean (0 FAIL on every target).
+
 ## 2026-06-07 — Production ISO (19:40 rebuild): encrypted + line-3 chwd + new mirror-refresh — 139 PASS / 0 / 0
 
 VM `Kiro-normal` (VirtualBox), installed from the **production `kiro-iso` 19:40 rebuild** (`ISO_BUILD` 19:40) carrying `kiro-calamares-config` **26.06-08**. That package (commit `97a2eb5`) newly brought the **entire chwd online mirror-refresh feature into production** (`_TRUSTED_MIRRORS` / `_ensure_cdn_first` / `_refresh_driver_mirrors` + greppable logging — 83-line add); the earlier 16:23 prod ISO / `26.06-07` had the nvidia fix but no mirror-refresh. The feature was first validated on `-next` (Kiro-E-jfs 390xx) and is here confirmed on production. Full-disk-encrypted layout, boot line 3 `driver=nonfreechwd`. One install exercised four things, all green:

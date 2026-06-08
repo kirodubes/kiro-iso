@@ -4,7 +4,7 @@
 
 ---
 
-## 2026-06-08 — Ship GRUB boot-safety hooks + spice-vdagent (promoted from -next)
+## 2026-06-08 — v26.06.08 — Ship GRUB boot-safety hooks + spice-vdagent (promoted from -next)
 
 **What Changed**
 - Added **`kiro-bootloader-grub`** (INSTALLER/CALAMARES section) and **`spice-vdagent`** (LIVE-ENV GUEST TOOLS section) to **`archiso/packages.x86_64`**.

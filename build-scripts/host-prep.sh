@@ -207,7 +207,7 @@ mirror_health_report() {
 
     # Build layer — the host mirrorlists mkarchiso actually pulls from.
     local first_arch first_chaotic
-    first_arch=$(grep -oP '^\s*Server\s*=\s*\K\S+' /etc/pacman.d/mirrorlist 2>/dev/null | head -1)
+    first_arch=$(grep -m1 -oP '^\s*Server\s*=\s*\K\S+' /etc/pacman.d/mirrorlist 2>/dev/null)
     if [[ -n "${first_arch}" ]] && _probe_mirror "${first_arch}" core; then
         status_ok "Arch  (build/host)   : ${first_arch}"
     else
@@ -215,7 +215,7 @@ mirror_health_report() {
     fi
 
     if [[ "${chaoticsrepo}" == "true" ]]; then
-        first_chaotic=$(grep -oP '^\s*Server\s*=\s*\K\S+' /etc/pacman.d/chaotic-mirrorlist 2>/dev/null | head -1)
+        first_chaotic=$(grep -m1 -oP '^\s*Server\s*=\s*\K\S+' /etc/pacman.d/chaotic-mirrorlist 2>/dev/null)
         if [[ -n "${first_chaotic}" ]] && _probe_mirror "${first_chaotic}" chaotic-aur; then
             status_ok "Chaotic (build/host) : ${first_chaotic}"
         else

@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-06-08 — Fix `exit 141` (SIGPIPE) crash in the mirror health check
+
+**What Changed**
+- In **`build-scripts/host-prep.sh`** `mirror_health_report()`, replaced the two `grep -oP … | head -1` mirrorlist reads with `grep -m1 -oP …` (lines 210 and 218).
+
+**Why**
+- Under `set -euo pipefail`, `grep … | head -1` is a SIGPIPE trap: `head` closes the pipe after the first line, and if `grep` is still writing (a normal multi-server `reflector` mirrorlist easily exceeds the 64 KB pipe buffer) it gets **SIGPIPE**, the pipeline exits **141**, and `errexit` aborts the whole build — right after the "Mirror health check — all repos must be green before building" banner, before a single repo status prints. Whether it fires is **grep-implementation- and buffer-timing-dependent**, so it failed for some users (stock GNU grep) while building fine for others — the classic "works on my machine" report. Surfaced by **cyberagency on Discussions #39**: every build died in ~6 s with `FAILED (exit 141)`, leaving the build folder behind so the next attempt re-prompted to delete it (the apparent "loop"). `grep -m1` makes grep stop after the first match itself — no pipe, no reader to close early, SIGPIPE impossible on any grep flavor. Verified: `yes | head -1` under `pipefail` reproduces exit 141 on the dev box; the `-m1` form cannot.
+
+**Files Modified**
+- `build-scripts/host-prep.sh` — `grep -m1` in `mirror_health_report()` (Arch + Chaotic mirrorlist reads).
+
 ## 2026-06-08 — v26.06.08 — Ship GRUB boot-safety hooks + spice-vdagent (promoted from -next)
 
 **What Changed**

@@ -61,6 +61,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-06-08 15:34 | v26.06.08 | erik@192.168.122.78 | 2m27s | 2 |  |
 | 2026-06-07 21:00 | v26.06.07 | erik@192.168.1.14 | 3m16s | 2 | line 2 nonfree (nvidia kept), Intel HD630, v26.06.07 19:40/cfg26.06-08 release ISO |
 | 2026-06-07 20:47 | v26.06.07 | erik@192.168.1.9 | 3m30s | 2 | line 1 free, Intel HD630, v26.06.07 19:40/cfg26.06-08 release ISO |
 | 2026-06-01 07:45 | v26.06.01 | picard | 3m47s | 2 | bare-metal install |

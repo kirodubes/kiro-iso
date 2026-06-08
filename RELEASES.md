@@ -1,9 +1,16 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Six ISOs shipped in June (`.01 .02 .04 .05 .06 .07`). For each: why it was worth a new ISO,
+Seven ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.07 — June 7 (current)
+## v26.06.08 — June 8 (current)
+**Why a new ISO:** GRUB installs can no longer be bricked by an update, and virtual machines get host↔guest clipboard out of the box.
+- **GRUB installs now self-heal:** the new `kiro-bootloader-grub` package adds pacman hooks that automatically re-run `grub-install` and rebuild the boot menu whenever GRUB or a kernel updates — closing the long-standing Arch trap where a `grub` update left the on-disk bootloader out of sync and the machine refused to boot (`error: symbol 'grub_…' not found`). The boot disk is detected automatically, so it works whatever the disk is named (`sda`, `vda`, NVMe…). It ships only where GRUB is the bootloader — every legacy-BIOS install, plus any UEFI user who picks GRUB in the Calamares Tweak Tool — and is cleanly removed on systemd-boot installs.
+- **Clipboard sharing in virtual machines:** `spice-vdagent` now ships, so copy/paste between your host and a Kiro guest works out of the box on QEMU/KVM with a SPICE display. It's kept only on QEMU/KVM installs and removed on bare metal, VirtualBox and VMware (where SPICE isn't used).
+- **Tidier ISO builder:** the Kiro ISO Builder now cleans up its work folder after each build by default — no leftover root-owned folder to trip its pre-flight check.
+- **Packages:** + `kiro-bootloader-grub`, + `spice-vdagent`.
+
+## v26.06.07 — June 7
 **Why a new ISO:** you can now build and customize **your own** Kiro ISO — the `kiro-iso-builder` GUI ships on the medium, backed by a beginner-friendly "Build Your Own ISO" guide — and installs are faster and more reliable worldwide thanks to geo-routed CDN mirrors.
 - **Build your own ISO, from a GUI:** `kiro-iso-builder` (GTK4) is on the ISO — pick the kernel, choose the NVIDIA driver, and untick optional apps, then build a personalized Kiro ISO without hand-editing a single file. The new `build-scripts/BYOI.md` walks a first-timer through it end to end (one folder of settings → a bootable `.iso`).
 - **Faster, more reliable installs everywhere:** the shipped mirrorlist drops from **605 worldwide servers to 4 geo-routed CDN mirrors** (plus a curated Chaotic-AUR list), so package downloads during install no longer crawl on a long tail of dead/slow mirrors — fast anywhere on earth with no per-location tuning.

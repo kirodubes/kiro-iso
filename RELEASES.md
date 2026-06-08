@@ -4,7 +4,7 @@ Seven ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08`). For each: why it was
 what functionality it added, and the package moves behind it. Newest first.
 
 ## v26.06.08 — June 8 (current)
-**Why a new ISO:** GRUB installs can no longer be bricked by an update, and virtual machines get host↔guest clipboard out of the box.
+**Why a new ISO:** GRUB installs can no longer be bricked by an update, and QEMU/KVM virtual machines get host↔guest clipboard out of the box.
 - **GRUB installs now self-heal:** the new `kiro-bootloader-grub` package adds pacman hooks that automatically re-run `grub-install` and rebuild the boot menu whenever GRUB or a kernel updates — closing the long-standing Arch trap where a `grub` update left the on-disk bootloader out of sync and the machine refused to boot (`error: symbol 'grub_…' not found`). The boot disk is detected automatically, so it works whatever the disk is named (`sda`, `vda`, NVMe…). It ships only where GRUB is the bootloader — every legacy-BIOS install, plus any UEFI user who picks GRUB in the Calamares Tweak Tool — and is cleanly removed on systemd-boot installs.
 - **Clipboard sharing in virtual machines:** `spice-vdagent` now ships, so copy/paste between your host and a Kiro guest works out of the box on QEMU/KVM with a SPICE display. It's kept only on QEMU/KVM installs and removed on bare metal, VirtualBox and VMware (where SPICE isn't used).
 - **Tidier ISO builder:** the Kiro ISO Builder now cleans up its work folder after each build by default — no leftover root-owned folder to trip its pre-flight check.

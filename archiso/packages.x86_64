@@ -351,14 +351,12 @@ maim
 numlockx
 picom-git
 playerctl
-redshift
 rofi
 scrot
 sxhkd
 volctl
 xautolock
 xclip
-xcolor
 xorg-xsetroot
 
 ###  SHELL / TERMINAL ENV
@@ -459,6 +457,7 @@ shortwave
 variety
 vlc
 vlc-plugins-all
+xcolor
 
 ###  PRODUCTIVITY / EDITORS
 baobab
@@ -497,6 +496,7 @@ inxi
 lm_sensors
 lshw
 pciutils
+redshift
 resources
 
 ###  BACKUP / SNAPSHOTS

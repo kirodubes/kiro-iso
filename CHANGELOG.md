@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-06-08 — Make Flameshot an optional (TIER 3) package
+
+**What Changed**
+- In **`archiso/packages.x86_64`**, moved **`flameshot-git`** out of the `### OHMYCHADWM RUNTIME` group (TIER 2) into the `### MEDIA / GRAPHICS` group (TIER 3), so the **kiro-iso-builder** "Choose packages" screen now lets a user remove it.
+
+**Why**
+- Flameshot is a screenshot tool that overlaps with **`maim`** and **`scrot`**, both of which stay in the runtime — so the session does not depend on it and it is genuinely optional. The TIER 3 gate was checked first: it has no build/boot/Calamares dependency, no enabled systemd unit, and **no shipped package depends on it** (verified with `expac`), so un-ticking it in the builder really removes it. One known cost, accepted on purpose: Flameshot **is** referenced by the Ohmychadwm session — the `run flameshot` autostart line in **`run.sh`** and the `ctrl + super + Print → flameshot gui` binding in **`sxhkd/sxhkdrc`** (plus the `keybindings.*` cheatsheets and the XFCE `keybindings.html`). None of those are guarded, so a user who removes Flameshot is left with a dead screenshot shortcut and a stale cheatsheet entry. That only affects users who deliberately remove it (it still ships by default); guarding the binding/cheatsheet is a separate follow-up in the `ohmychadwm` / `kiro-xfce` repos.
+
+**Files Modified**
+- `archiso/packages.x86_64` — `flameshot-git` moved from `OHMYCHADWM RUNTIME` (TIER 2) to `MEDIA / GRAPHICS` (TIER 3).
+
 ## 2026-06-08 — Fix `exit 141` (SIGPIPE) crash in the mirror health check
 
 **What Changed**

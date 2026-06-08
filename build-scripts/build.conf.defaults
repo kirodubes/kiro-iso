@@ -23,5 +23,5 @@ picker="auto"                 # auto | dialog | gum — picker UI for kernel="as
 chaoticsrepo=true
 clean_pacman_cache=no   # yes | no
 parallel_downloads="10"       # minimum pacman ParallelDownloads for the ISO install; only raised if shipped value is lower, never lowered
-remove_build_folder=no   # yes | no — set to yes to clean up after build
+remove_build_folder=yes   # yes | no — clean up the build folder after the build (default yes; the next build recreates it anyway)
 build_location=home   # home | local — home = build in $HOME; local = build beside the cloned repo

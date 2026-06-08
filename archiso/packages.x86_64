@@ -204,6 +204,7 @@ chaotic-mirrorlist
 calamares
 chwd
 hwdetect
+kiro-bootloader-grub
 kiro-calamares-config
 kiro-calamares-tweak-tool
 mkinitcpio-firmware
@@ -214,6 +215,7 @@ plymouth-theme-kiro-logo
 
 ###  LIVE-ENV GUEST TOOLS  (open-vm-tools / qemu-guest-agent live in ARCHISO BASE)
 virtualbox-guest-utils
+spice-vdagent
 
 ###  DISPLAY MANAGER — boot to the login screen
 accountsservice

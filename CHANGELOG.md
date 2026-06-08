@@ -4,7 +4,18 @@
 
 ---
 
-## 2026-06-07 — Stop local build.conf tweaks leaking into the repo (gitignore + defaults)
+## 2026-06-08 — Ship GRUB boot-safety hooks + spice-vdagent (promoted from -next)
+
+**What Changed**
+- Added **`kiro-bootloader-grub`** (INSTALLER/CALAMARES section) and **`spice-vdagent`** (LIVE-ENV GUEST TOOLS section) to **`archiso/packages.x86_64`**.
+
+**Why**
+- **`kiro-bootloader-grub`** ships two pacman hooks that re-run `grub-install`/`grub-mkconfig` so a `grub` upgrade can't brick boot (the classic Arch `grub_*` symbol mismatch). BIOS disk is auto-detected (`grub-probe`+`lsblk`, never hardcoded `/dev/sda`); proven on `sda` (VirtualBox + worf metal) and `vda` (QEMU). `kiro_final` keeps it on grub installs and strips it (with `grub`) on systemd-boot.
+- **`spice-vdagent`** gives QEMU/SPICE guests host↔guest clipboard; `kiro_final` keeps it on kvm/qemu and strips it elsewhere. (Not a resolution fix — auto-resize is broken on XFCE; that's a Display-settings matter.)
+- Both validated in `kiro-iso-next` before this promotion.
+
+**Files Modified**
+- `archiso/packages.x86_64` — `kiro-bootloader-grub` + `spice-vdagent`.
 
 **What Changed**
 - The live `build-scripts/build.conf` is now **gitignored**; a tracked canonical **`build.conf.defaults`** holds the shipped values.

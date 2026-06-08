@@ -331,7 +331,6 @@ firewalld
 irqbalance
 scx-manager
 sysz
-timeshift
 tuned
 tuned-ppd
 upower
@@ -348,7 +347,6 @@ alacritty
 dmenu
 fastcompmgr-git
 feh
-flameshot-git
 maim
 numlockx
 picom-git
@@ -449,6 +447,7 @@ vivaldi
 vivaldi-ffmpeg-codecs
 
 ###  MEDIA / GRAPHICS
+flameshot-git
 gcolor3
 gimp
 gpick
@@ -499,6 +498,9 @@ lm_sensors
 lshw
 pciutils
 resources
+
+###  BACKUP / SNAPSHOTS
+timeshift
 
 ###  PACKAGE / SYSTEM TOOLS
 appstream

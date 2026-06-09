@@ -81,11 +81,13 @@ KIRO comes pre-loaded with:
 cd build-scripts && ./build-the-iso.sh
 ```
 
-The build bumps the version (`vYY.MM.DD`) across all version files as its **Phase 2**, gated by the `bump_version="yes"` flag in the config block — set it to `no` for a same-day rebuild of the currently-pinned version. Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.
+The build bumps the version (`vYY.MM.DD`) across all version files as its **Phase 2**, gated by the `bump_version="yes"` flag in **`build-scripts/build.conf`** — set it to `no` for a same-day rebuild of the currently-pinned version. Build output lands in `~/kiro-Out/`. Checksums (sha1, sha256, md5) and a package list are generated alongside the ISO.
+
+All build knobs live in **`build-scripts/build.conf`** (a sourced config file — the `kiro-iso-builder` GUI reads and writes the same file, so CLI and GUI share one source of truth). Edit them there, not in `build-the-iso.sh`. The live `build.conf` is gitignored and seeded from the tracked `build.conf.defaults` on first use, so your local tweaks never get committed.
 
 ### Kernel Selection
 
-The default build ships **`linux-cachyos`** as the live-boot + post-install default and **`linux-zen`** as a secondary installed kernel selectable from the boot loader menu. Both are set on one line in the `build-scripts/build-the-iso.sh` config block:
+The default build ships **`linux-cachyos`** as the live-boot + post-install default and **`linux-zen`** as a secondary installed kernel selectable from the boot loader menu. Both are set on one line in **`build-scripts/build.conf`**:
 
 ```bash
 kernel="linux-cachyos linux-zen"   # space-separated; first entry = live-boot kernel
@@ -104,13 +106,27 @@ The `kiro_kernel` Calamares module is kernel-agnostic — it copies whichever ke
 
 ### NVIDIA Driver Selection
 
-Before building, open `build-scripts/build-the-iso.sh` and set `nvidia_driver` in the config block at the top:
+Before building, open **`build-scripts/build.conf`** and set `nvidia_driver`:
 
 ```bash
 nvidia_driver="open"    # nvidia-open-dkms  — modern GPUs (default)
 nvidia_driver="580xx"   # nvidia-580xx-dkms — legacy
 nvidia_driver="390xx"   # nvidia-390xx-dkms — older legacy
 ```
+
+### Editions & Extra Apps
+
+Two `build.conf` knobs let you shape what the ISO ships, without touching `packages.x86_64` by hand:
+
+```bash
+editions="xfce ohmychadwm"   # space-separated desktop/WM sessions to bake in
+default_session="xfce"       # which session the live ISO autologs into (must be one of the editions)
+```
+
+- **`editions`** — each name uncomments its `EDITION-BLOCK` in `packages.x86_64` at build time. The default `"xfce ohmychadwm"` reproduces the standard ISO; the other blocks (`awesome`, `bspwm`, `chadwm`, `i3`, `leftwm`, `qtile`) are opt-in. XFCE is an edition too now — `editions="cinnamon"` would build a pure-Cinnamon ISO with no XFCE.
+- **`default_session`** — sets the live-ISO SDDM autologin session; it must be one of the listed editions.
+
+To **add opt-in apps** that the base image doesn't ship, list their keys (one per line) in **`build-scripts/package-additions.conf`** — the build uncomments the matching `EXTRA-APP` block in `packages.x86_64`. An empty file (the default) adds nothing. This is the overlay the `kiro-iso-builder` GUI's "Add apps" page reads and writes.
 
 ### Adding a Personal Local Repo
 

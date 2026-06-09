@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-06-09 — Promote editions + add-apps system from kiro-iso-next
+
+**What Changed**
+- **Desktop/WM editions system** — `build-the-iso.sh` gained `apply_editions()`, which uncomments the `### >>> EDITION-BLOCK <name> >>>` block in **`archiso/packages.x86_64`** for each name in `build.conf`'s new `editions=` knob. Seven edition blocks ship (awesome, bspwm, chadwm, i3, ohmychadwm, leftwm, qtile), all commented by default. New `default_session=` knob sets the live-ISO SDDM autologin session.
+- **EXTRA-APP "add apps" overlay** — `build-the-iso.sh` gained `apply_package_additions()`, which uncomments `### >>> EXTRA-APP <key> >>>` blocks for each key listed in the new **`build-scripts/package-additions.conf`** (shipped empty = standard ISO). This is the overlay the `kiro-iso-builder` GUI's "Add apps" page reads/writes.
+- **`build-scripts/build.conf.defaults`** — added the `editions="xfce ohmychadwm"` and `default_session="xfce"` defaults.
+- **`CLAUDE.md`** — documented the new editions/add-apps stages; **`docs/OVERVIEW.md`** refreshed.
+
+**Why**
+- These features matured in the `kiro-iso-next` beta profile and are ready for production. The default `editions="xfce ohmychadwm"` reproduces the current standard ISO byte-for-byte in behaviour, so the *default* build output is unchanged — the extra WMs and apps are strictly opt-in.
+
+**Technical Details**
+- **Selective promotion, not a blanket sync.** Production identity was preserved on the way in:
+  - `archiso/packages.x86_64` — adopted next's edition/extra-app blocks but reverted the 6 beta package names back to production: `calamares-next`→`calamares`, `kiro-bootloader-grub-nemesis`→`kiro-bootloader-grub`, `kiro-calamares-config-next`→`kiro-calamares-config`, `kiro-calamares-tweak-tool-nemesis`→`kiro-calamares-tweak-tool`, `plymouth-theme-kiro-logo-nemesis`→`plymouth-theme-kiro-logo`, `kiro-iso-builder-nemesis`→`kiro-iso-builder`.
+  - `build-the-iso.sh` — kept production's `kiro-` ISO label naming (next used `kiro-next-`) and its integrated `apply_version_bump()` Phase 2.
+  - Not migrated: `build.conf` (gitignored local state), the build-generated version fields in `dev-rel`/`profiledef.sh`, and `profiledef.sh`'s `iso_name="kiro"`.
+
+**Files Modified**
+- `archiso/packages.x86_64`, `build-scripts/build-the-iso.sh`, `build-scripts/build.conf.defaults`, `build-scripts/package-additions.conf` (new), `CLAUDE.md`, `docs/OVERVIEW.md`
+
 ## 2026-06-08 — Make Flameshot an optional (TIER 3) package
 
 **What Changed**

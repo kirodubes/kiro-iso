@@ -1,27 +1,44 @@
-#####################################################################
+# =============================================================================
 # build.conf — user-editable Kiro ISO build configuration
 #
-# Sourced by build-the-iso.sh AND read/written by the kiro-iso-builder
-# GUI, so the CLI and the GUI share one source of truth. Edit these by
-# hand or through the GUI — assignments only, no logic.
+# Sourced by build-the-iso.sh AND read/written by the kiro-iso-builder GUI, so
+# the CLI and the GUI share one source of truth. Edit these by hand or through
+# the GUI — assignments only, no logic.
 #
 # This is the tracked CANONICAL copy. The live build.conf beside it is
-# gitignored: build-the-iso.sh and the GUI seed it from this file on
-# first use, so your local build tweaks never get committed/pushed.
+# gitignored: build-the-iso.sh and the GUI seed it from this file on first use,
+# so your local build tweaks never get committed/pushed.
 #
 # kiroVersion is NOT here: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it, so it stays in build-the-iso.sh.
-#####################################################################
+# =============================================================================
 
+# ── Desktop & editions ───────────────────────────────────────────────────────
+# name for the desktop
 desktop="xfce4/ohmychadwm"
+# space-separated editions to bake in, e.g. "xfce ohmychadwm i3" or "cinnamon".
+# XFCE is now an edition (not forced), so editions="cinnamon" = pure Cinnamon,
+# no XFCE. Default = XFCE + ohmychadwm (unchanged ISO).
+# Available: awesome bspwm budgie chadwm cinnamon gnome i3 leftwm mate
+#            ohmychadwm plasma qtile xfce
+editions="xfce ohmychadwm"
+# which session the live ISO boots (SDDM autologin). Set to your main edition,
+# e.g. "cinnamon" for a Cinnamon build. Must be one of the editions above.
+default_session="xfce"
 
-bump_version=yes   # yes | no — bump version to vYY.MM.DD before building; set to no for same-day rebuilds
-nvidia_driver=open   # open | 580xx | 390xx
-kernel="linux-cachyos linux-zen"   # space-separated kernel package(s); "ask" = interactive menu. First = the kernel the live ISO boots.
+# ── Versioning ───────────────────────────────────────────────────────────────
+bump_version=yes              # yes | no — bump version to vYY.MM.DD before building; no = same-day rebuild
 
+# ── Hardware ─────────────────────────────────────────────────────────────────
+nvidia_driver=open            # open | 580xx | 390xx
+kernel="linux-cachyos linux-zen"   # space-separated kernel(s); "ask" = interactive menu. First = live-boot kernel
 picker="auto"                 # auto | dialog | gum — picker UI for kernel="ask" (auto = dialog if installed, else gum)
+
+# ── Repositories ─────────────────────────────────────────────────────────────
 chaoticsrepo=true
-clean_pacman_cache=no   # yes | no
-parallel_downloads="10"       # minimum pacman ParallelDownloads for the ISO install; only raised if shipped value is lower, never lowered
-remove_build_folder=yes   # yes | no — clean up the build folder after the build (default yes; the next build recreates it anyway)
-build_location=home   # home | local — home = build in $HOME; local = build beside the cloned repo
+
+# ── Build behaviour ──────────────────────────────────────────────────────────
+clean_pacman_cache=no         # yes | no
+parallel_downloads="10"       # minimum pacman ParallelDownloads for the ISO install; only raised, never lowered
+remove_build_folder=yes       # yes | no — clean up the build folder after the build (next build recreates it)
+build_location=home           # home | local — home = build in $HOME; local = build beside the cloned repo

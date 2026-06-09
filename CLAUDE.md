@@ -45,7 +45,16 @@ For a same-day rebuild that keeps the currently-pinned version, set `bump_versio
 
 ## Build Config — `build.conf`
 
-The user-editable build knobs (`bump_version`, `nvidia_driver`, `kernel`, `picker`, `chaoticsrepo`, `clean_pacman_cache`, `parallel_downloads`, `remove_build_folder`, `build_location`, `desktop`) live in **`build-scripts/build.conf`**, which `build-the-iso.sh` sources. This is the single source of truth the `kiro-iso-builder` GUI reads and writes too. Edit them there — not in `build-the-iso.sh`. `kiroVersion` is the one exception: it stays in `build-the-iso.sh` because `apply_version_bump` seds it and `verify_version_sync` greps it.
+The user-editable build knobs (`bump_version`, `nvidia_driver`, `kernel`, `picker`, `chaoticsrepo`, `clean_pacman_cache`, `parallel_downloads`, `remove_build_folder`, `build_location`, `desktop`, `editions`, `default_session`) live in **`build-scripts/build.conf`**, which `build-the-iso.sh` sources. This is the single source of truth the `kiro-iso-builder` GUI reads and writes too. Edit them there — not in `build-the-iso.sh`. `kiroVersion` is the one exception: it stays in `build-the-iso.sh` because `apply_version_bump` seds it and `verify_version_sync` greps it.
+
+## Desktop/WM Editions & Add-Apps
+
+`build-the-iso.sh` bakes extra sessions and opt-in apps onto the base image via two stages driven by annotated blocks in `packages.x86_64`:
+
+- **`apply_editions()`** — for each name in `editions=` (build.conf), uncomments the matching `### >>> EDITION-BLOCK <name> >>>` block. `default_session=` sets the live ISO's SDDM autologin session and must be one of the listed editions. Default `editions="xfce ohmychadwm"` reproduces the standard ISO unchanged; the other blocks (awesome, bspwm, chadwm, i3, leftwm, qtile) ship commented and are opt-in.
+- **`apply_package_additions()`** — uncomments the `### >>> EXTRA-APP <key> >>>` block for each key in `build-scripts/package-additions.conf` (one key per line; empty file = standard ISO). The `kiro-iso-builder` GUI's "Add apps" page reads/writes this overlay.
+
+Both read `packages.x86_64` as the single source of truth, so there is no separate hardcoded edition/app list to drift.
 
 ## Nvidia Driver Selection
 

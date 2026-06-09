@@ -20,6 +20,7 @@ kiro-iso/
 ├── build-scripts/               # Build automation scripts
 ├── personal_repo/               # Local package repository
 ├── enable-oomd.sh              # Out-of-Memory daemon setup script
+├── change-version.sh           # Version management utility
 └── up.sh                        # Update and maintenance script
 ```
 
@@ -132,8 +133,9 @@ kiro-iso/
 ### 5. **Build System**
 
 #### Build Scripts
-- `build-scripts/` - Automated build processes (version bump merged into `build-the-iso.sh` Phase 2)
+- `build-scripts/` - Automated build processes
 - `up.sh` - Update and rebuild utilities
+- `change-version.sh` - Version management
 - `enable-oomd.sh` - Post-installation OOM daemon setup (includes tuned parameters)
 
 #### Configuration Files

@@ -97,7 +97,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #   and the kiro-iso-builder GUI share one source of truth. Edit them
 #   there, or through the GUI — not here.
 #####################################################################
-kiroVersion='v26.06.08'
+kiroVersion='v26.06.09'
 
 # kiroVersion stays in THIS file: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it. build.conf is sourced right after it — the
@@ -326,6 +326,7 @@ remove_buildfolder() {
 show_overview() {
     log_section "Build overview"
     echo "  Desktop      : ${desktop}"
+    echo "  Editions     : ${editions-ohmychadwm}"
     echo "  Version      : ${kiroVersion}"
     echo "  ISO label    : ${isoLabel}"
     echo "  NVIDIA driver: ${nvidia_driver}"
@@ -405,6 +406,7 @@ prepare_build_tree() {
     echo "Refreshing packages.x86_64..."
     cp -f "${REPO_DIR}/archiso/packages.x86_64" "${PACKAGES_FILE}"
     apply_package_selection
+    apply_package_additions
 }
 
 apply_package_selection() {
@@ -426,6 +428,30 @@ apply_package_selection() {
     local n
     n="$(grep -cvE '^[[:space:]]*(#|$)' "${sel}" || true)"
     log_info "Package selection: applied ${sel##*/} (${n} TIER 3 package(s) excluded)"
+}
+
+apply_package_additions() {
+    # Opt-in EXTRA APPS the kiro-iso-builder "Add apps" page selected. Each app is a
+    # commented EXTRA-APP block in packages.x86_64; this UNcomments the block(s) whose key
+    # is listed in build-scripts/package-additions.conf (one key per line). Missing/empty
+    # file = add nothing (= standard production ISO). Mirror of apply_editions, but a stale
+    # key warns-and-skips instead of aborting — an opt-in extra must never break the build.
+    local add="${SCRIPT_DIR}/package-additions.conf"
+    [[ -f "${add}" ]] || return 0
+    local n=0 key
+    while IFS= read -r key; do
+        key="${key%%#*}"; key="${key//[[:space:]]/}"
+        [[ -z "${key}" ]] && continue
+        if ! grep -qF ">>> EXTRA-APP ${key} " "${PACKAGES_FILE}"; then
+            log_warn "Extra app '${key}' has no block in packages.x86_64 — skipped"
+            continue
+        fi
+        # Uncomment the block's package lines (#pkg -> pkg); leave the ### markers.
+        sed -i "/>>> EXTRA-APP ${key} /,/<<< EXTRA-APP ${key} <<</ s/^#\([^#]\)/\1/" "${PACKAGES_FILE}"
+        log_info "Added extra app: ${key}"
+        n=$((n + 1))
+    done < "${add}"
+    log_info "Package additions: applied ${add##*/} (${n} extra app(s) added)"
 }
 
 prepopulate_keyring() {
@@ -466,11 +492,114 @@ inject_nvidia_packages() {
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
             printf 'nvidia-390xx-dkms\nnvidia-390xx-utils\nnvidia-390xx-settings\n' >> "${PACKAGES_FILE}"
             ;;
+        none)
+            # No NVIDIA GPU (AMD / Intel / VM): strip every NVIDIA package, add none.
+            # AMD/Intel run on in-kernel drivers + mesa, which are already on the ISO.
+            sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
+            log_info "NVIDIA driver: none — AMD/Intel/VM, relying on in-kernel drivers + mesa."
+            ;;
         *)
-            log_error "Unknown NVIDIA driver option: ${nvidia_driver}\nValid options: open | 580xx | 390xx"
+            log_error "Unknown NVIDIA driver option: ${nvidia_driver}\nValid options: open | 580xx | 390xx | none"
             exit 1
             ;;
     esac
+}
+
+#####################################################################
+# Desktop / WM editions — bake extra sessions onto the XFCE base.
+# Each edition has a commented block in packages.x86_64 (marked EDITION-BLOCK <name>);
+# this uncomments the package lines of every edition listed in build.conf
+# editions=. XFCE stays the login/fallback session, so nothing else
+# (sddm / calamares default session) changes — these only ADD a session.
+# Generic by design: TWMs now; full DEs (plasma/gnome) later use the same blocks.
+#####################################################################
+apply_editions() {
+    # Unset (e.g. an old live build.conf seeded before this knob existed) falls back to
+    # the shipped default so the standard ISO never silently changes.
+    local sel="${editions-xfce ohmychadwm}"
+    local default_sess="${default_session-xfce}"
+    log_section "Desktop / WM editions — ${sel:-none}  (login session: ${default_sess})"
+    # SAFEGUARD: an ISO must ship at least one session — refuse a desktop-less / WM-less build.
+    if [[ -z "${sel// /}" ]]; then
+        log_error "No editions selected (editions=\"\") — an ISO needs at least one desktop or window manager. Set 'editions' in build.conf."
+        exit 1
+    fi
+    # Guard: the login session must be one of the installed editions, else the live ISO
+    # would autologin to a session that isn't there. Fallback priority when default_session
+    # isn't valid: a selected full desktop (DE) wins over the WMs — a chosen desktop is the
+    # intended primary, so plasma/gnome/… outrank ohmychadwm; for several DEs the first in
+    # editions= wins. With no DE, the flagship ohmychadwm; with neither, the first edition.
+    # (DE list mirrors KIB's DESKTOPS set in configure_gui.py — keep them in sync.)
+    if [[ " ${sel} " != *" ${default_sess} "* ]]; then
+        local desktops="xfce cinnamon plasma gnome mate budgie lxqt deepin"
+        local fallback="" ed
+        for ed in ${sel}; do
+            if [[ " ${desktops} " == *" ${ed} "* ]]; then fallback="${ed}"; break; fi
+        done
+        if [[ -z "${fallback}" ]]; then
+            if [[ " ${sel} " == *" ohmychadwm "* ]]; then fallback="ohmychadwm"; else fallback="${sel%% *}"; fi
+        fi
+        log_warn "default_session='${default_sess}' is not in editions='${sel}' — using '${fallback}'."
+        default_sess="${fallback}"
+    fi
+    # Live ISO autologin session follows default_session, so a non-XFCE build (e.g.
+    # editions="cinnamon") boots its own desktop instead of a now-absent XFCE.
+    local sddm_conf="${buildFolder}/archiso/airootfs/etc/sddm.conf.d/kde_settings.conf"
+    [[ -f "${sddm_conf}" ]] && sed -i "s/^Session=.*/Session=${default_sess}/" "${sddm_conf}"
+    local ed
+    for ed in ${sel}; do
+        if ! grep -qF ">>> EDITION-BLOCK ${ed} >>>" "${PACKAGES_FILE}"; then
+            log_error "Edition '${ed}' has no block in packages.x86_64"
+            exit 1
+        fi
+        # Uncomment the block's package lines (#pkg -> pkg); leave the ### markers.
+        sed -i "/>>> EDITION-BLOCK ${ed} >>>/,/<<< EDITION-BLOCK ${ed} <<</ s/^#\([^#]\)/\1/" "${PACKAGES_FILE}"
+        log_info "Enabled edition: ${ed}"
+    done
+}
+
+#####################################################################
+# Plasma packaging rules — applied only when 'plasma' is in editions=.
+# KDE's packaging recommendations
+# (https://community.kde.org/Distributions/Packaging_Recommendations)
+# assume a Plasma-centric distro and clash with Kiro's "many desktops on
+# one ISO" model. So when Plasma is baked in we make the ISO respect it:
+#   1. Strip qt5ct/qt6ct from the package list — they conflict with
+#      plasma-integration and break the look-and-feel of Qt apps.
+#   2. Comment the QT_*/GTK_THEME overrides in /etc/environment — they
+#      override Plasma's own theming and trigger the yellow "could not
+#      apply theme" popup (the same fix ATT's themes.py applies).
+#   3. Warn (can't auto-fix) when gnome is also selected: the gnome group
+#      pulls xdg-desktop-portal-gnome, which conflicts with
+#      xdg-desktop-portal-kde.
+# ATT (desktopr.py / themes.py) is the reference for these desktop rules.
+#####################################################################
+apply_plasma_rules() {
+    local sel="${editions-}"
+    [[ " ${sel} " == *" plasma "* ]] || return 0
+    log_section "Plasma packaging rules (KDE recommendations)"
+    # 1. Strip the Qt platform-theme conflicts (whole-line match; only ever prefixes '#').
+    local pkg
+    for pkg in qt5ct qt6ct; do
+        if grep -qxF "${pkg}" "${PACKAGES_FILE}"; then
+            sed -i "s/^${pkg}\$/#${pkg}   # removed for Plasma: conflicts with plasma-integration/" "${PACKAGES_FILE}"
+            log_info "Stripped Qt-theme conflict: ${pkg}"
+        fi
+    done
+    # 2. Comment the theme-override vars in /etc/environment (idempotent — already-#'d lines won't match).
+    local env_file="${buildFolder}/archiso/airootfs/etc/environment"
+    if [[ -f "${env_file}" ]]; then
+        sed -i -E 's/^(QT_QPA_PLATFORMTHEME=|QT_STYLE_OVERRIDE=|GTK_THEME=)/#\1/' "${env_file}"
+        log_info "Commented QT_QPA_PLATFORMTHEME / QT_STYLE_OVERRIDE / GTK_THEME in /etc/environment"
+    fi
+    # 3. gnome + plasma: portal conflict we can't comment out (transitive via the gnome group).
+    if [[ " ${sel} " == *" gnome "* ]]; then
+        log_warn "gnome + plasma in one ISO: the gnome group pulls xdg-desktop-portal-gnome, which conflicts with xdg-desktop-portal-kde (KDE packaging rules). Consider separate ISOs."
+    fi
 }
 
 #####################################################################
@@ -765,6 +894,8 @@ main() {
     prepare_build_tree
     prepopulate_keyring
     inject_nvidia_packages
+    apply_editions
+    apply_plasma_rules
     apply_kernel
     stamp_build_date
     build_iso

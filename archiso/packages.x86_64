@@ -221,10 +221,213 @@ spice-vdagent
 accountsservice
 sddm-git
 
-###  DEFAULT SESSION — the shipped desktop (XFCE4 + Ohmychadwm)
-ohmychadwm
-xfce4
-xfce4-goodies
+###  DESKTOP / WM EDITIONS — MANAGED BY build-the-iso.sh
+###  Commented blocks; the build uncomments the block(s) named in build.conf
+###  editions= (e.g. "xfce ohmychadwm i3"). Each block is the session's full set
+###  from ATT's desktopr.py; duplicate package lines are harmless (pacman dedupes).
+###  XFCE is an edition too now (NO longer force-installed): a build can omit it
+###  entirely — e.g. editions="cinnamon" = pure Cinnamon, no XFCE, none in SDDM.
+###  Default editions = "xfce ohmychadwm" (build.conf.defaults) → default ISO unchanged.
+###  The login session is set from build.conf default_session (see build-the-iso.sh).
+### >>> EDITION-BLOCK awesome >>>
+#alacritty
+#kiro-awesome
+#awesome
+#dmenu
+#kiro-xfce
+#feh
+#lxappearance
+#noto-fonts
+#fastcompmgr-git
+#polkit-gnome
+#rofi
+#thunar
+#thunar-archive-plugin
+#thunar-volman
+#ttf-hack
+#vicious
+#volctl
+#xfce4-terminal
+### <<< EDITION-BLOCK awesome <<<
+### >>> EDITION-BLOCK bspwm >>>
+#alacritty
+#kiro-bspwm
+#kiro-xfce
+#kiro-polybar
+#archlinux-logout-gtk4
+#kiro-rofi
+#kiro-rofi-themes
+#awesome-terminal-fonts
+#bspwm
+#dmenu
+#feh
+#lxappearance
+#fastcompmgr-git
+#polybar
+#polkit-gnome
+#rofi
+#sxhkd
+#thunar
+#thunar-archive-plugin
+#thunar-volman
+#ttf-hack
+#volctl
+#xfce4-terminal
+### <<< EDITION-BLOCK bspwm <<<
+### >>> EDITION-BLOCK budgie >>>
+#budgie
+### <<< EDITION-BLOCK budgie <<<
+### >>> EDITION-BLOCK chadwm >>>
+#alacritty
+#archlinux-logout-gtk4
+#kiro-chadwm
+#kiro-rofi
+#kiro-rofi-themes
+#kiro-xfce
+#dmenu
+#feh
+#lxappearance
+#fastcompmgr-git
+#polkit-gnome
+#rofi
+#sxhkd
+#thunar
+#thunar-archive-plugin
+#thunar-volman
+#ttf-hack
+#ttf-jetbrains-mono-nerd
+#volctl
+#xfce4-notifyd
+#xfce4-power-manager
+#xfce4-screenshooter
+#xfce4-settings
+#xfce4-taskmanager
+#xfce4-terminal
+### <<< EDITION-BLOCK chadwm <<<
+### >>> EDITION-BLOCK cinnamon >>>
+#cinnamon
+#cinnamon-translations
+#kiro-cinnamon
+#gnome-screenshot
+#gnome-system-monitor
+#gnome-terminal
+#nemo-fileroller
+### <<< EDITION-BLOCK cinnamon <<<
+### >>> EDITION-BLOCK gnome >>>
+#gnome
+#gnome-tweaks
+### <<< EDITION-BLOCK gnome <<<
+### >>> EDITION-BLOCK i3 >>>
+#alacritty
+#kiro-i3
+#archlinux-logout-gtk4
+#kiro-rofi
+#kiro-rofi-themes
+#kiro-xfce
+#autotiling
+#dmenu
+#feh
+#i3blocks
+#i3-wm
+#i3status
+#lxappearance
+#fastcompmgr-git
+#polkit-gnome
+#rofi
+#thunar
+#thunar-archive-plugin
+#thunar-volman
+#ttf-hack
+#volctl
+#xfce4-terminal
+### <<< EDITION-BLOCK i3 <<<
+### >>> EDITION-BLOCK leftwm >>>
+#alacritty
+#archlinux-logout-gtk4
+#kiro-leftwm
+#kiro-polybar
+#kiro-rofi
+#kiro-rofi-themes
+#kiro-xfce
+#dmenu
+#feh
+#leftwm-git
+#leftwm-theme-git
+#lxappearance
+#fastcompmgr-git
+#polybar
+#polkit-gnome
+#rofi
+#sxhkd
+#thunar
+#thunar-archive-plugin
+#thunar-volman
+#ttf-hack
+#ttf-iosevka-nerd
+#ttf-material-design-iconic-font
+#ttf-meslo-nerd-font-powerlevel10k
+#volctl
+#xfce4-appfinder
+#xfce4-screenshooter
+#xfce4-taskmanager
+#xfce4-terminal
+### <<< EDITION-BLOCK leftwm <<<
+### >>> EDITION-BLOCK mate >>>
+#mate
+#mate-extra
+#kiro-mate
+### <<< EDITION-BLOCK mate <<<
+### >>> EDITION-BLOCK ohmychadwm >>>
+#ohmychadwm
+#alacritty
+#dmenu
+#fastcompmgr-git
+#feh
+#maim
+#numlockx
+#picom-git
+#playerctl
+#rofi
+#scrot
+#sxhkd
+#volctl
+#xautolock
+#xclip
+#xorg-xsetroot
+### <<< EDITION-BLOCK ohmychadwm <<<
+### >>> EDITION-BLOCK plasma >>>
+#plasma
+#kde-system-meta
+#konsole
+### <<< EDITION-BLOCK plasma <<<
+### >>> EDITION-BLOCK qtile >>>
+#alacritty
+#archlinux-logout-gtk4
+#kiro-qtile
+#kiro-rofi
+#kiro-rofi-themes
+#kiro-xfce
+#awesome-terminal-fonts
+#dmenu
+#feh
+#lxappearance
+#fastcompmgr-git
+#polkit-gnome
+#python-setuptools
+#python-psutil
+#qtile
+#rofi
+#thunar
+#thunar-archive-plugin
+#thunar-volman
+#ttf-hack
+#volctl
+#xfce4-terminal
+### <<< EDITION-BLOCK qtile <<<
+### >>> EDITION-BLOCK xfce >>>
+#xfce4
+#xfce4-goodies
+### <<< EDITION-BLOCK xfce <<<
 
 
 #############################################################################
@@ -343,22 +546,8 @@ imagemagick
 paru-git
 yay-git
 
-###  OHMYCHADWM RUNTIME — tools the shipped Ohmychadwm session needs to work
-alacritty
-dmenu
-fastcompmgr-git
-feh
-maim
-numlockx
-picom-git
-playerctl
-rofi
-scrot
-sxhkd
-volctl
-xautolock
-xclip
-xorg-xsetroot
+###  OHMYCHADWM RUNTIME — moved into EDITION-BLOCK ohmychadwm above; it's now an
+###  opt-in TWM edition (default), not part of the always-on base.
 
 ###  SHELL / TERMINAL ENV
 bash-completion
@@ -543,3 +732,101 @@ zenity
 #  PERSONAL_REPO / LOCAL REPO                                               #
 #  Add packages from your own local repo below (empty by default).         #
 #############################################################################
+
+
+#############################################################################
+#  EXTRA APPS — OPT-IN — NOT shipped by default                             #
+#  Apps Kiro deliberately leaves off the base image. The kiro-iso-builder   #
+#  "Add apps" page lists these; the build UNCOMMENTS the block(s) whose key #
+#  is in build-scripts/package-additions.conf. Empty/missing file = add     #
+#  nothing (= the standard production Kiro). Managed by build-the-iso.sh.    #
+#  Block marker:  ### >>> EXTRA-APP <key> | <label> | <repo> >>>            #
+#  Only list packages that resolve in an enabled build repo                 #
+#  (core/extra/nemesis_repo/chaotic-aur/cachyos) — AUR/pip/npm will fail.   #
+#############################################################################
+
+### CATEGORY: Office — Suites
+### >>> EXTRA-APP libreoffice | LibreOffice | extra >>>
+#libreoffice-fresh
+### <<< EXTRA-APP libreoffice <<<
+### >>> EXTRA-APP onlyoffice | OnlyOffice | chaotic-aur >>>
+#onlyoffice-bin
+### <<< EXTRA-APP onlyoffice <<<
+### >>> EXTRA-APP wps | WPS Office | chaotic-aur >>>
+#wps-office
+#wps-office-fonts
+#wps-office-mime
+#ttf-wps-fonts
+#libtiff5
+### <<< EXTRA-APP wps <<<
+
+### CATEGORY: Office — Mail
+### >>> EXTRA-APP thunderbird | Thunderbird | extra >>>
+#thunderbird
+### <<< EXTRA-APP thunderbird <<<
+### >>> EXTRA-APP betterbird | Betterbird | chaotic-aur >>>
+#betterbird-bin
+### <<< EXTRA-APP betterbird <<<
+### >>> EXTRA-APP geary | Geary | extra >>>
+#geary
+### <<< EXTRA-APP geary <<<
+### >>> EXTRA-APP evolution | Evolution | extra >>>
+#evolution
+### <<< EXTRA-APP evolution <<<
+### >>> EXTRA-APP clawsmail | Claws Mail | extra >>>
+#claws-mail
+### <<< EXTRA-APP clawsmail <<<
+### >>> EXTRA-APP kmail | KMail | extra >>>
+#kmail
+### <<< EXTRA-APP kmail <<<
+
+### CATEGORY: Office — Editors
+### >>> EXTRA-APP geany | Geany | extra >>>
+#geany
+### <<< EXTRA-APP geany <<<
+### >>> EXTRA-APP kate | Kate | extra >>>
+#kate
+### <<< EXTRA-APP kate <<<
+### >>> EXTRA-APP mousepad | Mousepad | extra >>>
+#mousepad
+### <<< EXTRA-APP mousepad <<<
+### >>> EXTRA-APP gedit | Gedit | extra >>>
+#gedit
+### <<< EXTRA-APP gedit <<<
+### >>> EXTRA-APP gnometext | GNOME Text Editor | extra >>>
+#gnome-text-editor
+### <<< EXTRA-APP gnometext <<<
+### >>> EXTRA-APP featherpad | FeatherPad | extra >>>
+#featherpad
+### <<< EXTRA-APP featherpad <<<
+
+### CATEGORY: Office — PDF & Notes
+### >>> EXTRA-APP okular | Okular | extra >>>
+#okular
+### <<< EXTRA-APP okular <<<
+### >>> EXTRA-APP evince | Evince | extra >>>
+#evince
+### <<< EXTRA-APP evince <<<
+### >>> EXTRA-APP qpdfview | qpdfview | chaotic-aur >>>
+#qpdfview
+### <<< EXTRA-APP qpdfview <<<
+### >>> EXTRA-APP pdfarranger | PDF Arranger | extra >>>
+#pdfarranger
+### <<< EXTRA-APP pdfarranger <<<
+### >>> EXTRA-APP xournalpp | Xournal++ | extra >>>
+#xournalpp
+### <<< EXTRA-APP xournalpp <<<
+### >>> EXTRA-APP cherrytree | CherryTree | extra >>>
+#cherrytree
+### <<< EXTRA-APP cherrytree <<<
+### >>> EXTRA-APP obsidian | Obsidian | extra >>>
+#obsidian
+### <<< EXTRA-APP obsidian <<<
+
+### CATEGORY: Office — Scanning
+### >>> EXTRA-APP simplescan | Simple Scan | extra >>>
+#simple-scan
+### <<< EXTRA-APP simplescan <<<
+### >>> EXTRA-APP gscan2pdf | gscan2pdf | extra >>>
+#gscan2pdf
+### <<< EXTRA-APP gscan2pdf <<<

@@ -1,9 +1,15 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Seven ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08`). For each: why it was worth a new ISO,
+Eight ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.08 — June 8 (current)
+## v26.06.09 — June 9 (current)
+**Why a new ISO:** one more filesystem choice at install time, and a new **Kiro** menu that puts the project's key links one click away.
+- **f2fs as a root filesystem:** the **Calamares Tweak Tool** now offers **f2fs** in its filesystem picker (right after ext4), alongside ext4 / xfs / jfs / btrfs — a flash-friendly, log-structured option well suited to SSD/NVMe installs. The `f2fs-tools` formatter already ships on the medium, so Calamares creates the filesystem cleanly.
+- **Kiro links in the menu:** a new **Kiro** submenu in the application menu gathers four one-click shortcuts — **Website**, **Releases**, **Discussions** and **Source Code** — each opening the matching page in your browser. A lightweight menu addition (no welcome app), with each link carrying its own coloured Kiro "K".
+- **Packages:** updates only — `kiro-calamares-tweak-tool` (f2fs option) and `kiro-dot-files` (Kiro menu links).
+
+## v26.06.08 — June 8
 **Why a new ISO:** GRUB installs can no longer be bricked by an update, and QEMU/KVM virtual machines get host↔guest clipboard out of the box.
 - **GRUB installs now self-heal:** the new `kiro-bootloader-grub` package adds pacman hooks that automatically re-run `grub-install` and rebuild the boot menu whenever GRUB or a kernel updates — closing the long-standing Arch trap where a `grub` update left the on-disk bootloader out of sync and the machine refused to boot (`error: symbol 'grub_…' not found`). The boot disk is detected automatically, so it works whatever the disk is named (`sda`, `vda`, NVMe…). It ships only where GRUB is the bootloader — every legacy-BIOS install, plus any UEFI user who picks GRUB in the Calamares Tweak Tool — and is cleanly removed on systemd-boot installs.
 - **Clipboard sharing in virtual machines:** `spice-vdagent` now ships, so copy/paste between your host and a Kiro guest works out of the box on QEMU/KVM with a SPICE display. It's kept only on QEMU/KVM installs and removed on bare metal, VirtualBox and VMware (where SPICE isn't used).

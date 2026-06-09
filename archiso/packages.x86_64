@@ -328,6 +328,7 @@ cachyos-ananicy-rules-git
 cronie
 firewall-config
 firewalld
+gparted
 irqbalance
 scx-manager
 sysz
@@ -467,7 +468,6 @@ file-roller
 galculator
 gnome-disk-utility
 gnome-screenshot
-gparted
 meld
 qbittorrent
 sublime-text-4

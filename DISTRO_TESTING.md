@@ -4,6 +4,22 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-09 — Production v26.06.09: new custom Calamares modules + WM editions — 4 installs, both firmware paths, 0 FAIL
+
+Production `kiro-iso` **v26.06.09** (`ISO_BUILD` 20:58, ISO file 21:04) carrying the day's two big shipped changes: the **WM/desktop editions system** (`build-the-iso.sh` `apply_editions()` + `### >>> EDITION-BLOCK >>>` blocks in `packages.x86_64`, promoted from `-next`) and a **ground-up Calamares installer rewrite** in `kiro-calamares-config` — three new custom Python modules **`kiro_bootloader`** (974-line, replaces stock bootloader), **`kiro_displaymanager`** (1101-line, replaces stock displaymanager), and **`kiro_packages`** (832-line, replaces stock packages) — plus the production package-name fix in `kiro_packages.conf`/`kiro_final`. Validated across four installs covering **both firmware paths** and **both bootloader branches of the new `kiro_bootloader`**:
+
+| Target | Firmware / bootloader | New modules ran | Result |
+|--------|----------------------|-----------------|--------|
+| VirtualBox VM (oracle) | UEFI / systemd-boot | `kiro_bootloader`/`kiro_displaymanager`/`kiro_packages` all ran; `Bootloader: systemd-boot` → SUCCESS | **kiro-audit 134 / 0 / 0** |
+| **picard** (real metal, Intel HD630) | UEFI / systemd-boot | all three ran; systemd-boot branch → SUCCESS | **135 / 0 / 0**; install 3m21s |
+| **riker** (real metal, i7-7700K, Intel HD630) | UEFI / systemd-boot | all three ran; systemd-boot branch → SUCCESS | **139 / 0 / 0**; install 4m21s |
+| **worf** (real metal, MEDION P7624, Fermi GT 620M + Intel) | **BIOS / grub** | all three ran; **GRUB branch executed** — `Bootloader: grub (bios)` → `grub-install --target=i386-pc --recheck --force /dev/sda` → `grub-mkconfig -o /boot/grub/grub.cfg` → SUCCESS | **134 / 2 / 0**; install 5m58s |
+
+- **New `kiro_bootloader` validated on BOTH branches:** systemd-boot (VM + picard + riker) and **GRUB/BIOS (worf)** — `grub-install i386-pc → /dev/sda` + `grub-mkconfig` both ran to SUCCESS on real BIOS metal. This was the decisive gap: the rewrite's GRUB branch had no v26.06.09 validation until worf.
+- **New `kiro_displaymanager` + `kiro_packages`** ran on every target; package-removal cleanup correct (production names — `kiro-calamares-config`/`kiro-calamares-tweak-tool`/`calamares` removed, GRUB removed on systemd-boot).
+- worf's 2 WARN are `NVIDIA Fermi present but nvidia-open-dkms / nvidia-utils not installed` — **expected/benign** (Fermi can't use the open driver; chwd correctly routes it to nouveau). `GRUB boot-safety hooks installed` PASS on the grub box.
+- Install times recorded in [BUILD_TIMES.md](BUILD_TIMES.md) (picard 3m21s, riker 4m21s, worf 5m58s).
+
 ## 2026-06-08 — Production v26.06.08: GRUB boot-safety + spice-vdagent — 4 installs, both firmware paths, 0 FAIL
 
 Production `kiro-iso` **v26.06.08** (built 15:13) carrying the day's two new features: **`kiro-bootloader-grub` 26.06-04** (self-healing GRUB — pacman hooks re-run `grub-install`/`grub-mkconfig` on grub/kernel updates), **`spice-vdagent` 0.23.0** (QEMU/SPICE host↔guest clipboard), the updated **`kiro-calamares-config`** (`kiro_final`: spice in the `qemu` cleanup profile + combined `kiro-bootloader-grub`+`grub` removal on systemd-boot), and **`kiro-system-files` 26.06-21** (new `kiro-audit` GRUB boot-safety check). Validated across four installs, both firmware paths:

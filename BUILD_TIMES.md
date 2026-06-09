@@ -64,6 +64,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-06-09 21:52 | v26.06.09 | erik@192.168.1.16 | 5m58s | 2 | worf — real metal BIOS/grub; new kiro_bootloader GRUB branch ran (grub-install i386-pc -> /dev/sda, SUCCESS); Fermi on nouveau |
 | 2026-06-09 21:48 | v26.06.09 | erik@192.168.1.9 | 3m21s | 2 | picard — real metal UEFI/systemd-boot; new Calamares modules ran; kiro-audit 135/0/0 |
 | 2026-06-09 21:48 | v26.06.09 | erik@192.168.1.14 | 4m21s | 2 | riker — real metal UEFI/systemd-boot; new Calamares modules ran; kiro-audit 139/0/0 |
 | 2026-06-08 16:44 | v26.06.08 | erik@192.168.1.14 | 3m19s | 2 | riker — real metal (UEFI/systemd-boot); grub + kiro-bootloader-grub + spice all stripped, kiro-audit 135/0/0 |

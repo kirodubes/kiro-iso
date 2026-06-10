@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-06-10 — Calamares installer launches on labwc-backed Wayland sessions (Budgie)
+
+Promoted from `kiro-iso-next` after validation on the beta ISO (Budgie launches; **XFCE and ohmychadwm regression-tested and unaffected**).
+
+On a **Budgie** live ISO the installer would not start. Budgie's session is Wayland with **labwc** as the compositor, and **Calamares is a Qt xcb/X11 app** launched as **root** via `pkexec` from **`calamares_polkit`**. Under labwc the root process has no authorization for the user's XWayland display, so Calamares died with `Authorization required, but no authorization protocol specified` / `qt.qpa.xcb: could not connect to display :1`. (Two early suspects were ruled out: `xcb-util-cursor` is already present — the `xcb-cursor0 ... is needed` line is Qt's generic message whenever the xcb plugin fails — and the SDDM autologin `Session=` naming is a separate concern.)
+
+This is **not "all Wayland"**: **GNOME-Wayland (mutter)** and **Plasma-Wayland (kwin)** launch the installer fine — those compositors set up XWayland so root can connect; minimal compositors like **labwc** do not. So the fix in **`calamares_polkit`** (shipped by the **`calamares`** package) keys on the **observable symptom, not the compositor**: it probes whether a root process can already reach the X display (`sudo -n env DISPLAY=… XAUTHORITY=… xhost`) and only when it can't does it grant access (`xhost +SI:localuser:root`, with a `trap` revoke and `DISPLAY`/`XAUTHORITY` passed through `pkexec`). Where root already reaches the display the launcher takes the **byte-for-byte original path**, and because the grant is additive + revoked, even a false-positive probe cannot regress a working session. Future Wayland editions (Hyprland, niri) are handled with no further code change.
+
+- **`calamares_polkit`** (in the `calamares` package) — runtime probe + conditional `xhost` grant; original path untouched where root already reaches the display.
+- **`archiso/packages.x86_64`** — added **`xorg-xhost`** (provides the `xhost` the launcher needs; tiny, harmless on X11).
+
 ## 2026-06-10 — GTK-stack desktops (GNOME, Budgie) get the same theme-override fix as Plasma
 
 `apply_plasma_rules()` in **`build-scripts/build-the-iso.sh`** now fires for the **GTK-stack desktops** (**GNOME** and **Budgie**) as well as Plasma. Booting a GNOME edition built from the ISO hit the same breakage Plasma did: the XFCE-oriented overrides Kiro ships in **`/etc/environment`** (`QT_QPA_PLATFORMTHEME`, `QT_STYLE_OVERRIDE`, `GTK_THEME=Arc-Dawn-Dark`) stomp the desktop's own theme management and trigger the yellow "could not apply theme" popup. Budgie is GTK/GNOME-stack and shares the same failure, so it's covered in the same pass — before its first build.

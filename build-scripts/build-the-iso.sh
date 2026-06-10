@@ -548,8 +548,16 @@ apply_editions() {
     fi
     # Live ISO autologin session follows default_session, so a non-XFCE build (e.g.
     # editions="cinnamon") boots its own desktop instead of a now-absent XFCE.
+    # Most editions' SDDM session basename equals the edition name, but budgie is the
+    # exception: Arch's budgie-desktop ships wayland-sessions/budgie-desktop.desktop, so
+    # SDDM needs Session=budgie-desktop — Session=budgie matches nothing and autologin
+    # silently drops to the greeter. Map the odd ones here; pass the rest through.
+    local sddm_session="${default_sess}"
+    case "${default_sess}" in
+        budgie) sddm_session="budgie-desktop" ;;
+    esac
     local sddm_conf="${buildFolder}/archiso/airootfs/etc/sddm.conf.d/kde_settings.conf"
-    [[ -f "${sddm_conf}" ]] && sed -i "s/^Session=.*/Session=${default_sess}/" "${sddm_conf}"
+    [[ -f "${sddm_conf}" ]] && sed -i "s/^Session=.*/Session=${sddm_session}/" "${sddm_conf}"
     local ed
     for ed in ${sel}; do
         if ! grep -qF ">>> EDITION-BLOCK ${ed} >>>" "${PACKAGES_FILE}"; then

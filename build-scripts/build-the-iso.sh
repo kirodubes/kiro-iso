@@ -563,41 +563,63 @@ apply_editions() {
 }
 
 #####################################################################
-# Plasma packaging rules — applied only when 'plasma' is in editions=.
-# KDE's packaging recommendations
-# (https://community.kde.org/Distributions/Packaging_Recommendations)
-# assume a Plasma-centric distro and clash with Kiro's "many desktops on
-# one ISO" model. So when Plasma is baked in we make the ISO respect it:
-#   1. Strip qt5ct/qt6ct from the package list — they conflict with
-#      plasma-integration and break the look-and-feel of Qt apps.
-#   2. Comment the QT_*/GTK_THEME overrides in /etc/environment — they
-#      override Plasma's own theming and trigger the yellow "could not
-#      apply theme" popup (the same fix ATT's themes.py applies).
-#   3. Warn (can't auto-fix) when gnome is also selected: the gnome group
-#      pulls xdg-desktop-portal-gnome, which conflicts with
+# Qt/GTK theme-override rules — applied when plasma or a GTK-stack
+# desktop (gnome, budgie, …) is in editions=. Kiro ships XFCE-oriented
+# Qt/GTK theme settings (the qt5ct package plus QT_QPA_PLATFORMTHEME /
+# QT_STYLE_OVERRIDE / GTK_THEME in /etc/environment). Desktops that
+# manage their own theming fight those settings:
+#   1. Strip qt5ct/qt6ct from the package list — PLASMA ONLY: they
+#      conflict with plasma-integration and break Qt apps' look-and-feel.
+#      The GTK-stack desktops have no such conflict, so qt5ct stays.
+#   2. Comment QT_QPA_PLATFORMTHEME / QT_STYLE_OVERRIDE / GTK_THEME in
+#      /etc/environment — PLASMA AND the GTK-stack desktops: these
+#      overrides stomp the desktop's own theming and trigger the yellow
+#      "could not apply theme" popup (the same fix ATT's themes.py applies).
+#   3. Warn (can't auto-fix) when gnome AND plasma are both selected: the
+#      gnome group pulls xdg-desktop-portal-gnome, which conflicts with
 #      xdg-desktop-portal-kde.
 # ATT (desktopr.py / themes.py) is the reference for these desktop rules.
+# (Name kept as apply_plasma_rules for call-site/doc stability.)
 #####################################################################
 apply_plasma_rules() {
     local sel="${editions-}"
-    [[ " ${sel} " == *" plasma "* ]] || return 0
-    log_section "Plasma packaging rules (KDE recommendations)"
-    # 1. Strip the Qt platform-theme conflicts (whole-line match; only ever prefixes '#').
-    local pkg
-    for pkg in qt5ct qt6ct; do
-        if grep -qxF "${pkg}" "${PACKAGES_FILE}"; then
-            sed -i "s/^${pkg}\$/#${pkg}   # removed for Plasma: conflicts with plasma-integration/" "${PACKAGES_FILE}"
-            log_info "Stripped Qt-theme conflict: ${pkg}"
-        fi
-    done
-    # 2. Comment the theme-override vars in /etc/environment (idempotent — already-#'d lines won't match).
+    local has_plasma=0 has_gnome=0 has_budgie=0
+    [[ " ${sel} " == *" plasma "* ]] && has_plasma=1
+    [[ " ${sel} " == *" gnome "* ]]  && has_gnome=1
+    [[ " ${sel} " == *" budgie "* ]] && has_budgie=1
+    # GTK-stack desktops that manage their own theming: they need the
+    # /etc/environment fix but not the (Plasma-specific) qt5ct strip.
+    local has_gtk_de=0
+    (( has_gnome || has_budgie )) && has_gtk_de=1
+    (( has_plasma || has_gtk_de )) || return 0
+
+    local which=""
+    (( has_plasma )) && which+="Plasma "
+    (( has_gnome ))  && which+="GNOME "
+    (( has_budgie )) && which+="Budgie "
+    log_section "Qt/GTK theme rules (${which% })"
+
+    # 1. Strip the Qt platform-theme conflicts — Plasma only (whole-line match; only ever prefixes '#').
+    if (( has_plasma )); then
+        local pkg
+        for pkg in qt5ct qt6ct; do
+            if grep -qxF "${pkg}" "${PACKAGES_FILE}"; then
+                sed -i "s/^${pkg}\$/#${pkg}   # removed for Plasma: conflicts with plasma-integration/" "${PACKAGES_FILE}"
+                log_info "Stripped Qt-theme conflict: ${pkg}"
+            fi
+        done
+    fi
+
+    # 2. Comment the theme-override vars in /etc/environment — Plasma or a GTK-stack DE
+    #    (idempotent — already-#'d lines won't match).
     local env_file="${buildFolder}/archiso/airootfs/etc/environment"
     if [[ -f "${env_file}" ]]; then
         sed -i -E 's/^(QT_QPA_PLATFORMTHEME=|QT_STYLE_OVERRIDE=|GTK_THEME=)/#\1/' "${env_file}"
         log_info "Commented QT_QPA_PLATFORMTHEME / QT_STYLE_OVERRIDE / GTK_THEME in /etc/environment"
     fi
+
     # 3. gnome + plasma: portal conflict we can't comment out (transitive via the gnome group).
-    if [[ " ${sel} " == *" gnome "* ]]; then
+    if (( has_plasma && has_gnome )); then
         log_warn "gnome + plasma in one ISO: the gnome group pulls xdg-desktop-portal-gnome, which conflicts with xdg-desktop-portal-kde (KDE packaging rules). Consider separate ISOs."
     fi
 }

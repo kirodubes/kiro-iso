@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-06-10 — GTK-stack desktops (GNOME, Budgie) get the same theme-override fix as Plasma
+
+`apply_plasma_rules()` in **`build-scripts/build-the-iso.sh`** now fires for the **GTK-stack desktops** (**GNOME** and **Budgie**) as well as Plasma. Booting a GNOME edition built from the ISO hit the same breakage Plasma did: the XFCE-oriented overrides Kiro ships in **`/etc/environment`** (`QT_QPA_PLATFORMTHEME`, `QT_STYLE_OVERRIDE`, `GTK_THEME=Arc-Dawn-Dark`) stomp the desktop's own theme management and trigger the yellow "could not apply theme" popup. Budgie is GTK/GNOME-stack and shares the same failure, so it's covered in the same pass — before its first build.
+
+The fix is deliberately asymmetric so each desktop gets only what it needs:
+
+- **`/etc/environment` commenting** (all three vars) now runs for **`plasma` or a GTK-stack desktop (`gnome`, `budgie`)** in `editions=`. This is the actual GNOME/Budgie fix — those overrides fight any desktop that manages its own theming.
+- **The `qt5ct`/`qt6ct` package strip stays Plasma-only.** It exists to resolve a real `plasma-integration` conflict; on the GTK-stack desktops `qt5ct` is merely unused, and removing it would leave Qt apps with no theming integration, so **GNOME and Budgie keep `qt5ct` installed**.
+- The **gnome + plasma** portal warning (the `gnome` group pulls `xdg-desktop-portal-gnome`, which conflicts with `xdg-desktop-portal-kde`) still fires only when *both* are selected.
+
+A new `has_gtk_de` flag (gnome or budgie) drives branch 2, keeping the gate easy to extend to cinnamon/mate later. The function name is kept as `apply_plasma_rules` to avoid churning the call site and the HQ build tutorial; the header comment and the runtime `log_section` label ("Qt/GTK theme rules") are updated to reflect the broader scope. ISOs that select none of these (the default `xfce ohmychadwm`) are completely untouched — verified on temp copies across all cases (default no-op, gnome, budgie, plasma, budgie+plasma, gnome+plasma, and a re-run for idempotency). The `sed` edits remain whole-line/idempotent.
+
 ## 2026-06-09 — Promote editions + add-apps system from kiro-iso-next
 
 **What Changed**

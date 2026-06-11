@@ -28,6 +28,22 @@ Calamares launches. Two installs off this ISO, both UEFI, validated over SSH (er
   (scans `/usr/share/xsessions` + `/usr/share/wayland-sessions`; passes on any session) — see
   `kiro-system-files` CHANGELOG 2026.06.11. Rebuild `kiro-system-files` to clear these on Budgie.
 
+**Re-verified on the FINAL ISO (`v26.06.11`, 08:35 build — new `kiro-audit` shipped).** A fresh
+**encrypted-btrfs** install, this time the **default XFCE + ohmychadwm** edition (sessions
+`xfce` / `xfce-wayland` / `ohmychadwm`), VirtualBox UEFI:
+
+| Check | Result |
+|-------|--------|
+| Encryption | `/dev/sda2` **LUKS2** / aes-xts-plain64; btrfs root unlocks at boot ✓ |
+| Subvolumes | full `@ @home @root @srv @cache @log @tmp @snapshots` ✓ |
+| Bootloader | UEFI / **systemd-boot 260.2** ✓ |
+| **kiro-audit (new tool)** | **136 PASS / 0 WARN / 0 FAIL** ✓ |
+
+This is the **first installed-system run of the edition-aware audit + live-guard build**, and it
+comes back **0 FAIL** — confirming all four 2026-06-11 `kiro-audit` fixes ship clean on a real
+install: edition-agnostic desktop check, `/run/archiso` live-guard, cachyos-enabled→PASS, and
+`MAKEFLAGS` `nproc-1`/`nproc-2`→PASS. No false FAILs.
+
 ## 2026-06-09 — Production v26.06.09: new custom Calamares modules + WM editions — 4 installs, both firmware paths, 0 FAIL
 
 Production `kiro-iso` **v26.06.09** (`ISO_BUILD` 20:58, ISO file 21:04) carrying the day's two big shipped changes: the **WM/desktop editions system** (`build-the-iso.sh` `apply_editions()` + `### >>> EDITION-BLOCK >>>` blocks in `packages.x86_64`, promoted from `-next`) and a **ground-up Calamares installer rewrite** in `kiro-calamares-config` — three new custom Python modules **`kiro_bootloader`** (974-line, replaces stock bootloader), **`kiro_displaymanager`** (1101-line, replaces stock displaymanager), and **`kiro_packages`** (832-line, replaces stock packages) — plus the production package-name fix in `kiro_packages.conf`/`kiro_final`. Validated across four installs covering **both firmware paths** and **both bootloader branches of the new `kiro_bootloader`**:

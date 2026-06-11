@@ -4,6 +4,30 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-11 — New Budgie ISO: CTT menu-launch fix + encrypted-btrfs and regular installs — both boot, 0 real FAIL
+
+New `kiro-iso` build carrying the **calamares-tweak-tool menu-launch fix** (`.desktop` dropped
+bare `sudo` for `pkexec`; no `exec` so the menu launcher doesn't leave pkexec a dead parent;
+socket-based Wayland detection — see `kiro-calamares-tweak-tool` CHANGELOG 2026.06.11). On the
+live **Budgie/Wayland** ISO, CTT now launches **from the menu** (previously did nothing) and
+Calamares launches. Two installs off this ISO, both UEFI, validated over SSH (erik@127.0.0.1):
+
+| Target (VBox) | FS / encryption | Bootloader | Result |
+|---------------|-----------------|------------|--------|
+| **Kiro** (Budgie edition) | **btrfs + LUKS2/argon2id** (aes-xts-plain64) | UEFI / systemd-boot | Booted = LUKS unlocks at boot; full `@`/`@home`/`@root`/`@snapshots`/`@log`/`@cache`/`@srv`/`@tmp` subvol layout; Calamares.log clean; **kiro-audit 4 FAIL = all edition artifacts** (see note) |
+| **Kiro default** (XFCE/ohmychadwm) | **ext4**, unencrypted | UEFI / systemd-boot 260.2 | Clean default install; no LUKS; Calamares.log clean; **kiro-audit 0 / 0 / 0** |
+
+- **CTT encrypted-btrfs path validated end-to-end:** `cryptsetup luksDump /dev/sda2` = **LUKS2 +
+  argon2id**, root is **btrfs** with the standard subvol scheme, and the system **boots** — so the
+  installed bootchain unlocks the LUKS2/argon2id volume. Exactly CTT's headline claim.
+- **The encrypted box's 4 kiro-audit FAILs are NOT install failures:** `ohmychadwm not installed`
+  / `xfwm4 not installed` / `ohmychadwm.desktop missing` / `xfce.desktop missing`. `kiro-audit`
+  hardcodes the default **XFCE + ohmychadwm** edition; this install is a **Budgie** edition, so
+  those checks miss. Real install health is clean (Calamares log, btrfs, LUKS2, boot all correct).
+  → **Fixed same day:** `kiro-audit` `check_desktop()` is now edition-agnostic + Wayland-aware
+  (scans `/usr/share/xsessions` + `/usr/share/wayland-sessions`; passes on any session) — see
+  `kiro-system-files` CHANGELOG 2026.06.11. Rebuild `kiro-system-files` to clear these on Budgie.
+
 ## 2026-06-09 — Production v26.06.09: new custom Calamares modules + WM editions — 4 installs, both firmware paths, 0 FAIL
 
 Production `kiro-iso` **v26.06.09** (`ISO_BUILD` 20:58, ISO file 21:04) carrying the day's two big shipped changes: the **WM/desktop editions system** (`build-the-iso.sh` `apply_editions()` + `### >>> EDITION-BLOCK >>>` blocks in `packages.x86_64`, promoted from `-next`) and a **ground-up Calamares installer rewrite** in `kiro-calamares-config` — three new custom Python modules **`kiro_bootloader`** (974-line, replaces stock bootloader), **`kiro_displaymanager`** (1101-line, replaces stock displaymanager), and **`kiro_packages`** (832-line, replaces stock packages) — plus the production package-name fix in `kiro_packages.conf`/`kiro_final`. Validated across four installs covering **both firmware paths** and **both bootloader branches of the new `kiro_bootloader`**:

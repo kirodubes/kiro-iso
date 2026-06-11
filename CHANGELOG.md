@@ -4,7 +4,15 @@
 
 ---
 
-## 2026-06-10 — Calamares installer launches on labwc-backed Wayland sessions (Budgie)
+## 2026-06-11 — Budgie live ISO autologins instead of stopping at the SDDM greeter
+
+A Budgie ISO built with KIB booted to the **SDDM login screen** instead of autologging into the desktop. Root cause was a **session-name mismatch**, not a missing autologin path. `apply_editions()` in **`build-scripts/build-the-iso.sh`** writes the live ISO's SDDM autologin session by `sed`-ing `default_session` straight into `Session=` in **`/etc/sddm.conf.d/kde_settings.conf`** — and KIB stores the **edition name** (`budgie`) there. For every other edition the edition name happens to equal the session `.desktop` basename (xfce→`xfce`, gnome→`gnome`, plasma→`plasma`, cinnamon→`cinnamon`), so they autologin fine. **Budgie is the lone exception**: Arch's **`budgie-desktop`** package ships its session as **`wayland-sessions/budgie-desktop.desktop`**, so SDDM needs `Session=budgie-desktop`. `Session=budgie` matched nothing, autologin silently failed, and the greeter appeared.
+
+The fix is a small **edition→session-basename map** placed right before the `Session=` `sed`: `budgie` resolves to `budgie-desktop`, every other edition passes through unchanged. This keeps KIB dumb (it still writes plain edition names) and puts the one piece of Budgie-specific knowledge at the canonical write point, rather than renaming/symlinking the session file in airootfs where a package update could clobber it.
+
+- **`build-scripts/build-the-iso.sh`** — `apply_editions()` now maps the SDDM autologin session basename (`budgie` → `budgie-desktop`) before writing `Session=`.
+
+
 
 Promoted from `kiro-iso-next` after validation on the beta ISO (Budgie launches; **XFCE and ohmychadwm regression-tested and unaffected**).
 

@@ -1,9 +1,20 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Eight ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09`). For each: why it was worth a new ISO,
+Ten ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.09 — June 9 (current)
+## v26.06.11 — June 11 (current)
+**Why a new ISO:** **Budgie** lands as a full edition you can build — and because Budgie is a **Wayland** desktop, the whole live experience around it was made to work: the ISO autologins straight into Budgie, and both the **Calamares installer** and the **Calamares Tweak Tool** now launch under Budgie's Wayland session.
+- **Budgie live ISO boots into the desktop:** a Budgie ISO built with the **Kiro ISO Builder** now autologins straight into Budgie instead of stopping at the SDDM login screen. Budgie's session file is named `budgie-desktop` (not `budgie` like every other edition), so the live ISO's autologin was silently dropping to the greeter; the builder now maps the Budgie edition to the right session name automatically.
+- **The installer and the Calamares Tweak Tool work on Wayland:** on a Budgie live ISO (which runs the **labwc** Wayland compositor) the installer and the **Calamares Tweak Tool** previously did nothing — both are X11/Qt apps launched as root, and a minimal Wayland compositor doesn't let the root process reach the display. The launcher now detects exactly that situation and grants the root installer just-enough access to the display, then revokes it — so Calamares and the CTT both open. GNOME-Wayland and Plasma-Wayland already worked (they set up XWayland themselves); this covers the lean compositors, and any future Wayland edition (Hyprland, niri) is handled with no further change.
+- **Validated end to end:** an encrypted **btrfs + LUKS2/argon2id** Budgie install unlocks at boot and comes up clean, alongside a plain default XFCE install (`kiro-audit` 0 / 0 / 0).
+- **Packages:** + `xorg-xhost` (lets the installer grant itself display access on Wayland; tiny and harmless on X11).
+
+## v26.06.10 — June 10
+**Why a new ISO:** **GNOME** and **Budgie** editions you build no longer throw the yellow "could not apply theme" popup.
+- **Theme handling fixed for GTK desktops:** Kiro ships XFCE-oriented Qt/GTK theme overrides (in `/etc/environment`) that fight any desktop which manages its own theming — the same breakage Plasma hit. The build now clears those overrides for **GNOME** and **Budgie** editions too, so they theme themselves cleanly instead of triggering the yellow theme-error popup. GNOME and Budgie keep `qt5ct` (only Plasma needs it stripped, to resolve a real conflict). The default **XFCE** ISO is completely untouched.
+
+## v26.06.09 — June 9
 **Why a new ISO:** the **Kiro ISO Builder** takes a big step up — build an ISO around *any* desktop, not just XFCE, and tick extra office and productivity apps onto it before you build — and **f2fs** lands as a real install-time filesystem choice.
 - **Build an ISO around any desktop:** the **Kiro ISO Builder**'s Configure screen now lets you pick exactly which editions go on your ISO from everything the medium offers — full desktops **XFCE, Cinnamon, GNOME, Plasma, MATE** and **Budgie**, plus the window managers **awesome, bspwm, chadwm, i3, leftwm, ohmychadwm** and **qtile** — and choose which one the live ISO logs into first. XFCE is now just one edition among many instead of always being forced on, so you can roll a pure Cinnamon, GNOME or Plasma ISO with nothing you didn't ask for. The list is read straight from the package manifest, so the builder never carries a hardcoded edition list that can drift.
 - **Add office & productivity apps to your build:** a new **Add apps** step — the wizard is now six (Pre-flight → Configure → Packages → Add apps → Build → Done) — lets you opt **in** to apps the base ISO deliberately leaves off: office suites (**LibreOffice, OnlyOffice, WPS Office**), email clients (**Thunderbird, Betterbird, Evolution, Geary, Claws Mail, KMail**), text editors, PDF tools, note-takers and scanning utilities, grouped by category with select-all and search. It's the mirror image of the Packages step — Packages strips defaults out, Add apps layers extras in — and both are driven by the same package manifest, so the builder stays in sync automatically.

@@ -101,6 +101,40 @@ EOF_CACHYOS
     log_success "cachyos-keyring and cachyos-mirrorlist installed"
 }
 
+enable_cachyos() {
+    # Re-enable a [cachyos] repo that is present in pacman.conf but commented out
+    # (Kiro ships it disabled by default — chaotic-aur is the backstop). Only
+    # needed when the user picks a cachyos-only kernel that chaotic-aur doesn't
+    # carry. Assumes the keyring/mirrorlist are already installed; setup_cachyos
+    # handles the from-scratch case. Idempotent.
+    if grep -qE '^[[:space:]]*\[cachyos\]' /etc/pacman.conf; then
+        log_info "[cachyos] is already enabled in /etc/pacman.conf"
+    elif grep -qE '^[[:space:]]*#[[:space:]]*\[cachyos\][[:space:]]*$' /etc/pacman.conf; then
+        log_info "Uncommenting the [cachyos] repo in /etc/pacman.conf"
+        [[ -f /etc/pacman.conf.kiro-bak ]] || sudo cp /etc/pacman.conf /etc/pacman.conf.kiro-bak
+        # Uncomment the [cachyos] header and its commented config lines, stopping
+        # at the next blank line or section header so nothing else is touched.
+        awk '
+            function uncomment(s) { sub(/^[[:space:]]*#[[:space:]]?/, "", s); return s }
+            /^[[:space:]]*#[[:space:]]*\[cachyos\][[:space:]]*$/ { print uncomment($0); blk=1; next }
+            blk==1 {
+                if ($0 ~ /^[[:space:]]*$/ || $0 ~ /^[[:space:]]*\[/) { blk=0; print; next }
+                if ($0 ~ /^[[:space:]]*#/) { print uncomment($0); next }
+                blk=0; print; next
+            }
+            { print }
+        ' /etc/pacman.conf | sudo tee /etc/pacman.conf.kiro-new >/dev/null
+        sudo mv /etc/pacman.conf.kiro-new /etc/pacman.conf
+    else
+        log_warn "No [cachyos] section in /etc/pacman.conf — running full setup"
+        setup_cachyos
+    fi
+
+    log_info "Syncing package databases"
+    sudo pacman -Sy --noconfirm
+    log_success "[cachyos] repo enabled"
+}
+
 #####################################################################
 # Repository mirror health + fallback
 #

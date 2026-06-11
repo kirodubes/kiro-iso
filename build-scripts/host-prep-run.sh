@@ -9,7 +9,8 @@ set -euo pipefail
 #
 #   Purpose:
 #   Thin dispatcher that lets the kiro-iso-builder GUI invoke a single
-#   host-prep.sh helper (ensure_package, setup_chaotic, setup_cachyos)
+#   host-prep.sh helper (ensure_package, setup_chaotic, setup_cachyos,
+#   enable_cachyos)
 #   in isolation, without running the whole build. host-prep.sh is a
 #   sourced fragment that expects its caller to provide the log_*
 #   helpers and a few vars; this wrapper supplies lightweight stdout
@@ -23,6 +24,7 @@ set -euo pipefail
 #
 #   Usage: host-prep-run.sh <function> [args...]
 #     host-prep-run.sh setup_cachyos
+#     host-prep-run.sh enable_cachyos
 #     host-prep-run.sh setup_chaotic
 #     host-prep-run.sh ensure_package archiso
 #

@@ -644,9 +644,10 @@ SELECTED_KERNELS=()
 PRIMARY_KERNEL=""
 
 # Kernel discovery lives in list-kernels.sh (shared with the kiro-iso-builder
-# GUI's "Detect" button) so the CLI and GUI always agree on what is offerable.
-# It prints the kernels that have a matching -headers package, one per line —
-# the same "only real kernels, no false positives" filter that used to live here.
+# GUI) so the CLI and GUI always agree on what is offerable. It prints every
+# kernel that has a matching -headers package, one per line — the full repo
+# offering (CachyOS/XanMod flavors, pinned-LTS series and CPU-microarch builds
+# included); the -headers test is the only filter.
 detect_available_kernels() {
     mapfile -t AVAILABLE_KERNELS < <(bash "${SCRIPT_DIR}/list-kernels.sh")
 }

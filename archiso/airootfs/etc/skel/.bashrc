@@ -361,6 +361,16 @@ ex ()
   fi
 }
 
+# Alacritty's terminfo is missing on many remote hosts (old NAS, firewalls),
+# which garbles the remote cursor. Fall back to a universal entry for SSH only;
+# the local session keeps full alacritty terminfo. Non-alacritty TERM passes through.
+ssh() {
+  case "$TERM" in
+    alacritty|alacritty-direct) TERM=xterm-256color command ssh "$@" ;;
+    *) command ssh "$@" ;;
+  esac
+}
+
 
 #git
 alias rmgitcache="rm -r ~/.cache/git"

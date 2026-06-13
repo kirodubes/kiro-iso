@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-06-12 — On-screen keyboard (onboard) ships, with five Kiro themes
+
+Added **`onboard`** to **`archiso/packages.x86_64`** so the on-screen keyboard is present out of the box — for touchscreen, tablet and mobility-impaired users. It is an **on-demand** tool (application menu / the Arch Linux Tweak Tool's Accessibility page), launched only when needed, so it stays invisible to users who don't want it and there is no autostart. `onboard` lives in Arch **`extra`** (1.4.1-14), so the build pulls it with no extra repo and no AUR. onboard is the **in-session** keyboard; the SDDM login greeter is a separate concern (tracked as a future Qt VirtualKeyboard task — SDDM has no onboard hook).
+
+Paired with this, the companion **`kiro-system-files`** package ships **five custom Kiro onboard themes** — **Kiro Aurora** (signature dark blue→green), **Kiro Daylight** (light, for bright rooms / low-vision light preference), **Kiro Beacon** (high-contrast amber-on-black accessibility flagship), **Kiro Emerald**, **Kiro Azure** — installed to `/usr/share/onboard/themes/`, with **Kiro Azure** set as the default via a gsettings schema override (a default, not a lock; users keep any theme they pick). Those files are documented in that package's own changelog, not here.
+
+- **`archiso/packages.x86_64`** — added **`onboard`**.
+
 ## 2026-06-11 — Kernel discovery lists the full repo offering; enable_cachyos host-prep (mirrored from beta)
 
 Promoted from `kiro-iso-next` after validation. **`build-scripts/list-kernels.sh`** no longer curates the kernel list — it now reports **every** kernel the enabled repos carry, where "a kernel" is still any package `X` with a matching `X-headers` (the discriminator that separates a real kernel from a companion package like `*-zfs`/`*-nvidia` and guarantees the DKMS drivers can build). The old version probed a fixed candidate list plus a few hard-coded families and **deliberately excluded** CPU-microarch builds; that exclusion is gone, and the implementation is simpler/faster (one `pacman -Sl` pass building a name→repo map instead of a `pacman -Si` per candidate). The **default stdout is unchanged in shape** — kernel names, one per line (now sorted) — so the build's `detect_available_kernels()` → `mapfile` consumer is unaffected, and fixed kernels are still validated directly with `pacman -Si`. A new **`--with-repo`** flag emits `"<repo><TAB><kernel>"` for the GUI to group by source; the build never passes it. Note: the interactive `kernel="ask"` picker (and bad-name suggestions) now also offer microarch kernels — intended, and buildability is unaffected since they still have headers.

@@ -1,9 +1,16 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Eleven ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12`). For each: why it was worth a new ISO,
+Twelve ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12 .13`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.12 — June 12 (current)
+## v26.06.13 — June 13 (current)
+**Why a new ISO:** a new **Kiro News** notifier puts Arch Linux news and Kiro's own announcements on your desktop — built in response to the "Active AUR malicious packages" advisory.
+- **Kiro News:** `kiro-news` watches **Arch Linux News** (live RSS) and **Kiro's own feed** (shipped in-package, no server) and notifies on anything new; `kiro-news show` or the Kiro menu entry opens the full items in your browser. Runs on a per-user hourly timer with a randomized delay so machines don't all hit the servers at once.
+- **You're covered:** Kiro itself is unaffected — every shipped package was reviewed. The risk is in AUR packages you install yourself; `informant` is an opt-in alternative (`paru -S informant`).
+- **Existing installs:** Kiro News ships in `/etc/skel`; adopt it with `kiro-skell`.
+- **Packages:** + `kiro-news`.
+
+## v26.06.12 — June 12
 **Why a new ISO:** accessibility becomes first-class from the login screen all the way to the desktop — the **SDDM login greeter** gains its own on-screen keyboard and low-vision readability, and Kiro ships **Onboard** with five custom, readable themes for the desktop session.
 - **An on-screen keyboard at the login screen itself:** the **Kiro Simplicity** SDDM theme now carries its own on-screen keyboard, raised by a **Keyboard** toggle in the login screen's button row. A user with no physical keyboard — touchscreen, tablet, or someone with a mobility impairment — can now type their password and sign in *before any desktop session exists*, which Onboard (below) can't help with because it only runs after login. It's toggle-only — it never pops up on its own, so it stays out of the way for everyone else — and the password field lifts above the keyboard so it's never hidden behind it.
 - **A more readable login screen:** every control on the greeter — user picker, password field, Login button, clock and power buttons — now renders at a larger, consistent size instead of the small Qt default, and the "Enter your password" hint is now clearly white against the dark translucent background instead of a hard-to-read grey. Easier to read for low-vision users and on high-DPI displays.
@@ -116,7 +123,12 @@ truth is in the diffs, not the log.
    version-sync checks) and validations-that-aren't-changes. A pure
    version-bump + mirrorlist build gets NO entry — let the filter collapse it.
 
-5. Order newest FIRST (most recent build at the top, under the intro). Keep
-   blocks short; a build with one real selling point gets one line.
+5. Order newest FIRST (most recent build at the top, under the intro).
+
+6. BE CONCISE (Erik's rule, 2026-06-13). Every entry is tight: a one-line
+   "Why a new ISO" plus a few short bullets, never a paragraph per bullet.
+   One feature = one bullet of one or two sentences. A build with one real
+   selling point gets one line. Trim ruthlessly — the user wants the gist,
+   not the full design write-up (that lives in the package CHANGELOGs).
 =============================================================================
 -->

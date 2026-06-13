@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-06-13 — Re-tiered packages.x86_64 so KIB can opt out of onboard, Bluetooth, printing and CJK/MS fonts
+
+The Kiro ISO Builder's **Packages** screen only ever lists **TIER 3** of **`archiso/packages.x86_64`** (`read_tier3()` in `kiro-iso-builder/functions.py`); TIER 1 (frozen) and TIER 2 (core) are deliberately never shown so the page can't offer a build-breaking package. The side effect was that several genuinely-optional packages sat in TIER 1/2 where a user could **never** untick them in KIB — most visibly **`onboard`**, which had been parked in the TIER 1 *Installer / Calamares* block even though nothing in the build/boot/install path depends on it (the SDDM greeter's on-screen keyboard is the separate `qt5-virtualkeyboard`).
+
+Moved four clusters down into TIER 3, each as its own labelled category so they appear as distinct, self-documenting opt-out groups in KIB:
+
+- **Accessibility** — `onboard` (its own category, leaving room for the planned ISO-side a11y work)
+- **Bluetooth** — `blueberry`, `bluez`, `bluez-libs`, `bluez-utils`
+- **Printing & scanning** — `cups`, `cups-filters`, `cups-pdf`, `ghostscript`, `gsfonts`, `gutenprint`, `simple-scan`, `system-config-printer`
+- **Fonts — optional** — the three `adobe-source-han-sans-*` CJK families, `ttf-ms-fonts`, plus five Latin fonts no shipped Kiro config references (`adobe-source-sans-fonts`, `ttf-droid`, `ttf-roboto`, `ttf-roboto-mono`, `ttf-ubuntu-font-family`). The four load-bearing fonts stay in TIER 2: `noto-fonts` ("Noto Sans" — the default GTK/xfwm4/polybar/dmenu UI font), `ttf-hack` (alacritty + xfce4-terminal), `ttf-font-awesome` (polybar icons), and `ttf-dejavu` (toolkit glyph fallback); `noto-fonts-emoji` is also kept (emoji glyphs).
+
+This is **byte-identical for a default build** — TIER 3 ships fully by default (everything ticked = stock ISO), so the only change is that KIB now exposes four new opt-out categories. The groups were moved **whole** on purpose: KIB excludes a package by commenting its line out, which only truly drops it if nothing still-shipping pulls it back as a dependency, so a closed group (all four Bluetooth lines, the full CUPS set) is the unit a user can actually remove. The fonts are fully clean — the browsers' `ttf-font` requirement is **virtual**, satisfied by the retained `noto-fonts`/`ttf-dejavu`, so none of the optional fonts get pulled back. Two cross-tier pins remain by design and are harmless: **`bluez-libs`** is hard-required by the shipped `pipewire-audio`, and **`gsfonts`** by the shipped `evince` — so those two tiny packages survive deselection even though the rest of their group is removed. Verified the new categories parse via KIB's own `read_tier3()` and confirmed the dependency facts against the synced pacman databases.
+
+- **`archiso/packages.x86_64`** — removed the Bluetooth, Printing/Scanning and CJK/MS-font lines from TIER 2 (and the stale "safe to drop" note); moved `onboard` out of the TIER 1 installer block; added `ACCESSIBILITY`, `BLUETOOTH`, `PRINTING & SCANNING` and `FONTS — OPTIONAL` categories under TIER 3.
+
 ## 2026-06-12 — On-screen keyboard (onboard) ships, with five Kiro themes
 
 Added **`onboard`** to **`archiso/packages.x86_64`** so the on-screen keyboard is present out of the box — for touchscreen, tablet and mobility-impaired users. It is an **on-demand** tool (application menu / the Arch Linux Tweak Tool's Accessibility page), launched only when needed, so it stays invisible to users who don't want it and there is no autostart. `onboard` lives in Arch **`extra`** (1.4.1-14), so the build pulls it with no extra repo and no AUR. onboard is the **in-session** keyboard; the SDDM login greeter is a separate concern (tracked as a future Qt VirtualKeyboard task — SDDM has no onboard hook).

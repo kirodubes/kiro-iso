@@ -461,12 +461,6 @@ pipewire-jack
 pipewire-pulse
 wireplumber
 
-###  BLUETOOTH
-blueberry
-bluez
-bluez-libs
-bluez-utils
-
 ###  NETWORK
 avahi
 hblock
@@ -493,16 +487,6 @@ mtpfs
 udiskie
 udisks2
 xdg-user-dirs
-
-###  PRINTING / SCANNING
-cups
-cups-filters
-cups-pdf
-ghostscript
-gsfonts
-gutenprint
-simple-scan
-system-config-printer
 
 ###  THUMBNAILS — tumbler + thumbnailers
 ffmpegthumbnailer
@@ -609,21 +593,12 @@ surfn-icons-git
 ttf-material-design-iconic-font
 vimix-cursors
 
-###  FONTS  (CJK + ttf-ms-fonts are safe to drop if you don't need them)
-adobe-source-han-sans-cn-fonts
-adobe-source-han-sans-jp-fonts
-adobe-source-han-sans-kr-fonts
-adobe-source-sans-fonts
+###  FONTS  (load-bearing — referenced by shipped Kiro configs / toolkit fallback)
 noto-fonts
 noto-fonts-emoji
 ttf-dejavu
-ttf-droid
 ttf-font-awesome
 ttf-hack
-ttf-ms-fonts
-ttf-roboto
-ttf-roboto-mono
-ttf-ubuntu-font-family
 
 
 #############################################################################
@@ -692,6 +667,25 @@ pciutils
 redshift
 resources
 
+###  ACCESSIBILITY  (on-screen keyboard for the desktop session)
+onboard
+
+###  BLUETOOTH  (drop the whole group if the target has no Bluetooth)
+blueberry
+bluez
+bluez-libs
+bluez-utils
+
+###  PRINTING & SCANNING  (drop the whole group if you never print/scan)
+cups
+cups-filters
+cups-pdf
+ghostscript
+gsfonts
+gutenprint
+simple-scan
+system-config-printer
+
 ###  BACKUP / SNAPSHOTS
 timeshift
 
@@ -717,6 +711,17 @@ unace
 unrar
 unzip
 
+###  FONTS — OPTIONAL  (not referenced by any Kiro config; safe to drop)
+adobe-source-han-sans-cn-fonts
+adobe-source-han-sans-jp-fonts
+adobe-source-han-sans-kr-fonts
+adobe-source-sans-fonts
+ttf-droid
+ttf-ms-fonts
+ttf-roboto
+ttf-roboto-mono
+ttf-ubuntu-font-family
+
 ###  DESKTOP / MISC EXTRAS
 arandr
 claude-code
@@ -725,7 +730,6 @@ font-manager
 gittyup
 laptop-detect
 lsb-release
-onboard
 menulibre
 mintstick
 mugshot

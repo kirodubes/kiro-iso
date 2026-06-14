@@ -37,6 +37,10 @@ REPO_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 # so build_location=home points at the real work dir, not /root/kiro-build.
 if [[ -n "${PKEXEC_UID:-}" ]]; then
     user_home="$(getent passwd "${PKEXEC_UID}" | cut -d: -f6)"
+elif [[ -n "${SUDO_USER:-}" ]]; then
+    # Under plain `sudo`, $HOME is root's — resolve the invoking user's home so
+    # buildFolder points at /home/<user>/kiro-build, not /root/kiro-build.
+    user_home="$(getent passwd "${SUDO_USER}" | cut -d: -f6)"
 else
     user_home="${HOME}"
 fi
@@ -66,11 +70,23 @@ case "${mode}" in
         [[ -z "${mounts}" ]]   # exit 0 when clean, 1 when mounts remain
         ;;
     clean)
+        if [[ ${EUID} -ne 0 ]]; then
+            echo "unmount-build.sh clean must run as root (use sudo or pkexec)" >&2
+            exit 1
+        fi
         while read -r target; do
             [[ -n "${target}" ]] || continue
             echo "Unmounting stale build mount: ${target}"
             umount -R -l "${target}" 2>/dev/null || umount -l "${target}" 2>/dev/null || true
         done < <(list_stale_mounts)
+        # Verify rather than trust: re-list and fail loudly if anything survived,
+        # so a partial/blocked cleanup can never masquerade as success.
+        remaining="$(list_stale_mounts)"
+        if [[ -n "${remaining}" ]]; then
+            echo "ERROR: mounts still present after cleanup:" >&2
+            echo "${remaining}" >&2
+            exit 1
+        fi
         echo "Build-mount cleanup done."
         ;;
     *)

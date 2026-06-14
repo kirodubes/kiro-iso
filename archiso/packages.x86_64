@@ -200,6 +200,14 @@ cachyos-keyring
 cachyos-mirrorlist
 chaotic-keyring
 chaotic-mirrorlist
+kiro-keyring
+kiro-mirrorlist
+
+###  REPLACEMENT PRE-SEEDS — ship the post-rename package so the first
+###  `pacman -Syu` has nothing to swap (no interactive replace prompt for users).
+###  sdl2-compat Provides: sdl2; it is pulled in only transitively, so without this
+###  line the old sdl2 installs and Arch's extra/sdl2-compat replaces it on first update.
+sdl2-compat
 
 ###  INSTALLER / CALAMARES — the installer and its install-time helpers
 calamares

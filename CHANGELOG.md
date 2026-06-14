@@ -2,6 +2,29 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.14
+
+### Pre-seed `sdl2-compat` to avoid the first-update replace prompt
+- A freshly installed ISO showed `:: Replace sdl2 with extra/sdl2-compat? [Y/n]` on the user's first `pacman -Syu`. `sdl2` isn't an explicit package — it's pulled in transitively (ffmpeg, sdl2_image, wxwidgets, qemu-ui-sdl…), so the build installs the old `sdl2` and Arch's `extra/sdl2-compat` (which `Replaces: sdl2`) proposes the swap on first update.
+- Fix: add **`sdl2-compat`** explicitly to `packages.x86_64` (new *REPLACEMENT PRE-SEEDS* group). Because it `Provides: sdl2`, the build installs it instead of `sdl2`, satisfies every transitive dep, ships no `sdl2`, and the first `-Syu` has nothing to replace. Zero-risk — `sdl2-compat` is the current Arch default already running on every up-to-date box. Proven first in `kiro-iso-next`, mirrored here for parity. Note this only removes *this* prompt; a rolling ISO can still surface future Arch renames between build and first update — pre-seeding known ones is the mitigation.
+
+### Files Modified
+- `archiso/packages.x86_64` — `sdl2-compat` added in a new *REPLACEMENT PRE-SEEDS* group.
+
+## 2026.06.13
+
+### Package-signature enforcement promoted to production
+- Ported the signing config proven in `kiro-iso-next` to production: a fresh prod install now **verifies signed `nemesis_repo`/`kiro_repo` packages out of the box**. Closes the gap where prod pulled GitHub-Pages binaries with no cryptographic proof of origin. (Signing itself has been live on both repos since the rollout began; this turns on *enforcement* — it signs nothing new.)
+
+### Technical Details
+- All four pacman.confs (`archiso/airootfs/etc/pacman.conf`, `…/pacman.conf.kiro`, `archiso/pacman.conf`, `build-scripts/pacman.conf`) — dropped the per-repo `SigLevel` lines from `nemesis_repo`/`kiro_repo`/`chaotic-aur` so they inherit the global `[options] SigLevel = Required DatabaseOptional` (single source of truth).
+- `build-scripts/build-the-iso.sh` — `prepopulate_keyring()` now `--populate kiro` into the airootfs keyring; `main()` calls `setup_kiro_keyring`.
+- `build-scripts/host-prep.sh` — new `setup_kiro_keyring` guard (installed? skip; else `pacman -S --needed kiro-keyring`) so `--populate kiro` has `kiro.gpg` on a clean build host.
+- **Safe rollout:** no package ships `/etc/pacman.conf`, so the existing fleet's local config is never overwritten — this only affects *new* installs, which get the key (prepopulated) and enforcement together. The key also reaches the fleet via the `kiro-system-files → kiro-keyring` dependency. Paired with `kiro-calamares-config`'s `kiro_before --populate kiro` (same release).
+
+### Files Modified
+- `archiso/airootfs/etc/pacman.conf`, `archiso/airootfs/etc/pacman.conf.kiro`, `archiso/pacman.conf`, `build-scripts/pacman.conf`, `build-scripts/build-the-iso.sh`, `build-scripts/host-prep.sh`
+
 ---
 
 ## 2026-06-13 — Re-tiered packages.x86_64 so KIB can opt out of onboard, Bluetooth, printing and CJK/MS fonts

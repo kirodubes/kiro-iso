@@ -97,7 +97,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #   and the kiro-iso-builder GUI share one source of truth. Edit them
 #   there, or through the GUI — not here.
 #####################################################################
-kiroVersion='v26.06.12'
+kiroVersion='v26.06.14'
 
 # kiroVersion stays in THIS file: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it. build.conf is sourced right after it — the
@@ -462,6 +462,10 @@ prepopulate_keyring() {
     sudo pacman-key --gpgdir "${keyring_dir}" --populate archlinux
     sudo pacman-key --gpgdir "${keyring_dir}" --populate chaotic
     sudo pacman-key --gpgdir "${keyring_dir}" --populate cachyos
+    # Kiro signing key — pre-seed it so the airootfs trusts nemesis_repo/kiro_repo
+    # signatures out of the box (the shipped pacman.conf enforces them). Reads the
+    # host's /usr/share/pacman/keyrings/kiro.gpg, provided by the kiro-keyring pkg.
+    sudo pacman-key --gpgdir "${keyring_dir}" --populate kiro
     log_info "Keyring prepopulation complete"
 }
 
@@ -910,6 +914,8 @@ main() {
     setup_chaotic
     ensure_chaotic_mirrors
     setup_cachyos
+    setup_kiro_keyring
+    setup_kiro_mirrorlist
 
     # "All green" gate — confirm every repo the build/install depends on is
     # reachable (after the host->curated fallbacks above) before mkarchiso runs.

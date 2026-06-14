@@ -101,6 +101,39 @@ EOF_CACHYOS
     log_success "cachyos-keyring and cachyos-mirrorlist installed"
 }
 
+setup_kiro_keyring() {
+    # prepopulate_keyring runs `pacman-key --populate kiro`, which reads the
+    # host's /usr/share/pacman/keyrings/kiro.gpg — shipped by the kiro-keyring
+    # package. Without it Phase 7 fails. Idempotent: a host that already has it
+    # (the dev box, any previously-set-up host) is detected and skipped.
+    if pacman -Q kiro-keyring &>/dev/null; then
+        log_info "kiro-keyring is installed"
+        return 0
+    fi
+    log_warn "Installing kiro-keyring"
+    sudo pacman -Sy --needed --noconfirm kiro-keyring
+    log_success "kiro-keyring installed"
+}
+
+setup_kiro_mirrorlist() {
+    # mkarchiso reads archiso/pacman.conf, whose [nemesis_repo] block resolves
+    # `Include = /etc/pacman.d/kiro-mirrorlist` against the BUILD HOST. That file
+    # is shipped by the kiro-mirrorlist package, but we can't depend on it being
+    # installed — and it can't bootstrap itself (the package lives in nemesis_repo,
+    # the very repo the file points at). So write the one-line file directly, the
+    # same way setup_cachyos inlines its CDN server. Idempotent: a host that
+    # already has it (kiro-mirrorlist installed, or a previous run) is skipped.
+    local ml="/etc/pacman.d/kiro-mirrorlist"
+    if [[ -f "${ml}" ]]; then
+        log_info "kiro-mirrorlist is present on the build host"
+        return 0
+    fi
+    log_warn "Writing ${ml} on the build host"
+    printf '##\n## Kiro repository mirrorlist\n##\nServer = https://erikdubois.github.io/$repo/$arch\n' \
+        | sudo tee "${ml}" >/dev/null
+    log_success "kiro-mirrorlist written"
+}
+
 enable_cachyos() {
     # Re-enable a [cachyos] repo that is present in pacman.conf but commented out
     # (Kiro ships it disabled by default — chaotic-aur is the backstop). Only

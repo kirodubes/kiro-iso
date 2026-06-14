@@ -732,7 +732,6 @@ ttf-ubuntu-font-family
 
 ###  DESKTOP / MISC EXTRAS
 arandr
-claude-code
 dconf-editor
 font-manager
 gittyup
@@ -744,6 +743,10 @@ mugshot
 plocate
 yad
 zenity
+
+###  AI TOOLS  (drop the whole group if you don't want AI on the system)
+claude-code
+kiro-assistant
 
 #############################################################################
 #  PERSONAL_REPO / LOCAL REPO                                               #

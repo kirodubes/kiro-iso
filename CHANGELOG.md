@@ -4,6 +4,14 @@
 
 ## 2026.06.14
 
+### New `AI TOOLS` group in TIER 3 — opt-out AI on the ISO
+- AI shouldn't be forced on users. Created a dedicated **`### AI TOOLS`** group in TIER 3 (USER-CHANGEABLE / OPTIONAL) of `packages.x86_64` holding `claude-code` and the new `kiro-assistant` (Claude Code knowledge pack for Kiro). Moved `claude-code` out of the misc `DESKTOP / MISC EXTRAS` bucket into it.
+- Because TIER 3 groups surface as categories in the Kiro ISO Builder package screen and ATT Streamline, this gives users a single **AI TOOLS** category they can untick/drop as a whole — "don't want AI? remove it in one move." Keeping both AI packages together also avoids the broken half-state where `kiro-assistant` (which `depends=claude-code`) is kept while `claude-code` is dropped.
+- **Build-ordering caveat:** `kiro-assistant` must exist in `nemesis_repo` before an ISO build that includes this line, or `mkarchiso` will fail to resolve it. Publishing `kiro-assistant` to `nemesis_repo` is still pending (GitHub repo not yet created).
+
+### Files Modified
+- `archiso/packages.x86_64` — new `AI TOOLS` TIER 3 group (`claude-code` + `kiro-assistant`); `claude-code` removed from `DESKTOP / MISC EXTRAS`.
+
 ### Pre-seed `sdl2-compat` to avoid the first-update replace prompt
 - A freshly installed ISO showed `:: Replace sdl2 with extra/sdl2-compat? [Y/n]` on the user's first `pacman -Syu`. `sdl2` isn't an explicit package — it's pulled in transitively (ffmpeg, sdl2_image, wxwidgets, qemu-ui-sdl…), so the build installs the old `sdl2` and Arch's `extra/sdl2-compat` (which `Replaces: sdl2`) proposes the swap on first update.
 - Fix: add **`sdl2-compat`** explicitly to `packages.x86_64` (new *REPLACEMENT PRE-SEEDS* group). Because it `Provides: sdl2`, the build installs it instead of `sdl2`, satisfies every transitive dep, ships no `sdl2`, and the first `-Syu` has nothing to replace. Zero-risk — `sdl2-compat` is the current Arch default already running on every up-to-date box. Proven first in `kiro-iso-next`, mirrored here for parity. Note this only removes *this* prompt; a rolling ISO can still surface future Arch renames between build and first update — pre-seeding known ones is the mitigation.

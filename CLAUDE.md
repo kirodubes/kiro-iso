@@ -85,8 +85,8 @@ The build pipeline:
 Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacman.conf`:
 
 - `[core]` / `[extra]` / `[multilib]` — standard Arch mirrors
-- `[kiro_repo]` — `https://kirodubes.github.io/$repo/$arch` (SigLevel Never)
-- `[nemesis_repo]` — `https://erikdubois.github.io/$repo/$arch` (SigLevel Never)
+- `[kiro_repo]` — `https://kirodubes.github.io/$repo/$arch` (signed; inherits global `SigLevel = Required DatabaseOptional`)
+- `[nemesis_repo]` — `https://erikdubois.github.io/$repo/$arch` (signed; inherits global `SigLevel = Required DatabaseOptional`)
 - `[chaotic-aur]` — requires `chaotic-keyring` + `chaotic-mirrorlist` on the build host
 - `[personal_repo]` — optional local repo, commented out by default (see in-file comment for path)
 

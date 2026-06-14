@@ -1,6 +1,6 @@
 #############################################################################
 #                                                                           #
-#   KIRO-ISO-NEXT  —  packages.x86_64                                        #
+#   KIRO-ISO  —  packages.x86_64                                        #
 #                                                                           #
 #   Organized into 3 risk tiers so it is clear what a user may safely       #
 #   change without breaking the ISO build / boot / install.                 #

@@ -1,9 +1,14 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Twelve ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12 .13`). For each: why it was worth a new ISO,
+Thirteen ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12 .13 .14`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.13 — June 13 (current)
+## v26.06.14 — June 14 (current)
+**Why a new ISO:** Kiro gains a built-in AI assistant that knows the distro inside out, and a more secure install that verifies Kiro's own packages are genuine before they're installed.
+- **An AI assistant at your fingertips:** Kiro now ships **Kiro Assistant** — an AI helper that knows the Kiro distro inside out, ready on your desktop to answer questions and guide you as you work (bring your own key). It's optional and can be removed in one move if you'd rather not have AI on your system.
+- **A more secure ISO — signed packages:** a fresh install now verifies that packages from Kiro's own repositories are cryptographically signed before installing them, so you have proof they genuinely came from Kiro and weren't tampered with along the way. Builds on the security focus of the previous ISO.
+
+## v26.06.13 — June 13
 **Why a new ISO:** a new **Kiro News** notifier puts Arch Linux news and Kiro's own announcements on your desktop — built in response to the "Active AUR malicious packages" advisory.
 - **Kiro News:** `kiro-news` watches **Arch Linux News** (live RSS) and **Kiro's own feed** (shipped in-package, no server) and notifies on anything new; `kiro-news show` or the Kiro menu entry opens the full items in your browser. Runs on a per-user hourly timer with a randomized delay so machines don't all hit the servers at once.
 - **You're covered:** Kiro itself is unaffected — every shipped package was reviewed. The risk is in AUR packages you install yourself; `informant` is an opt-in alternative (`paru -S informant`).

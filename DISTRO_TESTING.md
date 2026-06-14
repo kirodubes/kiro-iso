@@ -4,6 +4,33 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-14 — Production v26.06.14: AI assistant + signed-package enforcement + sdl2-compat pre-seed — default install, 0 FAIL
+
+Production `kiro-iso` **v26.06.14** (`ISO_BUILD` 07:45, ISO file 07:54) carrying the day's shipped
+changes: the new **AI TOOLS** TIER-3 group (`kiro-assistant` + `claude-code`), the **`sdl2-compat`
+pre-seed** (kills the first-`-Syu` sdl2 replace prompt), and — promoted from `-next` —
+**package-signature enforcement** (global `SigLevel = Required DatabaseOptional`; signed
+`nemesis_repo`/`kiro_repo` verified out of the box). Default-edition install validated over SSH
+(erik@127.0.0.1:2022):
+
+| Target (VBox) | FS / encryption | Bootloader | Result |
+|---------------|-----------------|------------|--------|
+| **Kiro default** (XFCE/ohmychadwm) | **ext4**, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 133 / 0 / 0** |
+
+Shipped-content verification on the installed system:
+- **AI tools present:** `kiro-assistant 26.06-04` + `claude-code 2.1.175-1` installed — the new
+  **AI TOOLS** group lands as expected.
+- **sdl2-compat pre-seed:** `sdl2-compat 2.32.70-1` installed and `pacman -Q sdl2` resolves to it
+  (`Provides`) — no old `sdl2`, so the first `-Syu` has nothing to replace.
+- **Signed-package enforcement:** `/etc/pacman.conf` carries `SigLevel = Required DatabaseOptional`
+  — signed repos verified out of the box.
+- **kiro-link menu + Onboard themes:** all four `kiro-link-*.desktop` entries and all five
+  `Kiro *.theme` Onboard themes present (from `kiro-system-files 26.06-34`).
+- Sessions `xfce` / `xfce-wayland` / `ohmychadwm`; host `erik-virtualbox`, VirtualBox (oracle).
+
+This validates the v26.06.14 production ISO on the default edition and **clears the distro-test
+staleness check** for the day's shipped changes.
+
 ## 2026-06-11 — New Budgie ISO: CTT menu-launch fix + encrypted-btrfs and regular installs — both boot, 0 real FAIL
 
 New `kiro-iso` build carrying the **calamares-tweak-tool menu-launch fix** (`.desktop` dropped

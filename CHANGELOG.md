@@ -2,6 +2,15 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.17
+
+### Fix: `clean_cache()` aborted the build with exit 141 (SIGPIPE) under `pipefail`
+- Reported in [issue #15](https://github.com/kirodubes/kiro-iso/issues/15) by rcraig57. With `clean_pacman_cache=yes`, `clean_cache()` ran `yes | sudo pacman -Scc`. `yes` streams `y\n` forever; `pacman -Scc` answers its two confirmation prompts and exits 0, closing the pipe's read end. `yes` is still writing, so the kernel kills it with SIGPIPE (exit 141). Because the script runs under `set -euo pipefail`, the pipeline's status becomes `yes`'s 141 instead of pacman's 0, and `set -e` aborts the whole build — right before Phase 11 (`mkarchiso`), so no ISO was produced. Deterministic, not a race: any host where `yes` outruns pacman's exit (i.e. every normal one) hits it.
+- Fix: replaced `yes |` with `printf 'y\ny\n' |`, which feeds exactly the two confirmations `-Scc` needs and then closes cleanly, leaving nothing writing to a closed pipe. The cache-clean step now completes and the build proceeds into `mkarchiso` normally.
+
+### Files Modified
+- `build-scripts/build-the-iso.sh` — `clean_cache()` now uses `printf 'y\ny\n' | sudo pacman -Scc` instead of `yes | sudo pacman -Scc`.
+
 ## 2026.06.14
 
 ### New `AI TOOLS` group in TIER 3 — opt-out AI on the ISO

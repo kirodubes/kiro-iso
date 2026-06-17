@@ -268,7 +268,10 @@ packages and fetch the latest .bashrc. Check your network and re-run."
 clean_cache() {
     if [[ "${clean_pacman_cache}" == "yes" ]]; then
         log_section "Cleaning pacman package cache"
-        yes | sudo pacman -Scc
+        # Feed exactly the two confirmations -Scc needs. `yes |` streams forever and
+        # gets SIGPIPE when pacman exits, which under `set -o pipefail` aborts the
+        # build with exit 141. printf closes cleanly after the answers it sends.
+        printf 'y\ny\n' | sudo pacman -Scc
     else
         log_info "Skipping pacman cache clean (clean_pacman_cache=no)"
     fi

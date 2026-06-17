@@ -1,4 +1,4 @@
-### EDU-SHELLS
+### KIRO-SHELLS
 ### EXPORT ###
 export EDITOR='nano'
 export VISUAL='nano'

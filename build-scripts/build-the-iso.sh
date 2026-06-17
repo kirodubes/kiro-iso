@@ -97,7 +97,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #   and the kiro-iso-builder GUI share one source of truth. Edit them
 #   there, or through the GUI — not here.
 #####################################################################
-kiroVersion='v26.06.14'
+kiroVersion='v26.06.17'
 
 # kiroVersion stays in THIS file: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it. build.conf is sourced right after it — the

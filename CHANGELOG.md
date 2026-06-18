@@ -2,6 +2,19 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.18
+
+### Moved `ananicy-cpp`, `firewalld`, `tuned`, `tuned-ppd` from TIER 2 → TIER 3
+- These four sat in **TIER 2 (KIRO CORE)** not because they're untouchable, but because `kiro-calamares-config`'s `services-systemd.conf` enabled their services with `mandatory: true`. With that flag, a user who dropped the package from the ISO would hit Calamares trying to enable a service for a package that isn't installed, and the **whole install would abort**. That made them unsafe to remove, which is the definition of TIER 2.
+- The companion change in `kiro-calamares-config` (commit `abbae32`) flipped those services to `mandatory: false`, so a missing package now logs a warning and the install continues. That removes the only blocker, so the four are now genuinely **user-changeable** and belong in TIER 3. They go into a new `### SYSTEM TUNING / SERVICES` group in TIER 3 (so they surface as a droppable category in the ISO Builder / ATT Streamline package screens).
+- The two companion apps moved with their parents so nobody is left with an orphaned helper after dropping a service: `cachyos-ananicy-rules-git` (the ruleset `ananicy-cpp` reads) and `firewall-config` (the `firewalld` GTK GUI). `scx-manager` (the `sched_ext` scheduler manager) was moved across too — it has no Calamares service entry, so it was already safe to drop.
+
+### `sardi-icons` → TIER 3, disabled by default
+- `sardi-icons` (57.9 MB installed) moved out of the TIER 2 `ICONS / CURSORS / THEMES — default Kiro look` group into a new TIER 3 `ICONS / CURSORS / THEMES` group, and **commented out** so it no longer ships by default. It stays in the file as a documented opt-in (uncomment to re-enable), per the TIER-3 convention that `#`-prefixed lines are deliberately-disabled options kept for reference. Trims the default ISO without losing the option.
+
+### Files Modified
+- `archiso/packages.x86_64` — `ananicy-cpp`, `cachyos-ananicy-rules-git`, `firewalld`, `firewall-config`, `scx-manager`, `tuned`, `tuned-ppd` moved from the TIER 2 `SYSTEM TUNING / SERVICES` group into a new TIER 3 group; `sardi-icons` moved to a new TIER 3 `ICONS / CURSORS / THEMES` group and commented out (off by default).
+
 ## 2026.06.17
 
 ### Fix: `clean_cache()` aborted the build with exit 141 (SIGPIPE) under `pipefail`

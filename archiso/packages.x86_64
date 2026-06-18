@@ -521,18 +521,11 @@ qt5ct
 vte4
 
 ###  SYSTEM TUNING / SERVICES
-ananicy-cpp
 archlinux-tools
-cachyos-ananicy-rules-git
 cronie
-firewall-config
-firewalld
 gparted
 irqbalance
-scx-manager
 sysz
-tuned
-tuned-ppd
 upower
 zram-generator
 
@@ -557,7 +550,7 @@ ripgrep-all
 tldr
 ttf-jetbrains-mono-nerd
 ttf-meslo-nerd-font-powerlevel10k
-unifetch
+#unifetch
 zsh
 zsh-completions
 zsh-syntax-highlighting
@@ -596,7 +589,6 @@ capitaine-cursors
 neo-candy-icons-git
 numix-circle-icon-theme-git
 numix-icon-theme-git
-sardi-icons
 surfn-icons-git
 ttf-material-design-iconic-font
 vimix-cursors
@@ -607,12 +599,25 @@ noto-fonts-emoji
 ttf-dejavu
 ttf-font-awesome
 ttf-hack
+ttf-hack-nerd
 
 
 #############################################################################
 #  TIER 3 — USER-CHANGEABLE / OPTIONAL                                      #
 #  Safe to add or remove. Edit freely — none of these affect the build.    #
 #############################################################################
+
+###  SYSTEM TUNING / SERVICES  (Calamares enables these non-mandatory; install won't fail if dropped)
+ananicy-cpp
+cachyos-ananicy-rules-git
+firewalld
+firewall-config
+scx-manager
+tuned
+tuned-ppd
+
+###  ICONS / CURSORS / THEMES  (alternate looks — keep at least the configured default)
+#sardi-icons   # opt-in; not shipped by default
 
 ###  WEB BROWSERS
 brave-bin

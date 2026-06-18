@@ -1,9 +1,21 @@
 # Kiro ISO — June 2026 builds, what changed and why
 
-Thirteen ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12 .13 .14`). For each: why it was worth a new ISO,
+Fifteen ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12 .13 .14 .17 .18`). For each: why it was worth a new ISO,
 what functionality it added, and the package moves behind it. Newest first.
 
-## v26.06.14 — June 14 (current)
+## v26.06.18 — June 18 (current)
+**Why a new ISO:** rolling your own Kiro ISO is leaner and more reliable — more of the system is now safe to drop in the builder, and a bug that could abort a build is fixed.
+- **More of the system is yours to drop:** the system-tuning services — **ananicy-cpp**, **firewalld**, **tuned**/**tuned-ppd** and **scx-manager** (with their companion apps) — now show up as a removable category in the **Kiro ISO Builder** and the **Arch Linux Tweak Tool**'s Streamline page. Dropping one no longer aborts the install (their services are now optional), so you can build a leaner ISO without breaking it. They still ship by default.
+- **Lighter default ISO:** the large **sardi-icons** set (~58 MB) no longer ships by default — it's a one-line opt-in if you want it back.
+- **Build-abort bug fixed:** building your own ISO with cache-cleaning enabled no longer aborts partway through (a SIGPIPE in the cache-clean step, reported as issue #15) — the build runs cleanly to completion.
+- **Packages:** + `ttf-hack-nerd`; − `sardi-icons` (now opt-in). The system-tuning packages moved to the user-removable tier but still ship by default.
+
+## v26.06.17 — June 17
+**Why a new ISO:** the on-board AI becomes a clean, one-move opt-out, and the **Kiro Assistant** package itself now ships on the medium.
+- **AI is one removable category:** **claude-code** and the new **Kiro Assistant** (a Kiro-specific knowledge pack for Claude Code) are grouped under a single **AI TOOLS** category that surfaces as one block in the **Kiro ISO Builder** and the **Arch Linux Tweak Tool**'s Streamline page — so "don't want AI on the system?" is a single untick, not a hunt through the package list. Keeping the two together also avoids a half-removed state, since Kiro Assistant depends on claude-code.
+- **Packages:** + `kiro-assistant` (`claude-code` regrouped into AI TOOLS, not new).
+
+## v26.06.14 — June 14
 **Why a new ISO:** Kiro gains a built-in AI assistant that knows the distro inside out, and a more secure install that verifies Kiro's own packages are genuine before they're installed.
 - **An AI assistant at your fingertips:** Kiro now ships **Kiro Assistant** — an AI helper that knows the Kiro distro inside out, ready on your desktop to answer questions and guide you as you work (bring your own key). It's optional and can be removed in one move if you'd rather not have AI on your system.
 - **A more secure ISO — signed packages:** a fresh install now verifies that packages from Kiro's own repositories are cryptographically signed before installing them, so you have proof they genuinely came from Kiro and weren't tampered with along the way. Builds on the security focus of the previous ISO.

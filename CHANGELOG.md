@@ -12,6 +12,19 @@
 - **Bootloader reality:** Kiro installs systemd-boot on UEFI and GRUB only on BIOS, so the theme applies to **BIOS installs**; on UEFI installs `kiro_final` removes `kiro-grub-theme` along with GRUB.
 - **Verification:** the installed-system theme render is **confirmed** in a VirtualBox boot (background, Kiro logo/wordmark, `kiro.png` on the kiro entry, blue select bar, restart/shutdown icons all correct).
 
+### Kiro-branded BIOS live-boot splash (syslinux)
+- Replaced the stock grey `archiso/syslinux/splash.png` (640×480) with a dark
+  Kiro splash — the Kiro logo (logo only, no wordmark) in the top band, above
+  where the vesamenu box renders (`MENU VSHIFT 10`), on the same dark gradient as
+  the installed GRUB theme. This brands the **BIOS** live USB menu.
+- `archiso/syslinux/archiso_head.cfg` — menu `title` colour set to Kiro blue and
+  the selected-entry bar to a translucent blue (`#802b8fff`), replacing the grey
+  defaults.
+- **Scope:** this is the live USB's *own* boot asset, not the `kiro-grub-theme`
+  package — a package inside the squashfs can't theme the bootloader (root image
+  isn't mounted yet at boot). The UEFI live menu (`grub.cfg`) is intentionally
+  left as text console.
+
 ### Clarified the NVIDIA driver consequence in the boot menu
 - The default boot entry (`driver=free`, previously labeled just "open source: AMD / Intel") makes Calamares' `kiro_remove_nvidia` strip the bundled NVIDIA driver during install — so an NVIDIA user who boots the default silently lands on nouveau with no warning. The boot-menu labels and help text now spell out each path's consequence so the choice is informed.
 - All three boot loaders were updated in lockstep (they present the same entries): the systemd-boot UEFI entries (`efiboot/loader/entries/01/02/02b`), the BIOS syslinux menu (`syslinux/archiso_sys-linux.cfg`, which also carries the longer TEXT HELP), and `grub/grub.cfg`.

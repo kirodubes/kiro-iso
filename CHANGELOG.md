@@ -9,7 +9,7 @@
 - All three boot loaders were updated in lockstep (they present the same entries): the systemd-boot UEFI entries (`efiboot/loader/entries/01/02/02b`), the BIOS syslinux menu (`syslinux/archiso_sys-linux.cfg`, which also carries the longer TEXT HELP), and `grub/grub.cfg`.
 - New wording:
   - `driver=free` → **"open drivers: AMD / Intel - NVIDIA driver removed"** (help: open stack; the bundled proprietary NVIDIA driver is removed during install; NVIDIA users should pick a 'NVIDIA proprietary' entry instead).
-  - `driver=nonfree` → **"NVIDIA proprietary, modern - keeps nvidia-open"** (keeps the baked `nvidia-open-dkms`; modern Turing+ GPUs; no internet needed).
+  - `driver=nonfree` → **"NVIDIA proprietary, modern - keeps nvidia"** (keeps whichever NVIDIA driver was baked into the ISO — `nvidia-open-dkms` by default, or a different variant if chosen via the KIB GUI; offline). Worded generically on purpose: KIB can bake `580xx`/`390xx`, so a hardcoded "nvidia-open" would be wrong on those builds.
   - `driver=nonfreechwd` → **"NVIDIA proprietary, auto-detect - needs internet"** (chwd detects and installs the matching driver online, including legacy 470xx/390xx).
 - **Text-only** — labels and help strings. No boot parameters, kernel cmdline, or build logic changed. Applied to both this production repo and beta `kiro-iso-next` for parity.
 - This is **Part 1** of the NVIDIA driver cleanup. **Part 2** (retiring the redundant `inject_nvidia_packages` build-time selector) is deferred pending chwd field-validation for legacy cards.

@@ -222,6 +222,7 @@ mkinitcpio-openswap
 os-prober
 pacman-hook-kernel-install
 plymouth-theme-kiro-logo
+update-grub
 
 ###  LIVE-ENV GUEST TOOLS  (open-vm-tools / qemu-guest-agent live in ARCHISO BASE)
 virtualbox-guest-utils

@@ -2,6 +2,23 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.19
+
+### Clarified the NVIDIA driver consequence in the boot menu
+- The default boot entry (`driver=free`, previously labeled just "open source: AMD / Intel") makes Calamares' `kiro_remove_nvidia` strip the bundled NVIDIA driver during install — so an NVIDIA user who boots the default silently lands on nouveau with no warning. The boot-menu labels and help text now spell out each path's consequence so the choice is informed.
+- All three boot loaders were updated in lockstep (they present the same entries): the systemd-boot UEFI entries (`efiboot/loader/entries/01/02/02b`), the BIOS syslinux menu (`syslinux/archiso_sys-linux.cfg`, which also carries the longer TEXT HELP), and `grub/grub.cfg`.
+- New wording:
+  - `driver=free` → **"open drivers: AMD / Intel - NVIDIA driver removed"** (help: open stack; the bundled proprietary NVIDIA driver is removed during install; NVIDIA users should pick a 'NVIDIA proprietary' entry instead).
+  - `driver=nonfree` → **"NVIDIA proprietary, modern - keeps nvidia-open"** (keeps the baked `nvidia-open-dkms`; modern Turing+ GPUs; no internet needed).
+  - `driver=nonfreechwd` → **"NVIDIA proprietary, auto-detect - needs internet"** (chwd detects and installs the matching driver online, including legacy 470xx/390xx).
+- **Text-only** — labels and help strings. No boot parameters, kernel cmdline, or build logic changed. Applied to both this production repo and beta `kiro-iso-next` for parity.
+- This is **Part 1** of the NVIDIA driver cleanup. **Part 2** (retiring the redundant `inject_nvidia_packages` build-time selector) is deferred pending chwd field-validation for legacy cards.
+
+### Files Modified
+- `archiso/syslinux/archiso_sys-linux.cfg` — MENU LABEL + TEXT HELP for the free / nonfree / nonfreechwd entries.
+- `archiso/grub/grub.cfg` — menuentry titles for the three driver entries.
+- `archiso/efiboot/loader/entries/01-archiso-linux.conf`, `02-nvidianouveau.conf`, `02b-nvidiachwd.conf` — `title` lines.
+
 ## 2026.06.18
 
 ### Moved `ananicy-cpp`, `firewalld`, `tuned`, `tuned-ppd` from TIER 2 → TIER 3

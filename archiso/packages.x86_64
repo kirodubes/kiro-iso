@@ -214,6 +214,7 @@ calamares
 chwd
 hwdetect
 kiro-bootloader-grub
+kiro-grub-theme
 kiro-calamares-config
 kiro-calamares-tweak-tool
 mkinitcpio-firmware

@@ -4,6 +4,14 @@
 
 ## 2026.06.19
 
+### Branded Kiro GRUB boot theme
+- Added a Kiro-branded GRUB2 theme, shipped as the new **`kiro-grub-theme`** package (built into `nemesis_repo`, source repo `kirodubes/kiro-grub-theme`). It is a rebrand of the actively-maintained [vinceliuice/grub2-themes](https://github.com/vinceliuice/grub2-themes) (GPL-3.0) — the same family Kiro already referenced via Vimix — with a dark 1920×1080 background carrying the **Kiro logo + KIRO wordmark**, the full colour OS-icon set, and a custom **`kiro.png`** icon for the install entries.
+- **`packages.x86_64`** — added `kiro-grub-theme` so the theme lands on installed systems.
+- **`airootfs/etc/default/grub`** — repointed `GRUB_THEME` from `/boot/grub/themes/Vimix/theme.txt` to `/boot/grub/themes/kiro/theme.txt`. The old Vimix path was **dangling** (no package ever shipped `/boot/grub/themes/Vimix`), so installed BIOS systems previously got no GRUB theme at all — this fixes that latent bug. The package installs under `/boot/grub/themes/` so the theme stays readable by GRUB even on a LUKS-encrypted root.
+- **Theme is delivered entirely by the package** — no theme files are committed into the ISO profile. The live ISO boot menu is intentionally left unchanged (text console): at GRUB time the squashfs isn't mounted, so a package inside the root image can't theme the live menu, and hand-copying theme files into `archiso/grub/` is exactly the duplication we avoid.
+- **Bootloader reality:** Kiro installs systemd-boot on UEFI and GRUB only on BIOS, so the theme applies to **BIOS installs**; on UEFI installs `kiro_final` removes `kiro-grub-theme` along with GRUB.
+- **Verification:** the installed-system theme render is **confirmed** in a VirtualBox boot (background, Kiro logo/wordmark, `kiro.png` on the kiro entry, blue select bar, restart/shutdown icons all correct).
+
 ### Clarified the NVIDIA driver consequence in the boot menu
 - The default boot entry (`driver=free`, previously labeled just "open source: AMD / Intel") makes Calamares' `kiro_remove_nvidia` strip the bundled NVIDIA driver during install — so an NVIDIA user who boots the default silently lands on nouveau with no warning. The boot-menu labels and help text now spell out each path's consequence so the choice is informed.
 - All three boot loaders were updated in lockstep (they present the same entries): the systemd-boot UEFI entries (`efiboot/loader/entries/01/02/02b`), the BIOS syslinux menu (`syslinux/archiso_sys-linux.cfg`, which also carries the longer TEXT HELP), and `grub/grub.cfg`.

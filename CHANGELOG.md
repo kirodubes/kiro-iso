@@ -2,6 +2,28 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.20
+
+### Plasma extras in the ISO builder — config, themes & icons
+- Brought the **Plasma EXTRA-APP** section of **`packages.x86_64`** into sync with `kiro-iso-next`.
+  These plasma-scoped opt-in blocks were tested on the beta ISO and are now ported to production:
+  - **`### CATEGORY: Plasma`** — the six `kiro-plasma-*` config packages (`kiro-plasma-dolphin`,
+    `-keybindings`, `-konsole`, `-servicemenus`, `-system-settings`, `-window-management`).
+  - **`### CATEGORY: Plasma — Themes`** — `kiro-plasma-sweet` (the complete Sweet Plasma global
+    theme) and `surfn-plasma-flow` (Surfn Flow theme).
+  - **`### CATEGORY: Plasma — Icons`** — `surfn-plasma-dark-icons` and `surfn-plasma-light-icons`.
+- **Why:** these only make sense on a Plasma build, so each block carries the optional 4th marker
+  field `| plasma` that scopes it to the Plasma edition. The Kiro ISO Builder reads the scope and
+  shows them on a dedicated **"Plasma extras"** page that appears only when Plasma is ticked
+  (nothing ticked by default). All served from **`nemesis_repo`**; auto-discovered, no builder code
+  change. `apply_package_additions()` matches by key and ignores the new field, so the build is
+  unchanged and a standard Plasma build with nothing ticked is byte-for-byte unaffected.
+- After this port the two `packages.x86_64` lists differ only by their intended divergences: the
+  header banner and the six `-next`/`-nemesis` beta-suffix package swaps.
+- **Note:** `kiro-plasma-sweet` is the renamed-from-`kiro-sweet` package; the EXTRA-APP entry uses
+  the new name and will resolve once that package is rebuilt under `kiro-plasma-sweet` into
+  `nemesis_repo`.
+
 ## 2026.06.19
 
 ### Branded Kiro GRUB boot theme

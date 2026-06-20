@@ -857,3 +857,41 @@ kiro-assistant
 ### >>> EXTRA-APP gscan2pdf | gscan2pdf | extra >>>
 #gscan2pdf
 ### <<< EXTRA-APP gscan2pdf <<<
+
+### CATEGORY: Plasma
+# Scoped to the plasma edition (4th marker field) — the kiro-iso-builder only offers
+# these when Plasma is ticked, on a conditional "Plasma extras" page. From nemesis_repo.
+### >>> EXTRA-APP kiro-plasma-dolphin | Kiro Dolphin config | nemesis_repo | plasma >>>
+#kiro-plasma-dolphin
+### <<< EXTRA-APP kiro-plasma-dolphin <<<
+### >>> EXTRA-APP kiro-plasma-keybindings | Kiro Plasma keybindings | nemesis_repo | plasma >>>
+#kiro-plasma-keybindings
+### <<< EXTRA-APP kiro-plasma-keybindings <<<
+### >>> EXTRA-APP kiro-plasma-konsole | Kiro Konsole config | nemesis_repo | plasma >>>
+#kiro-plasma-konsole
+### <<< EXTRA-APP kiro-plasma-konsole <<<
+### >>> EXTRA-APP kiro-plasma-servicemenus | Kiro Dolphin service menus | nemesis_repo | plasma >>>
+#kiro-plasma-servicemenus
+### <<< EXTRA-APP kiro-plasma-servicemenus <<<
+### >>> EXTRA-APP kiro-plasma-system-settings | Kiro System Settings config | nemesis_repo | plasma >>>
+#kiro-plasma-system-settings
+### <<< EXTRA-APP kiro-plasma-system-settings <<<
+### >>> EXTRA-APP kiro-plasma-window-management | Kiro Window Management config | nemesis_repo | plasma >>>
+#kiro-plasma-window-management
+### <<< EXTRA-APP kiro-plasma-window-management <<<
+
+### CATEGORY: Plasma — Themes
+### >>> EXTRA-APP kiro-plasma-sweet | Kiro Plasma Sweet (complete theme) | nemesis_repo | plasma >>>
+#kiro-plasma-sweet
+### <<< EXTRA-APP kiro-plasma-sweet <<<
+### >>> EXTRA-APP surfn-plasma-flow | Surfn Flow theme | nemesis_repo | plasma >>>
+#surfn-plasma-flow-git
+### <<< EXTRA-APP surfn-plasma-flow <<<
+
+### CATEGORY: Plasma — Icons
+### >>> EXTRA-APP surfn-plasma-dark-icons | Surfn Dark icons | nemesis_repo | plasma >>>
+#surfn-plasma-dark-icons-git
+### <<< EXTRA-APP surfn-plasma-dark-icons <<<
+### >>> EXTRA-APP surfn-plasma-light-icons | Surfn Light icons | nemesis_repo | plasma >>>
+#surfn-plasma-light-icons-git
+### <<< EXTRA-APP surfn-plasma-light-icons <<<

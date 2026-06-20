@@ -10,7 +10,8 @@
   - **`### CATEGORY: Plasma`** — the six `kiro-plasma-*` config packages (`kiro-plasma-dolphin`,
     `-keybindings`, `-konsole`, `-servicemenus`, `-system-settings`, `-window-management`).
   - **`### CATEGORY: Plasma — Themes`** — `kiro-plasma-sweet` (the complete Sweet Plasma global
-    theme) and `surfn-plasma-flow` (Surfn Flow theme).
+    theme), the four further Kiro Plasma global themes `kiro-plasma-layan`, `kiro-plasma-nord`,
+    `kiro-plasma-whitesur` and `kiro-plasma-win11`, and `surfn-plasma-flow` (Surfn Flow theme).
   - **`### CATEGORY: Plasma — Icons`** — `surfn-plasma-dark-icons` and `surfn-plasma-light-icons`.
 - **Why:** these only make sense on a Plasma build, so each block carries the optional 4th marker
   field `| plasma` that scopes it to the Plasma edition. The Kiro ISO Builder reads the scope and

@@ -897,14 +897,14 @@ kiro-assistant
 ### >>> EXTRA-APP kiro-plasma-win11 | Kiro Plasma Win11 — Windows 11 look (Light + Dark) | nemesis_repo | plasma >>>
 #kiro-plasma-win11
 ### <<< EXTRA-APP kiro-plasma-win11 <<<
-### >>> EXTRA-APP surfn-plasma-flow | Surfn Flow theme | nemesis_repo | plasma >>>
-#surfn-plasma-flow-git
-### <<< EXTRA-APP surfn-plasma-flow <<<
 
 ### CATEGORY: Plasma — Icons
-### >>> EXTRA-APP surfn-plasma-dark-icons | Surfn Dark icons | nemesis_repo | plasma >>>
+### >>> EXTRA-APP surfn-plasma-dark-icons | Surfn Plasma Dark | nemesis_repo | plasma >>>
 #surfn-plasma-dark-icons-git
 ### <<< EXTRA-APP surfn-plasma-dark-icons <<<
 ### >>> EXTRA-APP surfn-plasma-light-icons | Surfn Light icons | nemesis_repo | plasma >>>
 #surfn-plasma-light-icons-git
 ### <<< EXTRA-APP surfn-plasma-light-icons <<<
+### >>> EXTRA-APP surfn-plasma-flow | Surfn Plasma Flow | nemesis_repo | plasma >>>
+#surfn-plasma-flow-git
+### <<< EXTRA-APP surfn-plasma-flow <<<

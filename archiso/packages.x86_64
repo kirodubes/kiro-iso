@@ -902,6 +902,15 @@ kiro-assistant
 ### >>> EXTRA-APP surfn-plasma-dark-icons | Surfn Plasma Dark | nemesis_repo | plasma >>>
 #surfn-plasma-dark-icons-git
 ### <<< EXTRA-APP surfn-plasma-dark-icons <<<
+### >>> EXTRA-APP surfn-plasma-dark-breeze-icons | Surfn Plasma Dark Breeze | nemesis_repo | plasma >>>
+#surfn-plasma-dark-breeze-icons-git
+### <<< EXTRA-APP surfn-plasma-dark-breeze-icons <<<
+### >>> EXTRA-APP surfn-plasma-dark-qogir-icons | Surfn Plasma Dark Qogir | nemesis_repo | plasma >>>
+#surfn-plasma-dark-qogir-icons-git
+### <<< EXTRA-APP surfn-plasma-dark-qogir-icons <<<
+### >>> EXTRA-APP surfn-plasma-dark-tela-icons | Surfn Plasma Dark Tela | nemesis_repo | plasma >>>
+#surfn-plasma-dark-tela-icons-git
+### <<< EXTRA-APP surfn-plasma-dark-tela-icons <<<
 ### >>> EXTRA-APP surfn-plasma-light-icons | Surfn Plasma Light | nemesis_repo | plasma >>>
 #surfn-plasma-light-icons-git
 ### <<< EXTRA-APP surfn-plasma-light-icons <<<

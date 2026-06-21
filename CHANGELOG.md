@@ -2,6 +2,20 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.21
+
+### Three more Surfn Plasma icon variants in the builder
+- Extended the **`### CATEGORY: Plasma — Icons`** EXTRA-APP group in **`packages.x86_64`** with three
+  additional Surfn Plasma icon themes served from **`nemesis_repo`**: **`surfn-plasma-dark-breeze-icons`**
+  (Surfn Plasma Dark Breeze), **`surfn-plasma-dark-qogir-icons`** (Surfn Plasma Dark Qogir) and
+  **`surfn-plasma-dark-tela-icons`** (Surfn Plasma Dark Tela). The Plasma — Icons section now exposes the
+  full six-package Surfn family: Dark, Dark Breeze, Dark Qogir, Dark Tela, Light and Flow.
+- **Why:** `nemesis_repo` ships six `surfn-plasma-*` icon packages but the builder only surfaced three —
+  the three dark base-style variants (Breeze/Qogir/Tela re-coloured for the Surfn dark look) were missing,
+  so users couldn't pick them from the **"Plasma extras"** page. Each new block carries the `| plasma`
+  scope field and ships commented-out (opt-in); auto-discovered by the Kiro ISO Builder, no builder code
+  change. All six package names verified present in the `nemesis_repo` sync database.
+
 ## 2026.06.20
 
 ### Plasma extras in the ISO builder — config, themes & icons

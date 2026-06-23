@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.23
+
+### Drop `vim` from the default package list
+- Removed the **`vim`** line from **`packages.x86_64`**. **`nano`** stays as the lightweight default
+  terminal editor, so the ISO still ships an editor out of the box.
+- **Why:** vim is not wanted in the default Kiro install. With it installed, running `vim` in a
+  terminal made **Konsole** show vim's icon on its taskbar entry (Konsole mirrors the foreground
+  program's icon), which read as "vim pinned itself to the panel." Dropping the package removes both
+  the install and that taskbar artifact. Affects the next build only; no builder code change.
+
 ## 2026.06.21
 
 ### Three more Surfn Plasma icon variants in the builder

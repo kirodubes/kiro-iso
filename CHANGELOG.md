@@ -4,6 +4,21 @@
 
 ## 2026.06.24
 
+### Decision: keep the KDE Plasma Welcome Center on the live ISO
+- **No change made.** Considered suppressing the KDE **Welcome Center** (`plasma-welcome`)
+  that pops up on first login of the live Plasma session, then deliberately decided to **leave it
+  as-is**.
+- The intended mechanism — an autostart override (`~/.config/autostart/plasma-welcome.desktop`
+  with `Hidden=true`) — would have belonged here in **`archiso/airootfs/etc/skel/.config/autostart/`**,
+  since the live `liveuser` home derives from `/etc/skel` and that same skel is unpacked to the
+  install target (so one file would have covered both the live session and every installed user). It
+  was briefly scoped against `kiro-calamares-config`, but that repo only runs at install time and
+  cannot touch the live session shown to the user, so the skel route was the correct home.
+- **Why keep it:** the Welcome Center is standard upstream Plasma behaviour and harmless on a live
+  ISO; suppressing it was judged not worth the extra shipped file. Recording the decision here so the
+  next person who notices the pop-up knows it is intentional and not an oversight. Revisit only if it
+  becomes a support nuisance.
+
 ### Phase-1 connectivity probe now retries before failing the build
 - Reworked the connectivity check in **`build-scripts/build-the-iso.sh`** (Phase 1). The probe
   for `https://archlinux.org` and `https://github.com` previously ran a single shot

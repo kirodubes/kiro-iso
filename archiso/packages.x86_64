@@ -552,6 +552,7 @@ tldr
 ttf-jetbrains-mono-nerd
 ttf-meslo-nerd-font-powerlevel10k
 #unifetch
+xclip
 zsh
 zsh-completions
 zsh-syntax-highlighting

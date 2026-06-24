@@ -2,7 +2,32 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.24
+
+### Phase-1 connectivity probe now retries before failing the build
+- Reworked the connectivity check in **`build-scripts/build-the-iso.sh`** (Phase 1). The probe
+  for `https://archlinux.org` and `https://github.com` previously ran a single shot
+  (`wget --spider --timeout=10 --tries=1`) and called `exit 1` on the first miss. It now retries
+  each host up to **3 times** with a **3s** pause between attempts, and the per-attempt timeout was
+  raised **10s → 15s**. Only when all attempts to a host fail does the build abort.
+- **Why:** a single transient network hiccup — a slow TLS handshake to github.com over the 10s
+  window, a momentary DNS blip, one dropped packet — was enough to hard-fail the build at Phase 1,
+  before any real work. Each abort left the root-owned `kiro-build` work dir behind, so the
+  `kiro-iso-builder` GUI then prompted to remove it (requiring the sudo password) before a manual
+  restart. In practice it took three retry cycles before github answered inside the single-try
+  window. The retry loop absorbs these blips so a momentarily flaky connection no longer triggers
+  the whole remove-folder-and-re-authenticate dance; a genuinely-down network still fails, just a
+  few seconds later.
+
 ## 2026.06.23
+
+### Remove obsolete `kiro-neo-candy-*` packages
+- Dropped five lines from **`packages.x86_64`**: **`kiro-neo-candy-arc`**,
+  **`kiro-neo-candy-arc-mint-grey`**, **`kiro-neo-candy-arc-mint-red`**, **`kiro-neo-candy-qogir`**
+  and **`kiro-neo-candy-tela`**.
+- **Why:** these packages no longer exist in the repos after the candy package set was reworked, so
+  `mkarchiso` failed the install root with `target not found` for each one and aborted the build.
+  Removing the stale references unblocks the build.
 
 ### Drop `vim` from the default package list
 - Removed the **`vim`** line from **`packages.x86_64`**. **`nano`** stays as the lightweight default

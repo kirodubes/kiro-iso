@@ -240,15 +240,21 @@ Free up space and re-run."
     # Connectivity — the build syncs pacman databases and fetches the latest
     # .bashrc over HTTPS. wget is a hard build dependency, so use it as the probe.
     ensure_package wget
-    local host
+    # A single dropped probe (slow TLS handshake, DNS blip) shouldn't abort the
+    # whole build — retry each host a few times before declaring it unreachable.
+    local host attempt
     for host in https://archlinux.org https://github.com; do
-        if wget -q --spider --timeout=10 --tries=1 "${host}"; then
-            status_ok "Reachable: ${host}"
-        else
-            log_error "No connectivity to ${host} — the build needs internet to sync
+        attempt=1
+        until wget -q --spider --timeout=15 --tries=1 "${host}"; do
+            if (( attempt >= 3 )); then
+                log_error "No connectivity to ${host} — the build needs internet to sync
 packages and fetch the latest .bashrc. Check your network and re-run."
-            exit 1
-        fi
+                exit 1
+            fi
+            attempt=$((attempt + 1))
+            sleep 3
+        done
+        status_ok "Reachable: ${host}"
     done
 
     # Arch mirror fallback must run BEFORE `pacman -Sy`: the sync below (and

@@ -2,6 +2,24 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.25
+
+### Fix: ISO build failed on `broadcom-wl-dkms` against kernel 7.1
+- Pinned **`broadcom-wl-dkms`** to the cachyos repo in **`archiso/packages.x86_64`** — the entry is
+  now written as **`cachyos/broadcom-wl-dkms`**.
+- **What was breaking:** during the `mkarchiso` chroot stage, DKMS tried to build the Broadcom `wl`
+  module against `linux-cachyos 7.1.1` and failed with `incompatible function pointer types` on
+  `.get_station`, `.add_key`, `.del_key` and `.get_key`. Kernel 7.1's cfg80211 ops changed those
+  callbacks to take `struct wireless_dev *` instead of `struct net_device *`, and the unmaintained
+  Broadcom `wl` source still uses the old signatures.
+- **Why pinning fixes it:** `[extra]` is listed before `[cachyos]` in **`archiso/pacman.conf`**,
+  and pacman resolves a bare package name from the *first* repo in config order that provides it —
+  not the highest version. So the build kept pulling Arch extra's pkgrel `-47`, which lacks a
+  kernel-7.1 patch, while cachyos's pkgrel `-49` (which carries `022-linux71.patch`) sat unused at
+  the bottom of the list. Repo-qualifying the single package forces the patched cachyos build without
+  reordering the whole repo precedence — keeping the deliberate Arch-first ordering for every other
+  package on the ISO.
+
 ## 2026.06.24
 
 ### Decision: keep the KDE Plasma Welcome Center on the live ISO

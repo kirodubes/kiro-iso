@@ -33,7 +33,8 @@ base
 bind
 #bolt
 #brltty
-broadcom-wl-dkms
+# pinned to cachyos: extra's -47 fails to build on kernel 7.1; cachyos ships the 022-linux71 patch
+cachyos/broadcom-wl-dkms
 btrfs-progs
 clonezilla
 #cloud-init

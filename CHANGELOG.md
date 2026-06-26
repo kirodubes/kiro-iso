@@ -4,6 +4,8 @@
 
 ## 2026.06.26
 
+> **Milestone:** from **2026/07/01** Kiro ships **one official ISO per month**; **v26.07.01** is the first official monthly release. The bash → fish shell switch below is its headline change. v26.06.26 itself is a daily build, not the official release.
+
 ### Default shell: live `liveuser` switched bash → fish
 - **`archiso/airootfs/etc/passwd`**: the `liveuser` login shell (field 7) changed from
   `/bin/bash` to `/bin/fish`, so booting the live ISO drops into fish. Root stays on bash.

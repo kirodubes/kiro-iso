@@ -1,9 +1,12 @@
-# Kiro ISO — June 2026 builds, what changed and why
+# Kiro ISO — releases, what changed and why
 
-Fifteen ISOs shipped in June (`.01 .02 .04 .05 .06 .07 .08 .09 .10 .11 .12 .13 .14 .17 .18`). For each: why it was worth a new ISO,
-what functionality it added, and the package moves behind it. Newest first.
+Each release entry answers the same three things: why it was worth a new ISO, what functionality it added, and the package moves behind it. Newest first. From **2026/07/01** Kiro switches to **one official ISO per month**; the v26.07.01 ISO is the first official monthly release.
 
-## v26.06.18 — June 18 (current)
+## v26.06.26 — June 26 (current)
+**Why a new ISO:** Kiro's default shell switches to **fish** — the headline change going into the first official monthly release on **2026/07/01**.
+- **Fish is the default shell:** the live session and every fresh install now drop into **fish** instead of bash. The matching config ships out of the box (PATH, aliases, prompt, helper functions via `kiro-fish-config`), so it's a smoother out-of-box experience with no setup. `bash` and `zsh` still ship — `tobash`/`tozsh` switch back in one command.
+
+## v26.06.18 — June 18
 **Why a new ISO:** rolling your own Kiro ISO is leaner and more reliable — more of the system is now safe to drop in the builder, and a bug that could abort a build is fixed.
 - **More of the system is yours to drop:** the system-tuning services — **ananicy-cpp**, **firewalld**, **tuned**/**tuned-ppd** and **scx-manager** (with their companion apps) — now show up as a removable category in the **Kiro ISO Builder** and the **Arch Linux Tweak Tool**'s Streamline page. Dropping one no longer aborts the install (their services are now optional), so you can build a leaner ISO without breaking it. They still ship by default.
 - **Lighter default ISO:** the large **sardi-icons** set (~58 MB) no longer ships by default — it's a one-line opt-in if you want it back.

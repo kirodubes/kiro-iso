@@ -4,6 +4,21 @@
 
 ## 2026.06.26
 
+### Default shell: live `liveuser` switched bash → fish
+- **`archiso/airootfs/etc/passwd`**: the `liveuser` login shell (field 7) changed from
+  `/bin/bash` to `/bin/fish`, so booting the live ISO drops into fish. Root stays on bash.
+  Only the shell field changes — the `x` placeholder and the (blank) password are untouched;
+  `/etc/passwd` is the account table, not the password store.
+- **Why:** align the out-of-box experience with fish as Kiro's default interactive shell. The
+  matching `config.fish` already ships in `/etc/skel/.config/fish/` via **`kiro-fish-config`**
+  (which also `depends=('fish')`), so PATH (`~/.bin`/`~/.local/bin`), aliases, prompt colors and
+  helper functions are all in place — no regression. `.bashrc`/`.zshrc` still ship, so
+  `tobash`/`tozsh` switch back in one command.
+- Path `/bin/fish` chosen to match Kiro's existing convention (the `tofish` alias, the replaced
+  `/bin/bash`); on Arch `/bin` → `/usr/bin` so it's identical to `/usr/bin/fish`.
+- **Paired with** the installed-system half in **`kiro-calamares-config`** (`users.conf`
+  `shell: /bin/fish`). Plan/decision record: `KIRO-PROJECTS/kiro-iso/bash-to-fish-conversion.md`.
+
 ### Shells: `kiro-shells` → meta-package + skel `.bashrc` repointed to `kiro-bash-config`
 - The monolithic **`kiro-shells`** package was split into three per-shell packages —
   **`kiro-bash-config`**, **`kiro-zsh-config`**, **`kiro-fish-config`**. `kiro-shells`

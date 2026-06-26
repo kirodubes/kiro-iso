@@ -89,7 +89,7 @@ kiro-iso/
 - **Nemesis Repo** (custom): Educational customizations
   - `kiro-dot-files`: Configuration and dotfiles management
   - `kiro-xfce`: XFCE customizations
-  - `kiro-shells`: Custom shell configurations
+  - `kiro-shells`: shell config meta — pulls `kiro-bash-config`, `kiro-zsh-config`, `kiro-fish-config`
   - `kiro-rofi`, `kiro-rofi-themes`: Application launcher
   - `kiro-polybar`: Custom statusbar
   - `ohmychadwm-git`: Modern tiling window manager with integrated menu and keybindings

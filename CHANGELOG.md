@@ -2,6 +2,34 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.26
+
+### Shells: `kiro-shells` → meta-package + skel `.bashrc` repointed to `kiro-bash-config`
+- The monolithic **`kiro-shells`** package was split into three per-shell packages —
+  **`kiro-bash-config`**, **`kiro-zsh-config`**, **`kiro-fish-config`**. `kiro-shells`
+  keeps its name and is now a **meta-package** depending on all three, so the package list
+  and existing installs migrate transparently. **`archiso/packages.x86_64`** gains the
+  three explicitly (alpha order) alongside the retained `kiro-shells`.
+- The ISO bakes the skel `.bashrc` a second way, independent of the package: **`up.sh`**
+  and **`build-scripts/build-the-iso.sh`** copy `.bashrc-latest` straight into
+  `airootfs/etc/skel/.bashrc`. That logic was **repointed from `kiro-shells` to
+  `kiro-bash-config`** — both the local path and the raw-GitHub `wget` URL. Docs
+  (`README.md`, `docs/OVERVIEW.md`, `CLAUDE.md`) updated to match; the CLAUDE.md fetch
+  line also corrected from the stale `erikdubois/` org to `kirodubes/`.
+
+### Add: `intel-media-driver` + `pacman-contrib` (clean-CachyOS comparison)
+- Added **`intel-media-driver`** to the **GRAPHICS / XORG** block of **`archiso/packages.x86_64`**,
+  right after `mesa`. A live comparison against a clean CachyOS install surfaced that Kiro shipped
+  no VA-API driver for Intel iGPUs: AMD/Radeon get VA-API through `mesa`, but Intel hardware needs
+  `intel-media-driver` (Broadwell/Gen8 and newer) explicitly. Without it, Intel laptops fall back to
+  software video decode — higher CPU, worse battery, choppier playback. CachyOS ships it by default;
+  now so does Kiro.
+- Added **`pacman-contrib`** to the **PACKAGE / SYSTEM TOOLS** block (alphabetically, after
+  `namcap`). It provides `paccache` (cache cleanup), `checkupdates` (safe update check without
+  touching the sync db), `pactree`, and `rankmirrors` — utilities multiple Kiro helper scripts and
+  everyday maintenance lean on. CachyOS ships it; Kiro did not.
+- Mirrored to `kiro-iso-next` the same day.
+
 ## 2026.06.25
 
 ### Fix: ISO build failed on `broadcom-wl-dkms` against kernel 7.1

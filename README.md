@@ -246,7 +246,7 @@ kiro-iso/
 - **Nemesis Repository** (custom): Educational configurations and customizations
   - `kiro-dot-files`: Pre-configured shell and application settings
   - `kiro-xfce`: XFCE4 customization package
-  - `kiro-shells`: Custom shell configurations
+  - `kiro-shells`: shell config meta — pulls `kiro-bash-config`, `kiro-zsh-config`, `kiro-fish-config`
   - `kiro-rofi` + `kiro-rofi-themes`: Application launcher with themes
   - `kiro-polybar`: Custom status bar
   - `ohmychadwm-git`: Tiling window manager with integrated menu

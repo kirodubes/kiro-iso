@@ -165,6 +165,9 @@ wget
 
 ###  GRAPHICS / XORG — live session display stack
 mesa
+# Intel iGPU VA-API hardware video decode/encode (Broadwell/Gen8+).
+# AMD/Radeon get VA-API via mesa; Intel needs this driver explicitly.
+intel-media-driver
 xf86-input-elographics
 xf86-input-libinput
 xorg-apps
@@ -566,7 +569,9 @@ archlinux-tweak-tool-gtk4
 fastfetch-tweak-tool
 kiro-arc-dawn
 kiro-arc-kde
+kiro-bash-config
 kiro-dot-files
+kiro-fish-config
 kiro-iso-builder
 kiro-keybindings
 kiro-kvantum
@@ -579,6 +584,7 @@ kiro-shells
 kiro-system-files
 kiro-variety-config
 kiro-xfce
+kiro-zsh-config
 sparklines-git
 
 ###  ICONS / CURSORS / THEMES — default Kiro look
@@ -709,6 +715,7 @@ downgrade
 expac
 hardcode-fixer-git
 namcap
+pacman-contrib
 pacmanlogviewer
 pacquery
 pamac-aur

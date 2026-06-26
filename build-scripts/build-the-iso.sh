@@ -346,24 +346,24 @@ show_overview() {
 
 refresh_skel_bashrc() {
     # Maintainer-only: on the build host, refresh skel's .bashrc from the local
-    # kiro-shells checkout so the ISO always ships the current shell. No-op (and
+    # kiro-bash-config checkout so the ISO always ships the current shell. No-op (and
     # no phase number) everywhere else.
     [[ "${HOSTNAME}" == "hq" ]] || return 0
 
-    log_section "Refreshing skel .bashrc from kiro-shells (maintainer host only)"
+    log_section "Refreshing skel .bashrc from kiro-bash-config (maintainer host only)"
     local skel_dir="${REPO_DIR}/archiso/airootfs/etc/skel"
     local skel_bashrc="${skel_dir}/.bashrc"
     local skel_bashrc_latest="${skel_dir}/.bashrc-latest"
-    local edu_bashrc_latest="${HOME}/KIRO/kiro-shells/etc/skel/.bashrc-latest"
+    local edu_bashrc_latest="${HOME}/KIRO/kiro-bash-config/etc/skel/.bashrc-latest"
     # Pull the latest .bashrc-latest in, drop the old .bashrc, then promote the
-    # fresh copy into its place so skel always ships the current kiro-shells .bashrc.
+    # fresh copy into its place so skel always ships the current kiro-bash-config .bashrc.
     if [[ -f "${edu_bashrc_latest}" ]]; then
         cp "${edu_bashrc_latest}" "${skel_bashrc_latest}"
         rm -f "${skel_bashrc}"
         mv "${skel_bashrc_latest}" "${skel_bashrc}"
-        status_ok "${GREEN}.bashrc refreshed from kiro-shells${RESET}"
+        status_ok "${GREEN}.bashrc refreshed from kiro-bash-config${RESET}"
     else
-        log_warn "kiro-shells .bashrc-latest not found at ${edu_bashrc_latest}"
+        log_warn "kiro-bash-config .bashrc-latest not found at ${edu_bashrc_latest}"
     fi
 }
 
@@ -408,9 +408,9 @@ prepare_build_tree() {
     find "${skel_dir}" -mindepth 1 -delete 2>/dev/null || true
 
     echo "Fetching latest .bashrc..."
-    wget -q "https://raw.githubusercontent.com/kirodubes/kiro-shells/refs/heads/main/etc/skel/.bashrc-latest" \
+    wget -q "https://raw.githubusercontent.com/kirodubes/kiro-bash-config/refs/heads/main/etc/skel/.bashrc-latest" \
         -O "${skel_dir}/.bashrc" \
-        || { log_error "Failed to download .bashrc from kiro-shells"; exit 1; }
+        || { log_error "Failed to download .bashrc from kiro-bash-config"; exit 1; }
 
     echo "Refreshing packages.x86_64..."
     cp -f "${REPO_DIR}/archiso/packages.x86_64" "${PACKAGES_FILE}"

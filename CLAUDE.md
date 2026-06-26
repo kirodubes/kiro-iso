@@ -70,7 +70,7 @@ The script manipulates `packages.x86_64` in the build folder to inject the chose
 
 The build pipeline:
 1. `build-the-iso.sh` copies `archiso/` into `~/kiro-build/archiso/`
-2. Fetches latest `.bashrc` from `erikdubois/kiro-shells` into `airootfs/etc/skel/`
+2. Fetches latest `.bashrc` from `kirodubes/kiro-bash-config` into `airootfs/etc/skel/`
 3. Pre-populates the pacman GPG keyring (archlinux + chaotic) in the build tree
 4. Injects the correct NVIDIA packages into the package list
 5. Calls `mkarchiso` to squash and produce the ISO

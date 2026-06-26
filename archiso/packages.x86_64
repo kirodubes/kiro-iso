@@ -676,6 +676,7 @@ yt-dlp
 
 ###  SYSTEM INFO / DIAGNOSTICS
 cpuid
+eza
 hardinfo2
 hw-probe
 hwinfo

@@ -15,7 +15,7 @@ REPO_DIR="${SCRIPT_DIR}/.."
 #####################################################################
 # Colors
 #####################################################################
-if command -v tput >/dev/null 2>&1 && [[ -t 1 ]]; then
+if command -v tput >/dev/null 2>&1 && [[ -t 1 ]] && tput setaf 1 >/dev/null 2>&1; then
     RED="$(tput setaf 1)"
     GREEN="$(tput setaf 2)"
     YELLOW="$(tput setaf 3)"

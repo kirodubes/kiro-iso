@@ -4,6 +4,34 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-28 — Production v26.06.28: fish default (Starship + fish-tweak-tool) — default install, 0 FAIL
+
+Production `kiro-iso` **v26.06.28** (`ISO_BUILD` 11:03) — the **July-1 `v26.07.01` release candidate**
+in everything but the version string (the release-day build bumps the version only). It carries the
+completed **bash → fish default**: the live `liveuser` and the installed user both log into fish, with
+the **Starship** prompt and the **fish-tweak-tool** GUI now shipped. Default-edition install validated
+over SSH (`erik@127.0.0.1:2020`):
+
+| Target (VBox) | FS / encryption | Bootloader | Result |
+|---------------|-----------------|------------|--------|
+| **Kiro default** (XFCE/ohmychadwm) | **ext4**, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 132 / 0 / 0** |
+
+Shipped-content verification on the installed system:
+- **fish is the default shell end-to-end:** installed `erik` login shell = `/bin/fish` (via
+  `kiro-calamares-config` `users.conf shell: /bin/fish`); the live ISO's `liveuser` is also `/bin/fish`.
+- **fish-stack present:** `starship 1.25.1`, `fish-tweak-tool 26.06-23`, `kiro-starship 26.06-06`,
+  `kiro-fish-config 26.06-09`, `kiro-shells 26.06-103` (meta), `fish 4.7.1` — the new prompt engine,
+  preset and GUI all land. `seahorse 47.0.1` (keyring GUI) also present.
+- **Calamares cleanup clean:** calamares binary, `mkinitcpio-archiso`, `memtest86+`,
+  `kiro-calamares-tweak-tool` and `kiro-calamares-config-next` all removed; `/etc/calamares` gone;
+  no autologin / nopasswd survivors.
+- Kernel `linux-cachyos` 7.1.2-2 (+ `linux-zen` fallback); sessions `ohmychadwm` / `xfce` /
+  `xfce-wayland`; UEFI / systemd-boot; ZRAM 8G zstd; 0 failed units; boot 15.6s; host `erik-virtualbox`,
+  VirtualBox (oracle).
+
+This validates the v26.06.28 production ISO on the default edition and **clears the distro-test
+staleness check** for the fish-default release shipping as `v26.07.01` on 2026-07-01.
+
 ## 2026-06-14 — Production v26.06.14: AI assistant + signed-package enforcement + sdl2-compat pre-seed — default install, 0 FAIL
 
 Production `kiro-iso` **v26.06.14** (`ISO_BUILD` 07:45, ISO file 07:54) carrying the day's shipped

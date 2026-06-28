@@ -2,6 +2,50 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.28
+
+### Complete the fish default: ship `starship`, `kiro-starship` and `fish-tweak-tool`
+
+The 2026.06.26 change switched the live `liveuser` login shell to fish; it left the prompt
+unstyled and unmanaged. These three additions to **`archiso/packages.x86_64`** round out the
+fish experience for the **v26.07.01** monthly release:
+- **`starship`** — the cross-shell prompt engine (added after `ripgrep-all`).
+- **`kiro-starship`** — Kiro's `starship.toml` preset, shipped both to `/etc/skel/.config/` and
+  as the `/usr/share/kiro/starship/` default that **`fish-tweak-tool`** reads.
+- **`fish-tweak-tool`** — the GTK tool for switching the prompt/preset and managing fish from a
+  GUI (added next to `fastfetch-tweak-tool`).
+- **Why:** with a styled Starship prompt and a GUI to tweak it, the first official monthly ISO
+  ships fish as a finished default rather than a bare login-shell swap.
+
+## 2026.06.27
+
+### Add **`seahorse`** (keyring management GUI)
+
+Added **`seahorse`** ("Passwords and Keys") to **`archiso/packages.x86_64`**, in the
+desktop-integration section next to **`gnome-keyring`**. It is the companion GUI to
+gnome-keyring and lets users inspect and — crucially — change their **Login keyring
+password**. This matters because Kiro uses SDDM **autologin**: no password is typed
+at login, so PAM can never unlock a password-protected login keyring. Chromium-based
+browsers (Vivaldi, Brave) store their secure key (`v11`) in that keyring, so when the
+keyring stays locked — especially after switching desktop environments — the browser
+fails to decrypt with *"Decryption Failed: Risk of Data Loss"*. Setting the Login
+keyring password to blank via seahorse makes gnome-keyring store it in plaintext and
+auto-unlock it transparently in every session (verified against a cold daemon start),
+fixing the breakage without any autostart or launcher changes.
+
+### Harden the colors block against a junk `TERM` (tput abort)
+
+When the ISO Builder GUI runs `build-the-iso.sh` it does so under a PTY, so the
+script's `[[ -t 1 ]]` test is true and it calls `tput`. On a desktop session that
+exports a junk terminal type (`TERM=unknown`, reported on Arch + MATE), `tput setaf`
+errors and — under the script's `set -euo pipefail` — kills the whole build at
+startup with `tput: unknown terminal "unknown"`. The colors block now also probes
+`tput setaf 1 >/dev/null 2>&1`; if that fails it falls through to the empty-string
+fallback instead of aborting. The real GUI-side fix (forcing a sane `TERM`) lives in
+`kiro-iso-builder`; this is defense-in-depth for anyone running the script directly.
+
+- **`build-scripts/build-the-iso.sh`** — colors guard gains `&& tput setaf 1 >/dev/null 2>&1`.
+
 ## 2026.06.26
 
 > **Milestone:** from **2026/07/01** Kiro ships **one official ISO per month**; **v26.07.01** is the first official monthly release. The bash → fish shell switch below is its headline change. v26.06.26 itself is a daily build, not the official release.

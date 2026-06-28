@@ -513,6 +513,7 @@ tumbler
 
 ###  DESKTOP INTEGRATION — polkit / portals / keyring
 gnome-keyring
+seahorse
 polkit
 polkit-gnome
 xapp
@@ -552,6 +553,7 @@ lolcat
 oh-my-zsh-git
 ripgrep
 ripgrep-all
+starship
 tldr
 ttf-jetbrains-mono-nerd
 ttf-meslo-nerd-font-powerlevel10k
@@ -567,6 +569,7 @@ arc-gtk-theme
 archlinux-logout-gtk4
 archlinux-tweak-tool-gtk4
 fastfetch-tweak-tool
+fish-tweak-tool
 kiro-arc-dawn
 kiro-arc-kde
 kiro-bash-config
@@ -581,6 +584,7 @@ kiro-rofi
 kiro-rofi-themes
 kiro-sddm-simplicity
 kiro-shells
+kiro-starship
 kiro-system-files
 kiro-variety-config
 kiro-xfce

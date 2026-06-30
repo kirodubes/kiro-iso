@@ -4,6 +4,37 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-06-30 — Production v26.07.01 release ISO: fish default + Kiro-menu reorg — default install, 0 FAIL
+
+The **actual `v26.07.01` release ISO** (`ISO_BUILD` Tue Jun 30 13:18, ISO file 13:25) — built today
+via the new `version_override` knob and installed via Calamares. This supersedes the 2026-06-28 RC
+test: it validates the same fish default **plus** the `kiro-system-files` **26.06-116** menu
+reorganization that landed 2026-06-29 (after the RC test) and ships in this ISO. Default-edition
+install validated over SSH (`erik@127.0.0.1:2020`):
+
+| Target (VBox) | FS / encryption | Bootloader | Result |
+|---------------|-----------------|------------|--------|
+| **Kiro default** (XFCE/ohmychadwm) | **ext4**, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 132 / 0 / 0** |
+
+Shipped-content verification on the installed system:
+- **Release identity:** `/etc/dev-rel` `ISO_RELEASE=v26.07.01`, `ISO_BUILD=Tue Jun 30 01:18:30 PM CEST 2026`.
+- **fish default end-to-end:** installed `erik` login shell = `/bin/fish`. fish-stack present:
+  `fish 4.7.1`, `starship 1.26.0`, `fish-tweak-tool 26.06-32`, `kiro-starship 26.06-06`,
+  `kiro-fish-config 26.06-10`; `seahorse 47.0.1` (keyring GUI) present.
+- **Kiro-menu reorg (the content that postdated the RC test):** `kiro-system-files 26.06-116`
+  installed; `/usr/share/desktop-directories/kiro-apps.directory` present; all four
+  `kiro-link-*.desktop` launchers carry `Categories=X-Kiro;` (moved out of the Internet menu into
+  the Kiro menu). **This clears the distro-test staleness check** for kiro-system-files commits
+  `8c29d4e` / `9d08636` / `93dcf8d`.
+- **Calamares cleanup clean:** `calamares` binary removed (`pacman -Q` = not found); `/etc/calamares`
+  gone.
+- Kernels `linux-cachyos` 7.1.2-3 (+ `linux-zen` 7.0.14 fallback); sessions `ohmychadwm` / `xfce` /
+  `xfce-wayland`; UEFI / systemd-boot; ZRAM 8G zstd; 0 failed units; boot 16.6s; host
+  `erik-virtualbox`, VirtualBox (oracle).
+
+This validates the **v26.07.01 production release ISO** on the default edition and clears the
+distro-test staleness check for everything shipping in it.
+
 ## 2026-06-28 — Production v26.06.28: fish default (Starship + fish-tweak-tool) — default install, 0 FAIL
 
 Production `kiro-iso` **v26.06.28** (`ISO_BUILD` 11:03) — the **July-1 `v26.07.01` release candidate**

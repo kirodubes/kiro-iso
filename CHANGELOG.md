@@ -2,6 +2,34 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.06.30
+
+### Add `version_override` knob — forward/back-date a release without faking the clock
+
+`apply_version_bump` (Phase 2) always derived the version from `date +%y.%m.%d`, so an
+ISO built today could only ever be stamped with today's date. To build a release ahead
+of time (e.g. cut the **v26.07.01** monthly ISO a day early), there was no clean option
+short of `faketime`-ing the whole build.
+
+- New **`version_override`** setting in **`build-scripts/build.conf`** (and the tracked
+  `build.conf.defaults`). Empty = unchanged behaviour (use today's date). Set to a
+  `vYY.MM.DD` string = stamp that exact version everywhere the bump touches (dev-rel
+  `ISO_RELEASE`, `build-the-iso.sh` `kiroVersion`, profiledef `iso_label` + `iso_version`).
+- Only applies on the **`bump_version=yes`** path. A malformed value fails loudly with a
+  clear error instead of producing a garbage ISO name.
+- The internal build-date stamp (`ISO_BUILD` in `/etc/dev-rel`, Phase 10) is left alone:
+  it still records the real moment of the build, so version can be forward-dated while
+  build provenance stays honest.
+- **Why:** monthly/scheduled releases can now be built when there's time and labelled with
+  the release date, with one config line instead of a clock hack.
+
+**Technical Details** — added the override branch + a `^v[0-9]{2}\.[0-9]{2}\.[0-9]{2}$`
+format guard in `apply_version_bump`; `verify_version_sync` (Phase 3) is unchanged and
+still confirms all four files carry the resolved version.
+
+**Files Modified** — `build-scripts/build-the-iso.sh`, `build-scripts/build.conf.defaults`,
+`build-scripts/build.conf` (live copy, also set to `v26.07.01` for this build).
+
 ## 2026.06.28
 
 ### Complete the fish default: ship `starship`, `kiro-starship` and `fish-tweak-tool`

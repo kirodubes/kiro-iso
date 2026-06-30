@@ -28,6 +28,8 @@ default_session="xfce"
 
 # ── Versioning ───────────────────────────────────────────────────────────────
 bump_version=yes              # yes | no — bump version to vYY.MM.DD before building; no = same-day rebuild
+version_override=             # empty = use today's date (vYY.MM.DD). Set e.g. v26.07.01 to forward/back-date
+                              # a release built ahead of time. Only applies when bump_version=yes. Format: vYY.MM.DD
 
 # ── Hardware ─────────────────────────────────────────────────────────────────
 nvidia_driver=open            # open | 580xx | 390xx

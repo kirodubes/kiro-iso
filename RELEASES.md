@@ -2,9 +2,76 @@
 
 Each release entry answers the same three things: why it was worth a new ISO, what functionality it added, and the package moves behind it. Newest first. From **2026/07/01** Kiro switches to **one official ISO per month**; the v26.07.01 ISO is the first official monthly release.
 
-## v26.06.26 — June 26 (current)
+## v26.07.01 — July 1 (current)
+**Why a new ISO:** Kiro's **first official monthly release** — Kiro's **Hyprland** edition lands, and the **fish** default is now finished.
+- **One polished ISO a month, starting now:** from July, Kiro ships a single official release each month instead of a stream of daily builds. v26.07.01 is the first; the next is **v26.09.01** — there is no August release, as July and August are the holiday period.
+- **Hyprland edition lands — the one people were waiting for:** Kiro's Wayland line arrives as a complete **Hyprland** edition you can build, boot and install. It ships with **hyprland-tweak-tool**, a setups hub that installs popular community Hyprland configs — **ML4W**, **Omarchy**, **end-4**, **HyDE**, **Caelestia** and **JaKooLit** — through their own installers, each with a risk marker and a backup of your existing config first.
+- **Hyprland in the Arch Linux Tweak Tool:** ATT gained a Wayland-sessions page that installs or removes Wayland desktops — including **Hyprland**, with a live preview — so it sits alongside the other desktops and tiling window managers without any issues. Tested.
+- **Fish is a polished default, not just a shell swap:** the live session and every fresh install now get the **Starship** prompt styled out of the box, plus **fish-tweak-tool** — a GUI to switch prompt presets and manage fish. The shell was flipped to fish in late June; this release makes it feel finished. `bash` and `zsh` still ship — `tobash`/`tozsh` switch back in one command.
+- **Keybindings cleaned up across every desktop:** the app-launcher keys (Super+F1–F12) are now grouped into one tidy block in every cheatsheet. The printable cheatsheet — the **kiro-keybindings** app — can now export to HTML/PDF on demand and works on Plasma, and the Plasma shortcuts were rebuilt from the real sources (28 bindings, up from a stub).
+- **A new "Kiro Apps" menu:** the Kiro tweak/config tools and the Website / Releases / Discussions / Source links are now gathered under one **Kiro Apps** menu instead of being scattered through the application menu.
+- **Lock and logout that work everywhere:** **archlinux-logout** matured into a proper standalone app with a real settings window, and its lock screen now works on Plasma (native KScreenLocker) and on Wayland/Hyprland — not just X11.
+- **More capable tweak tools:** **fastfetch-tweak-tool** gained a real colour picker, a module browser, a Nerd-Font icon picker and save/export/import presets; **fish-tweak-tool** is new for managing the fish prompt.
+- **A full Plasma theming line:** five Kiro Plasma themes — **Sweet, Layan, Nord, WhiteSur** and **Win11** — are now packaged under the Kiro namespace with sensible Kvantum and icon defaults (these are the "Plasma extras" the ISO Builder can add).
+- **Shells split out:** the shell config is now three packages — **kiro-bash-config**, **kiro-zsh-config** and **kiro-fish-config** under a `kiro-shells` meta — with fish reworked into a documented two-tier config and a new `fish-help` overview.
+- **Chromium browsers stop losing their passwords:** added **Seahorse** ("Passwords and Keys") so you can clear the login-keyring password — the fix for **Vivaldi** and **Brave** throwing *"Decryption Failed"* after autologin or a desktop-environment switch.
+- **A faster `ls`:** `eza`, a modern colour-and-icon directory lister, now ships on the medium.
+- **Packages:** + `starship`, + `kiro-starship`, + `fish-tweak-tool`, + `seahorse`, + `eza`; plus updates across the Kiro desktop, keybinding, Plasma-theme, logout and tweak-tool packages.
+
+### Every Kiro app is free — and 1 July kicks off our donation drive to cover the expenses
+
+Kiro stays free and open — but keeping it running month to month does cost money. **1 July kicks off a Kiro donation drive** to help cover the coming month's running costs. If Kiro and its tools save you time, please consider chipping in — donations only target break-even, and the core always stays free for everyone:
+
+- GitHub Sponsors — https://github.com/sponsors/erikdubois
+- Patreon — https://www.patreon.com/c/kiroproject
+- YouTube memberships — https://www.youtube.com/@ErikDubois/join
+- Ko-fi — https://ko-fi.com/erikdubois
+- PayPal — https://www.paypal.me/erikdubois
+
+And there's a lot you get for free — every Kiro app ships free and open, now gathered under the new **Kiro Apps** menu:
+
+- **Arch Linux Tweak Tool** — the big modular system tool (now with a Wayland-sessions page)
+- **Arch Linux Logout** — logout / lock / power, on X11 and Wayland
+- **BetterLockScreen settings** — a companion GUI to set up and preview your lock screen
+- **Kiro ISO Builder** — roll your own Kiro ISO around any desktop
+- **Calamares Tweak Tool** — tune the installer (filesystems, options) before you install
+- **Kiro News** — Arch + Kiro news on your desktop
+- **Kiro Keybindings** — a polished GUI cheatsheet of every shortcut for each Kiro desktop and tiling window manager, with one-click export to HTML or PDF
+- **Fastfetch Tweak Tool** — design your fastfetch system-info readout: colour picker, module browser, Nerd-Font icon picker and saveable presets
+- **Fish Tweak Tool** — manage the fish shell and switch Starship prompt presets from a GUI
+- **Alacritty Tweak Tool** — configure the Alacritty terminal (font, colours, options) without editing the config by hand
+- **Hyprland Tweak Tool** — a setups hub that installs popular community Hyprland configs through their own installers
+- **Kiro Assistant** — the on-board AI helper
+
+## v26.06.26 — June 26 (development build — not released to the public)
 **Why a new ISO:** Kiro's default shell switches to **fish** — the headline change going into the first official monthly release on **2026/07/01**.
 - **Fish is the default shell:** the live session and every fresh install now drop into **fish** instead of bash. The matching config ships out of the box (PATH, aliases, prompt, helper functions via `kiro-fish-config`), so it's a smoother out-of-box experience with no setup. `bash` and `zsh` still ship — `tobash`/`tozsh` switch back in one command.
+- **Smoother video on Intel graphics:** `intel-media-driver` now ships, giving Intel iGPUs (Broadwell/Gen8+) hardware-accelerated video decode/encode through VA-API. AMD/Radeon already get this via mesa.
+- **Packages:** + `intel-media-driver`, + `kiro-bash-config`, + `kiro-fish-config`, + `kiro-zsh-config`, + `pacman-contrib`.
+
+## v26.06.25 — June 25 (development build — not released to the public)
+**Why a new ISO:** Broadcom Wi-Fi keeps working on the current kernel.
+- **Broadcom Wi-Fi fix:** the `broadcom-wl-dkms` driver is now pulled from the CachyOS repo, which carries the patch that builds against kernel 7.1 — Arch's stock package fails to build there, which would have left some Broadcom adapters without Wi-Fi.
+- **Packages:** `broadcom-wl-dkms` now sourced from `cachyos`.
+
+## v26.06.24 — June 24 (development build — not released to the public)
+**Why a new ISO:** copy-to-clipboard works out of the box, and a flaky network no longer aborts a build.
+- **Clipboard support:** `xclip` now ships, so tools that copy to the clipboard (such as `kiro-report --copy`) work on a fresh system without installing anything.
+- **More resilient builds:** rolling your own ISO no longer aborts on a single dropped connectivity check — the build retries each host a few times before giving up.
+- **Packages:** + `xclip`.
+
+## v26.06.23 — June 23 (development build — not released to the public)
+**Why a new ISO:** a built Plasma ISO can now carry the full Kiro Plasma look, and the default medium gets a little lighter.
+- **Plasma extras in the ISO Builder:** tick **Plasma** in the **Kiro ISO Builder** and a new conditional "Plasma extras" page offers the complete Kiro Plasma set — Dolphin, Konsole, keybindings, system-settings and window-management configs, the Plasma themes (Sweet, Layan, Nord, WhiteSur, Win11) and the Surfn Plasma icon sets — so a Plasma ISO you build can look like Kiro Plasma out of the box.
+- **A fastfetch GUI and Kvantum theming:** `fastfetch-tweak-tool` and `kiro-kvantum` now ship by default.
+- **Lighter default:** the bundled neo-candy Arc/Qogir/Tela icon variants no longer ship on the base medium, and `vim` is dropped from the default list.
+- **Packages:** + `fastfetch-tweak-tool`, + `kiro-kvantum`, + `update-grub`; − `vim`, − the default `kiro-neo-candy-*` icon variants.
+
+## v26.06.19 — June 19 (development build — not released to the public)
+**Why a new ISO:** a branded boot experience and clearer install-medium choices.
+- **Kiro GRUB theme:** the boot menu now wears a custom **Kiro** GRUB theme (`kiro-grub-theme`) in place of the generic Vimix one.
+- **Clearer boot entries:** the GRUB install-medium entries spell out what each does in plain language — open drivers (NVIDIA removed), NVIDIA proprietary (keeps nvidia), and auto-detect (needs internet).
+- **Packages:** + `kiro-grub-theme`.
 
 ## v26.06.18 — June 18
 **Why a new ISO:** rolling your own Kiro ISO is leaner and more reliable — more of the system is now safe to drop in the builder, and a bug that could abort a build is fixed.

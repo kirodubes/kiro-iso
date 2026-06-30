@@ -97,7 +97,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #   and the kiro-iso-builder GUI share one source of truth. Edit them
 #   there, or through the GUI — not here.
 #####################################################################
-kiroVersion='v26.06.29'
+kiroVersion='v26.07.01'
 
 # kiroVersion stays in THIS file: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it. build.conf is sourced right after it — the
@@ -143,7 +143,16 @@ apply_version_bump() {
     fi
 
     local newversion
-    newversion="v$(date +%y.%m.%d)"
+    if [[ -n "${version_override:-}" ]]; then
+        if [[ ! "${version_override}" =~ ^v[0-9]{2}\.[0-9]{2}\.[0-9]{2}$ ]]; then
+            log_error "version_override='${version_override}' is malformed — expected vYY.MM.DD (e.g. v26.07.01). Fix it in build.conf."
+            exit 1
+        fi
+        newversion="${version_override}"
+        log_info "Using version_override from build.conf: ${newversion} (not today's date)"
+    else
+        newversion="v$(date +%y.%m.%d)"
+    fi
 
     log_section "Phase 2 — Bumping version to ${newversion}"
 

@@ -87,10 +87,10 @@ All build knobs live in **`build-scripts/build.conf`** (a sourced config file â€
 
 ### Kernel Selection
 
-The default build ships **`linux-cachyos`** as the live-boot + post-install default and **`linux-zen`** as a secondary installed kernel selectable from the boot loader menu. Both are set on one line in **`build-scripts/build.conf`**:
+The default build ships **`linux`** as the live-boot + post-install default and **`linux-lts`** as a secondary installed kernel selectable from the boot loader menu. Both are set on one line in **`build-scripts/build.conf`**:
 
 ```bash
-kernel="linux-cachyos linux-zen"   # space-separated; first entry = live-boot kernel
+kernel="linux linux-lts"   # space-separated; first entry = live-boot kernel
 picker="auto"                       # auto | gum | dialog â€” only used when kernel="ask"
 ```
 

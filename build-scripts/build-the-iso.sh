@@ -698,6 +698,7 @@ apply_plasma_rules() {
 # kiro_kernel module, which installs whatever kernel(s) the ISO ships.
 #####################################################################
 CANONICAL_KERNEL="linux-cachyos"   # the kernel token the repo's archiso tree ships by default
+CANONICAL_FALLBACK="linux-zen"     # the kernel token the shipped fallback boot entry points at
 AVAILABLE_KERNELS=()
 SELECTED_KERNELS=()
 PRIMARY_KERNEL=""
@@ -834,7 +835,13 @@ apply_kernel() {
         printf '%s\n%s-headers\n' "${k}" "${k}" >> "${PACKAGES_FILE}"
     done
 
-    # boot entries + live presets reference a single kernel — the primary
+    # boot entries + live presets reference a single kernel — the primary.
+    # This runs BEFORE the fallback rewrite below: the file-wide substitution here
+    # would otherwise catch a freshly-retargeted fallback too. Building
+    # linux + linux-cachyos would collapse the fallback onto the primary, and
+    # linux + linux-cachyos-bore would leave a fallback pointing at "linux-bore",
+    # a kernel that does not exist. While the fallback still reads
+    # ${CANONICAL_FALLBACK} this substitution cannot touch it.
     if [[ "${PRIMARY_KERNEL}" != "${CANONICAL_KERNEL}" ]]; then
         local f
         for f in \
@@ -849,19 +856,42 @@ apply_kernel() {
         done
     fi
 
-    # Zen fallback entries: keep only if linux-zen is in SELECTED_KERNELS, else strip them.
-    # The boot menus include a "fallback kernel linux-zen" entry in 04-fallback-zen.conf
-    # and inside KIRO_ZEN_FALLBACK markers in syslinux/grub configs — these reference
-    # vmlinuz-linux-zen, so they're dead entries unless linux-zen is installed.
-    if [[ ! " ${SELECTED_KERNELS[*]} " == *" linux-zen "* ]]; then
-        log_info "linux-zen not selected — stripping zen fallback entries from boot configs"
-        rm -f "${buildFolder}/archiso/efiboot/loader/entries/04-fallback-zen.conf"
-        local zf
-        for zf in \
+    # ── Fallback boot entry ───────────────────────────────────────────────
+    # The live menus carry a second "fallback kernel" entry (04-fallback.conf for
+    # UEFI, the KIRO_FALLBACK marker block for syslinux/grub). The repo's tree
+    # ships it pointing at ${CANONICAL_FALLBACK}; retarget it to whichever kernel
+    # the user picked as secondary, or strip it when only one kernel is selected.
+    #
+    # The syslinux/grub substitution is confined to the marker range so it can
+    # never reach a main menu entry — needed because the primary rewrite above may
+    # already have put the same token there (build with PRIMARY_KERNEL=linux-zen).
+    # The UEFI entry is a file of its own, so a plain substitution is safe there.
+    local fallback_kernel=""
+    for k in "${SELECTED_KERNELS[@]}"; do
+        [[ "${k}" != "${PRIMARY_KERNEL}" ]] && { fallback_kernel="${k}"; break; }
+    done
+
+    local fallback_uefi="${buildFolder}/archiso/efiboot/loader/entries/04-fallback.conf"
+    local fb
+    if [[ -z "${fallback_kernel}" ]]; then
+        log_info "Only one kernel selected — stripping the fallback entry from the boot menus"
+        rm -f "${fallback_uefi}"
+        for fb in \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
             "${buildFolder}"/archiso/grub/grub.cfg; do
-            [[ -f "${zf}" ]] && sed -i '/KIRO_ZEN_FALLBACK_BEGIN/,/KIRO_ZEN_FALLBACK_END/d' "${zf}"
+            [[ -f "${fb}" ]] && sed -i '/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/d' "${fb}"
         done
+    elif [[ "${fallback_kernel}" != "${CANONICAL_FALLBACK}" ]]; then
+        log_info "Retargeting the fallback boot entry: ${CANONICAL_FALLBACK} -> ${fallback_kernel}"
+        [[ -f "${fallback_uefi}" ]] && sed -i "s/${CANONICAL_FALLBACK}/${fallback_kernel}/g" "${fallback_uefi}"
+        for fb in \
+            "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
+            "${buildFolder}"/archiso/grub/grub.cfg; do
+            [[ -f "${fb}" ]] && sed -i \
+                "/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/s/${CANONICAL_FALLBACK}/${fallback_kernel}/g" "${fb}"
+        done
+    else
+        log_info "Fallback boot entry already targets ${fallback_kernel} — no rewrite needed"
     fi
 }
 

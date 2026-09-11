@@ -2,6 +2,67 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.11
+
+### Fallback boot entry is now kernel-agnostic — promoted from `kiro-iso-next`
+
+The live boot menus carry a second "fallback kernel" entry so a user whose hardware refuses the
+primary kernel can pick another one at the boot screen instead of being stranded before Calamares.
+That entry was hardcoded to `linux-zen`, and `apply_kernel()` in **`build-scripts/build-the-iso.sh`**
+knew only two outcomes: keep it if `linux-zen` was among the selected kernels, or **delete it
+outright** if it was not.
+
+With the ISO kernel pairing now rotating month to month, that was a silent trap. Building the October
+pairing (`linux` + `linux-lts`) would have stripped every fallback boot entry: the ISO would still
+have *installed* `linux-lts`, but offered **no live boot entry for it** — the backup kernel unpickable,
+which is exactly the failure the fallback exists to prevent.
+
+`apply_kernel()` now derives the fallback from the selection (the first selected kernel that is not
+`PRIMARY_KERNEL`) and **retargets** the entry to it, stripping only when a single kernel is selected
+and there is genuinely no second one to offer.
+
+### Technical Details
+
+- New `CANONICAL_FALLBACK="linux-zen"` beside `CANONICAL_KERNEL`, naming the token the archiso tree
+  ships in its fallback entry.
+- **Order is load-bearing.** The primary-kernel rewrite runs first, the fallback rewrite second. The
+  primary step is a file-wide `s/${CANONICAL_KERNEL}/${PRIMARY_KERNEL}/g`, so running it after the
+  fallback would eat the freshly-retargeted entry: `linux` + `linux-cachyos` collapsed the fallback
+  onto `linux`, and `linux` + `linux-cachyos-bore` produced a fallback pointing at `linux-bore`, a
+  kernel that does not exist. Both were reproduced in a dry-run harness before the order was fixed.
+- The syslinux/grub fallback rewrite is confined to the marker range
+  (`/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/s/...`), so it cannot touch a main entry in the reverse
+  collision — a build with `PRIMARY_KERNEL=linux-zen`, where main entries legitimately carry the token
+  the fallback is keyed on.
+- Renamed now that the entry is generic: `KIRO_ZEN_FALLBACK_BEGIN/END` → `KIRO_FALLBACK_BEGIN/END`,
+  `LABEL arch_fallback_zen` → `LABEL arch_fallback`, and
+  **`archiso/efiboot/loader/entries/04-fallback-zen.conf`** → **`04-fallback.conf`**.
+- Default `kernel=` knob set to the October pairing in **`build-scripts/build.conf`** and
+  **`build-scripts/build.conf.defaults`**: `linux linux-lts`.
+
+### Verification before promotion
+
+Proven on `kiro-iso-next` first, then ported here unchanged (the two `build-the-iso.sh` files differ
+only in their version/label lines):
+
+- Dry-run harness over 10 kernel pairings — including liquorix, three-kernel selections, duplicates
+  and the two collision cases above — re-run against this tree with identical results.
+- Built twice from the beta tree, once directly and once through the KIB: byte-identical ISOs.
+- Live menus confirmed on **both** BIOS and UEFI (separate config paths), fallback entry present and
+  on the first screen.
+- Booted the fallback entry: working Xfce4 live session on `6.18.50-2-lts`.
+- Installed from it: Calamares keeps both kernels with headers and initramfs, and the installed
+  systemd-boot menu lists `Arch Linux (7.2.4-arch1-2)` (default) and `Arch Linux (6.18.50-2-lts)`
+  with `timeout 5` — the backup is selectable post-install, not merely present.
+
+### Files Modified
+
+- [build-scripts/build-the-iso.sh](build-scripts/build-the-iso.sh)
+- [build-scripts/build.conf](build-scripts/build.conf), [build-scripts/build.conf.defaults](build-scripts/build.conf.defaults)
+- [archiso/efiboot/loader/entries/04-fallback.conf](archiso/efiboot/loader/entries/04-fallback.conf) (renamed from `04-fallback-zen.conf`)
+- [archiso/syslinux/archiso_sys-linux.cfg](archiso/syslinux/archiso_sys-linux.cfg), [archiso/grub/grub.cfg](archiso/grub/grub.cfg)
+- [README.md](README.md), [CLAUDE.md](CLAUDE.md)
+
 ## 2026.09.01
 
 ### Version bump `v26.08.25` → `v26.09.01` — the September release build

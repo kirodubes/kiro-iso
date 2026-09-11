@@ -33,7 +33,7 @@ version_override=             # empty = use today's date (vYY.MM.DD). Set e.g. v
 
 # ── Hardware ─────────────────────────────────────────────────────────────────
 nvidia_driver=open            # open | 580xx | 390xx
-kernel="linux-cachyos linux-zen"   # space-separated kernel(s); "ask" = interactive menu. First = live-boot kernel
+kernel="linux linux-lts"   # space-separated kernel(s); "ask" = interactive menu. First = live-boot kernel
 picker="auto"                 # auto | dialog | gum — picker UI for kernel="ask" (auto = dialog if installed, else gum)
 
 # ── Repositories ─────────────────────────────────────────────────────────────

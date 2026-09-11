@@ -4,6 +4,38 @@
 
 ## 2026.09.11
 
+### Stray `.claude` tooling dirs no longer reach the shipped root filesystem
+
+Comparing two v26.09.11 ISOs built the same day — one from the CLI, one from `kiro-iso-builder` —
+turned up two empty directories present only in the CLI one: `/.claude/.cc-writes` and
+`/etc/pacman.d/.claude/.cc-writes`, sitting in the live root filesystem of a shipped image.
+
+They came from `archiso/airootfs/` in the local working tree, created 2026-08-22 by editor/agent
+tooling. Git could never report them: `.gitignore` hides `.claude/`, and git does not track empty
+directories at all. So they stayed invisible to `git status`, never got committed, and a fresh clone
+(which is what the GUI builds from) was clean — while every ISO built from that working tree since
+22 August copied them straight into `airootfs`, because `mkarchiso` takes that tree verbatim.
+
+The four stray dirs under `archiso/` were deleted, and `prepare_build_tree()` now strips any
+`.claude` directory from the **build copy** right after the tree is copied, so the leak cannot
+return no matter what recreates them locally. The repo tree itself is never modified by the guard.
+
+### Technical Details
+
+- `prepare_build_tree()` (Phase 5): after `cp -r "${REPO_DIR}/archiso" "${buildFolder}/archiso"`,
+  count `.claude` dirs with `find -type d -name '.claude' -print | wc -l`, then remove them with
+  `-prune -exec rm -rf {} +`. `log_warn` reports the count when any were found, so a recurrence is
+  visible in the build log rather than silent.
+- Deliberately operates on `${buildFolder}` only — the repo's own `.claude/` project dir at the
+  root is untouched, and so is the working tree's `archiso/`.
+- Mirrored verbatim into `kiro-iso-next`; the two scripts differ only in their `kiro-next-` labels.
+
+### Files Modified
+
+- `build-scripts/build-the-iso.sh`
+- `archiso/.claude/`, `archiso/syslinux/.claude/`, `archiso/airootfs/.claude/`,
+  `archiso/airootfs/etc/pacman.d/.claude/` (deleted)
+
 ### Fallback boot entry is now kernel-agnostic — promoted from `kiro-iso-next`
 
 The live boot menus carry a second "fallback kernel" entry so a user whose hardware refuses the

@@ -97,7 +97,7 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #   and the kiro-iso-builder GUI share one source of truth. Edit them
 #   there, or through the GUI — not here.
 #####################################################################
-kiroVersion='v26.09.01'
+kiroVersion='v26.09.11'
 
 # kiroVersion stays in THIS file: apply_version_bump (Phase 2) seds it and
 # verify_version_sync greps it. build.conf is sourced right after it — the
@@ -424,6 +424,18 @@ prepare_build_tree() {
     remove_buildfolder yes
     mkdir -p "${buildFolder}"
     cp -r "${REPO_DIR}/archiso" "${buildFolder}/archiso"
+
+    # Editor/agent tooling drops empty marker dirs (.claude/.cc-writes) inside the
+    # repo's archiso tree. Git never reports them — .gitignore hides .claude/ and
+    # git does not track empty dirs — but mkarchiso copies airootfs verbatim, so
+    # they end up in the live root filesystem of the shipped ISO. Strip them from
+    # the build copy; the repo tree is left untouched.
+    local stray_count
+    stray_count=$(find "${buildFolder}/archiso" -type d -name '.claude' -print | wc -l)
+    if (( stray_count > 0 )); then
+        find "${buildFolder}/archiso" -type d -name '.claude' -prune -exec rm -rf {} +
+        log_warn "Removed ${stray_count} stray .claude tooling dir(s) from the build tree"
+    fi
 
     # Pacman ParallelDownloads in the build-tree pacman.conf (the file mkarchiso
     # uses for the airootfs install) is treated as a floor: raise it to

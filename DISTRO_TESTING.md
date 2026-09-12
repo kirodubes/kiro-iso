@@ -6,6 +6,56 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-12 — Dev v26.09.11 ISO: first bare-metal ext4 / systemd-boot run (metal-B) — kiro-audit 131 / 0 / 0, two un-shipped fixes confirmed
+
+The **`v26.09.11` dev ISO** (`ISO_BUILD` Fri Sep 11 18:33:54 CEST 2026, ISO file 18:41) installed on
+**real hardware** (metal-B — i7-7700K, Intel HD630, Samsung SSD 860 EVO 500GB, ASUS STRIX Z270H,
+real UEFI firmware). The two previous entries were both VirtualBox, so this is the **first
+bare-metal ext4 / systemd-boot run in this log** — the 08-25 entry covered btrfs + LUKS + GRUB, so
+the two runs validate different install paths and neither supersedes the other.
+
+| Target (metal-B) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE/ohmychadwm) | **ext4**, unencrypted | UEFI / **systemd-boot 261.3** | Clean install; **kiro-audit 131 / 0 / 0** |
+
+The 131 (vs 146 on 08-25) is **not** lost coverage: riker is ext4, so the btrfs/snapper and LUKS
+sections do not apply — the audit says so itself ("Root filesystem is ext4, not btrfs — snapshot
+stack not applicable").
+
+Shipped-content verification on the installed system:
+- **Release identity:** `/etc/dev-rel` `ISO_RELEASE=v26.09.11`, `ISO_CODENAME=kiro`.
+- **pacman.conf:** `[core] [extra] [nemesis_repo] [chaotic-aur]` active; `#[cachyos]` correctly
+  commented (opt-in post-install) and `#[multilib]` commented — both deliberate. `kiro_repo` does
+  not leak to the target.
+- **Boot:** 19.738s total (7.213 firmware + 5.471 loader + 1.782 kernel + 1.932 initrd + 3.338
+  userspace); `graphical.target` at 3.260s. Secure Boot disabled, TPM2 absent.
+- **Kernels:** `linux` and `linux-lts` both present with initramfs; running `7.2.4-arch1-2`.
+- **Zero failed units** (`systemctl --failed` empty). 1460 packages. SDDM, NetworkManager and
+  bluetooth enabled. `pacman -Qk`: no missing files.
+- **Journal, priority ≤3, whole boot: three lines, all benign** — `x86/cpu: SGX disabled or
+  unsupported by BIOS`, `virt/tdx: TDX not supported by the host platform` (CPU feature probes) and
+  `sddm-helper: gkr-pam: unable to locate daemon control file` (gnome-keyring PAM at greeter time,
+  cosmetic).
+
+**Two defects found — both already fixed in git, neither in this ISO:**
+1. **Stray `.claude` tooling dirs reached the installed root.** `/.claude/.cc-writes` and
+   `/etc/pacman.d/.claude/.cc-writes` are present, empty, root-owned and **unowned by any package**
+   (`pacman -Qo /.claude` → "No package owns"). This is the defect `0543fa3` fixes by stripping them
+   from the build tree before mkarchiso — that commit landed at **19:47**, about 74 minutes *after*
+   this ISO was built, so the image predates its own fix. First confirmation that the dirs survive
+   Calamares onto a target, not just the live medium.
+2. **`kiro-polybar` shipped with no polybar.** The package was installed (25 config files under
+   `/etc/skel/.config/polybar/`), but the `polybar` binary was never on the ISO and nothing
+   autostarts it — no reference in the ohmychadwm session autostart, `/etc/xdg/autostart/`,
+   `.xprofile` or `.xinitrc`. Removed from both package lists the next morning (`aa20e34`).
+
+**Consequence for release readiness:** this run does **not** clear the staleness gate. It validates
+`c42c4cd` (kernel-agnostic fallback boot entry, committed 09-11 11:08, so baked into this 18:33
+build) in the field, but `0543fa3` and `aa20e34` have never existed inside any ISO — only a fresh
+build plus a fresh install test can cover those.
+
+---
+
 ## 2026-08-25 — Production v26.08.25 release ISO: VirtualBox install — GRUB + LUKS + btrfs, kiro-audit 146 / 0 / 0
 
 The **`v26.08.25` release ISO** (`ISO_BUILD` Tue Aug 25 06:44:05 CEST 2026, ISO file 06:52)

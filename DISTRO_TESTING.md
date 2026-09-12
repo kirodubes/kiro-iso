@@ -6,6 +6,69 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-12 — v26.09.12 zen+lts, **BIOS / GRUB** install: `GRUB_TOP_LEVEL` verified, menu order not yet discriminating
+
+Same ISO as the entry below (`ISO_BUILD` Sat Sep 12 13:48:23 CEST 2026, file 13:55), installed a
+second time in a **BIOS** VirtualBox VM to reach the GRUB path. `efiBootLoader: "systemd-boot"` is
+hardcoded in `kiro_bootloader.conf`, so UEFI always takes the systemd-boot branch and GRUB runs only
+when `fw_type != "efi"` — a BIOS install is the only way to exercise it, and it needs no rebuild.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE/ohmychadwm) | ext4, unencrypted | **BIOS / GRUB 2:2.14-1** | Clean install; **kiro-audit 124 / 4 / 3** (same package-absence set as the UEFI run) |
+
+- Booted `7.2.4-zen2-1-zen`. 1072 packages, **zero failed units**, boot 11.294s
+  (759ms kernel + 5.678s initrd + 4.856s userspace).
+- `[core] [extra] [nemesis_repo] [chaotic-aur]` active.
+
+### What the GRUB path showed
+
+- **`/etc/default/grub` carries `GRUB_TOP_LEVEL="/boot/vmlinuz-linux-zen"` and it survives.** On the
+  UEFI run the same line was written (proved in `Calamares.log`) and then removed — `kiro_final`
+  deletes the GRUB package set, `/boot/grub` and every `/etc/default/grub*` when systemd-boot is in
+  use. On BIOS it persists, which is the half UEFI could not show.
+- `grub 2:2.14-1` is installed and **owns** `/etc/default/grub`, so writing that file can never
+  leave an unowned file for a later `pacman -S grub` to collide with.
+- `/etc/kiro/primary-kernel` reads `linux-zen` here too.
+- `grub.cfg`: `set default="0"` (line 31), and entry 0 is the single top-level
+  `menuentry 'kiro Linux'` (line 131) that `10_linux` builds from the first kernel in its list.
+
+### Two corrections to what was previously written about this path
+
+The `kiro-calamares-config` CHANGELOG originally reasoned from `grubcfg.conf`'s
+`GRUB_DEFAULT: "saved"` and `GRUB_DISABLE_SUBMENU: true`. **Neither reaches the installed system.**
+`/etc/default/grub` is owned by the `grub` package and `grubcfg` runs with `overwrite: false`, so
+the installed copy keeps `GRUB_DEFAULT=0` and has no `GRUB_DISABLE_SUBMENU` at all:
+
+- the default comes from a literal `set default="0"`, not from a `saved_entry` fallback — a more
+  direct chain than the one described, and `grubenv` holds no `saved_entry`;
+- a submenu **is** generated ("Advanced options for kiro Linux", line 148) holding both kernels. It
+  does not affect which entry is 0.
+
+Worth noting separately, and unrelated to the kernel work: **`grubcfg.conf`'s `defaults:` block is
+largely inert on Kiro** for that same `overwrite: false` reason.
+
+### Why "zen is first" is still not proof
+
+`10_linux` sorts its kernel list with `version_sort -r`, descending. `7.2.4.zen2` beats `6.18.51`,
+so **zen tops the menu with or without `GRUB_TOP_LEVEL`** — the same version-luck trap the UEFI run
+hit on the systemd-boot side. This run proves the code executes, writes the correct value and
+survives to the installed system; it does not prove the reordering has any effect.
+
+**The discriminating test is a pairing whose primary loses the version sort** — build
+`kernel="linux-lts linux-zen"` (lts primary) and confirm `menuentry 'kiro Linux'` is still built
+from **lts** despite zen sorting higher. One line in `build.conf`.
+
+### Still open
+
+- The **sort-key plugin** (`kiro-system-files 26.09-01`) remains untested; it needs a
+  UEFI/systemd-boot system, and the UEFI VM from the previous entry no longer exists.
+- The same `linux-lts linux-zen` build would make **both** halves discriminating at once: lts as
+  primary loses the version tiebreak under GRUB *and* under systemd-boot, so either mechanism
+  working becomes visible rather than coincidental.
+
+---
+
 ## 2026-09-12 — v26.09.12 KIB rebuild, `linux-zen` + `linux-lts`: the fallback retarget proven, sort-key plugin missed the ISO
 
 Fourth run of the day, on a **KIB-built `v26.09.12` ISO** (ISO file 13:55, 4.44 GB, 1118 packages),

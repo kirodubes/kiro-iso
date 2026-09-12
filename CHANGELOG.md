@@ -2,6 +2,43 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.12
+
+### `kiro-polybar` dropped from the shipped package list
+
+A fresh install on a bare-metal test box surfaced `kiro-polybar` in `pacman -Q`, which raised the
+question of what it was actually doing there. The answer: nothing.
+
+The package ships **configuration only** — 25 files under `/etc/skel/.config/polybar/`
+(`config.ini`, `launch.sh`, and eight helper scripts for Spotify, volume, public IP, core temps and
+Arch/AUR update counts). It has no `depends`, and **`polybar` itself was never on the ISO**. Nothing
+autostarted it either: no reference in the ohmychadwm session autostart, `/etc/xdg/autostart/`,
+`.xprofile` or `.xinitrc`, and `ohmychadwm-menu` has no polybar toggle despite a line in its README
+implying one. Every new user therefore got a `~/.config/polybar/` full of config for a bar whose
+binary was absent.
+
+It is a leftover from the ArcoLinux/EDU lineage, where polybar was the bar. ohmychadwm draws its own
+bar in C, so the base system has no use for it.
+
+**Why:** shipping dead config into every user's home is a support-question generator — it looks like
+a broken feature rather than an absent one.
+
+### Technical Details
+
+Removed the single uncommented `kiro-polybar` line from `archiso/packages.x86_64`. The three
+**commented** occurrences inside the disabled `EDITION-BLOCK` sections (bspwm, leftwm,
+herbstluftwm) were deliberately left alone — each is correctly paired with a commented `polybar`,
+so those editions still pull both if they are ever enabled.
+
+The package stays in `nemesis_repo`: anyone who installs polybar themselves can still
+`pacman -S kiro-polybar` to get the Kiro config.
+
+### Files Modified
+
+- `archiso/packages.x86_64`
+- `README.md`
+- `docs/OVERVIEW.md`
+
 ## 2026.09.11
 
 ### Stray `.claude` tooling dirs no longer reach the shipped root filesystem

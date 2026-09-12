@@ -248,7 +248,6 @@ kiro-iso/
   - `kiro-xfce`: XFCE4 customization package
   - `kiro-shells`: shell config meta — pulls `kiro-bash-config`, `kiro-zsh-config`, `kiro-fish-config`
   - `kiro-rofi` + `kiro-rofi-themes`: Application launcher with themes
-  - `kiro-polybar`: Custom status bar
   - `ohmychadwm-git`: Tiling window manager with integrated menu
   - `kiro-variety-config`: Wallpaper manager presets
 - **AUR Helpers**: `paru-git`, `yay-git`

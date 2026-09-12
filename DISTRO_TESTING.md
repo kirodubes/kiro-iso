@@ -6,6 +6,77 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-12 — v26.09.12 lts+zen, **BIOS / GRUB**: `GRUB_TOP_LEVEL` reordering proven, sysctl fix confirmed in a real install
+
+Seventh and final run of the day. Rebuilt ISO (`kernel="linux-lts linux-zen"`) carrying
+**`kiro-system-files 26.09-02`** — the first image with both the sort-key plugin *and* the
+`netdev_budget_usecs` fix. Installed in a VirtualBox VM switched to `firmware="BIOS"`, booting live
+**entry 1 (`linux-lts`, the primary)**.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | **BIOS / GRUB 2:2.14-1** | Clean install; **kiro-audit 124 / 4 / 3**, zero failed units |
+
+Booted `6.18.51-1-lts`; boot 12.581s (1.494s kernel + 6.169s initrd + 4.918s userspace).
+
+### `GRUB_TOP_LEVEL` actually reorders — the gap the 09-12 BIOS run left open
+
+```
+/etc/default/grub:  GRUB_TOP_LEVEL="/boot/vmlinuz-linux-lts"
+/etc/kiro/primary-kernel:  linux-lts
+
+grub.cfg menu:
+  kiro Linux                            <- entry 0, set default="0"
+  kiro Linux, with Linux linux-lts      <- submenu, lts FIRST
+  kiro Linux, with Linux linux-zen
+uname -r: 6.18.51-1-lts
+```
+
+`10_linux` builds its list with `version_sort -r`, descending, so **zen `7.2.4.zen2` would precede
+lts `6.18.51` on version order alone**. lts appears first instead, both as the top-level entry and
+inside the submenu — `grub_move_to_front` did its job. The earlier BIOS run (zen primary) could only
+show that `GRUB_TOP_LEVEL` was written and survived; it could not show any effect, because zen won
+the version sort anyway. This run separates the two.
+
+Note for future readers: **GRUB's top-level entry is titled plainly `kiro Linux` with no kernel name**,
+so the boot menu itself cannot tell you which kernel won. `uname -r`, the submenu order, or
+`grub.cfg` are the readouts.
+
+### The `netdev_budget_usecs` fix, confirmed twice
+
+- **On the live medium, before installing.** The live session is itself `CONFIG_HZ=300` lts running
+  `kiro-system-files 26.09-02`: `systemd-sysctl.service` **active**, `systemctl --failed` empty, and
+  `/proc/sys/net/core/netdev_budget_usecs` left at the kernel default 6666.
+- **On the installed system.** Same result, and **`kiro-audit` is back to 3 FAIL** from the 4 seen on
+  the unfixed lts install — the `1 failed systemd unit(s)` entry is gone.
+
+The shipped key now reads `-net.core.netdev_budget_usecs = 2000`.
+
+The remaining 3 FAIL / 4 WARN are the familiar package absences from the xfce-only edition selection
+(`ananicy-cpp` ×2, Bluetooth AutoEnable, `firewalld`, `tuned`), unrelated to any of this work.
+
+### Feature status after seven runs
+
+| Behaviour | Status |
+|---|---|
+| `apply_kernel()` fallback retarget | proven across three pairings, incl. the reverse-collision case |
+| Primary = the kernel actually booted | proven **both ways** — entry 1 → lts, entry 4 → zen |
+| systemd-boot sort-key ordering | proven against version order (lts `kiro-0`, `(default)`) |
+| `GRUB_TOP_LEVEL` written and surviving | proven on BIOS |
+| `GRUB_TOP_LEVEL` reordering | **proven here** |
+| `netdev_budget_usecs` fix | proven on live medium and installed system |
+
+### Methodological note worth keeping
+
+Four of the seven runs produced a *correct-looking* result that proved nothing, because the primary
+kernel also happened to win the version tiebreak. **A boot-order test is only meaningful when the
+intended winner would lose on version order** — here, making `linux-lts` the primary against
+`linux-zen`. The same applies to package delivery: three runs were compromised or nearly so by an
+ISO shipping a stale `kiro-system-files`, so checking the version in the ISO's `.pkglist.txt` before
+installing is now a standing precondition rather than an afterthought.
+
+---
+
 ## 2026-09-12 — v26.09.12 lts+zen ISO, **fallback entry booted**: primary follows the booted kernel
 
 Sixth run of the day, on the **same ISO** as the entry below (`kernel="linux-lts linux-zen"`), but

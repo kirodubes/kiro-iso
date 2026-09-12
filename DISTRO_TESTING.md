@@ -6,6 +6,69 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-12 — v26.09.12 lts+zen ISO, **fallback entry booted**: primary follows the booted kernel
+
+Sixth run of the day, on the **same ISO** as the entry below (`kernel="linux-lts linux-zen"`), but
+booting live **entry 4 — the fallback, `linux-zen`** — instead of entry 1. This is the first test of
+the design decision behind the feature: the installed default follows the kernel the user actually
+booted, not the ISO's build-time primary. Someone who picks the fallback because the primary will
+not run on their hardware must not be handed a system that defaults back to it.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 123 / 4 / 3**, zero failed units |
+
+Booted `7.2.4-zen2-1-zen`; boot 16.042s (2.249s kernel + 6.154s initrd + 7.638s userspace).
+
+### The result, and why it is discriminating
+
+```
+/etc/kiro/primary-kernel:  linux-zen
+
+title: Arch Linux (7.2.4-zen2-1-zen)  sort-key: kiro-0  (default) (selected)
+title: Arch Linux (6.18.51-1-lts)     sort-key: kiro-1
+```
+
+Three candidate implementations predict different answers here, and only one matches:
+
+| If the primary were taken from… | would give |
+|---|---|
+| the ISO's build-time first kernel | `linux-lts` |
+| the old alphabetical `names[0]` (`sorted(glob(...))`) | `linux-lts` |
+| **the kernel actually booted** | **`linux-zen`** ✓ |
+
+**The menu order alone settles it**, because the previous entry established the control: on the very
+same ISO, booting entry 1 produced `linux-lts` at `kiro-0` and lts **first despite its lower
+version**. Had the primary been the build-time kernel or the alphabetical one, lts would have
+topped the menu again here. It did not — the sort-keys are exactly inverted. Two runs off one ISO,
+differing only in which live entry was chosen, producing opposite and correct orderings.
+
+Both mkinitcpio presets are Calamares-generated, `95-kiro-sort-key.install` is present, and
+`kiro-system-files 26.09-01` is installed.
+
+### Incidental corroboration of the `netdev_budget_usecs` diagnosis
+
+The entry below recorded `systemd-sysctl.service` failing on that ISO, diagnosed as
+`net.core.netdev_budget_usecs = 2000` falling below linux-lts's `CONFIG_HZ=300` floor of 6666us.
+
+**This run has zero failed units and one fewer audit FAIL (3, not 4)** — same ISO, same
+`kiro-system-files 26.09-01` without the fix, the only difference being that the booted kernel is
+`linux-zen` at `CONFIG_HZ=1000`, where 2000us is exactly on the floor and accepted. The failure
+appearing and disappearing purely with the booted kernel is independent confirmation that the cause
+is the HZ-derived floor and nothing else.
+
+The remaining 3 FAIL / 4 WARN are the familiar package absences from the xfce-only edition
+selection (`ananicy-cpp`, Bluetooth AutoEnable, `firewalld`, `tuned`).
+
+### Still open
+
+- **GRUB half, discriminatingly** — a BIOS install with **lts** as the booted primary would show
+  whether `GRUB_TOP_LEVEL` actually reorders. Needs the VM's firmware set to BIOS; UEFI always takes
+  the systemd-boot branch because `efiBootLoader: "systemd-boot"` is hardcoded.
+- Re-test once `kiro-system-files` is rebuilt with the `-net.core.netdev_budget_usecs` fix.
+
+---
+
 ## 2026-09-12 — v26.09.12 **`linux-lts` + `linux-zen`**, UEFI install: sort-key plugin proven, and a latent linux-lts sysctl bug found
 
 Fifth run of the day, on a KIB-built ISO (file 18:55, 4.44 GB) with `kernel="linux-lts linux-zen"`.

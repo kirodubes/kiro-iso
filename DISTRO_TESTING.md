@@ -6,6 +6,89 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-12 — v26.09.12 **`linux-lts` + `linux-zen`**, UEFI install: sort-key plugin proven, and a latent linux-lts sysctl bug found
+
+Fifth run of the day, on a KIB-built ISO (file 18:55, 4.44 GB) with `kernel="linux-lts linux-zen"`.
+**The first pairing whose primary loses the version tiebreak** — `linux-lts 6.18.51` sorts below
+`linux-zen 7.2.4.zen2` — which is what finally made the result falsifiable. The three earlier runs
+all had a primary that would have won on version order anyway, so "primary boots first" proved
+nothing in any of them.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 122 / 4 / 4** (see below) |
+
+Booted `6.18.51-1-lts`, 1068 packages, boot 12.155s (1.173s kernel + 4.508s initrd + 6.474s
+userspace). Live boot entry 1 was used, so the primary kernel is what Calamares saw.
+
+### The delivery gate, checked first this time
+
+`kiro-system-files` **26.09-01** is on the ISO — the version carrying
+`etc/kernel/install.d/95-kiro-sort-key.install`. The previous ISO shipped 26.08-04 because the
+build's pacman sync beat the GitHub Pages republish, which produced a meaningless result. Checking
+the `.pkglist.txt` before installing is now the standing precondition for this test.
+
+### `apply_kernel()` — third distinct shape, correct
+
+Read out of the ISO before booting: `01-archiso-linux.conf`, `02`, `02b`, `03` →
+`vmlinuz-linux-lts`; `04-fallback.conf` → `vmlinuz-linux-zen`; `default 01-archiso-linux.conf`;
+both kernels and both initramfs present. This is the exact inverse of the previous build's mapping,
+which is the strongest evidence so far that the retarget is genuinely computed rather than
+coincidentally right.
+
+### Sort-key plugin — proven, and not by luck
+
+```
+title: Arch Linux (6.18.51-1-lts)      sort-key: kiro-0   (default) (selected)
+title: Arch Linux (7.2.4-zen2-1-zen)   sort-key: kiro-1
+
+.../4496…-6.18.51-1-lts.conf:sort-key   kiro-0
+.../4496…-7.2.4-zen2-1-zen.conf:sort-key   kiro-1
+loader.conf: default 4496…*            (unchanged glob)
+```
+
+**lts carries the lower version and still wins.** With `loader.conf` still holding the plain
+`<machine-id>*` glob, the only thing that can put lts first is the sort-key — confirming both that
+the plugin ran and that the glob resolves to the first entry in sort order. The full chain is
+exercised: package ships the plugin → `kiro_kernel` writes `/etc/kiro/primary-kernel` (`linux-lts`)
+→ `kernel-install` invokes the plugin → systemd-boot honours the result. Both mkinitcpio presets
+are Calamares-generated.
+
+### Found: `net.core.netdev_budget_usecs = 2000` fails `systemd-sysctl` on linux-lts
+
+One failed unit — `systemd-sysctl.service`, *"Couldn't write '2000' to
+'net/core/netdev_budget_usecs': Invalid argument"* — and the fourth `kiro-audit` FAIL is that unit.
+
+The kernel enforces a floor of 2 jiffies, `2 * (1000000 / CONFIG_HZ)`. linux-zen and linux-cachyos
+ship `CONFIG_HZ=1000`, giving a 2000us floor that our value sits exactly on; **linux-lts ships
+`CONFIG_HZ=300`, so the floor is 6666us** and 2000 is rejected. Boundary probed on the running
+kernel rather than inferred: 1000 / 2000 / 4000 rejected, 8000 / 10000 / 20000 accepted.
+
+Every earlier install test booted a 7.2.4 HZ=1000 kernel, which is why four clean runs never saw
+it — **the upcoming October `linux linux-lts` pairing would have shipped it**. Impact was limited:
+`systemd-sysctl` continues past a rejected key, so `netdev_budget`, `vm.swappiness` and
+`netdev_max_backlog` all applied; the cost was a permanently failed unit.
+
+Fixed the same day in `kiro-system-files` by prefixing the key with `-` (skip on failure),
+verified on this very install: unit `active`, `systemctl --failed` empty, other keys still applied.
+**Needs a `kiro-system-files` rebuild to reach an ISO.**
+
+### The other three audit FAIL/WARN are package absence
+
+`ananicy-cpp` (2 FAIL), Bluetooth AutoEnable, `firewalld`, `tuned` — all absent from the ISO
+because only the **xfce** edition was ticked on the KIB Editions screen, which also explains the
+1068-package count against the morning's 1510. Not a regression.
+
+### Still open
+
+- **GRUB half, discriminatingly.** A BIOS install off this same ISO would show whether
+  `GRUB_TOP_LEVEL` actually reorders: lts should become the top-level `menuentry 'kiro Linux'`
+  despite zen sorting higher. The 09-12 BIOS run proved the value is written and survives, but its
+  pairing could not prove the reordering had any effect.
+- Re-test once `kiro-system-files` is rebuilt with the sysctl fix.
+
+---
+
 ## 2026-09-12 — v26.09.12 zen+lts, **BIOS / GRUB** install: `GRUB_TOP_LEVEL` verified, menu order not yet discriminating
 
 Same ISO as the entry below (`ISO_BUILD` Sat Sep 12 13:48:23 CEST 2026, file 13:55), installed a

@@ -101,7 +101,7 @@ kiro-iso/
 - **Power Management**: `irqbalance`, `tuned` (performance profile manager)
 - **Memory**: `zram-generator` (compressed RAM swap)
 - **DKMS Support**: `nvidia-open-dkms` for dynamic kernel module support
-- **System Tuning**: `archlinux-tweak-tool-gtk4-git`
+- **System Tuning**: `archlinux-tweak-tool`
 - **System Monitoring**: `glances`, `resources`, `sysz` (system information tools)
 
 #### File Management

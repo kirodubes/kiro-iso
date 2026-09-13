@@ -566,7 +566,7 @@ the two runs validate different install paths and neither supersedes the other.
 |------------------|-----------------|------------|--------|
 | Kiro default (XFCE/ohmychadwm) | **ext4**, unencrypted | UEFI / **systemd-boot 261.3** | Clean install; **kiro-audit 131 / 0 / 0** |
 
-The 131 (vs 146 on 08-25) is **not** lost coverage: riker is ext4, so the btrfs/snapper and LUKS
+The 131 (vs 146 on 08-25) is **not** lost coverage: metal-B is ext4, so the btrfs/snapper and LUKS
 sections do not apply — the audit says so itself ("Root filesystem is ext4, not btrfs — snapshot
 stack not applicable").
 
@@ -781,7 +781,7 @@ The **actual `v26.07.01` release ISO** (`ISO_BUILD` Tue Jun 30 13:18, ISO file 1
 via the new `version_override` knob and installed via Calamares. This supersedes the 2026-06-28 RC
 test: it validates the same fish default **plus** the `kiro-system-files` **26.06-116** menu
 reorganization that landed 2026-06-29 (after the RC test) and ships in this ISO. Default-edition
-install validated over SSH (`erik@127.0.0.1:2020`):
+install validated over SSH (`<user>@<vm-host>`):
 
 | Target (VBox) | FS / encryption | Bootloader | Result |
 |---------------|-----------------|------------|--------|
@@ -812,7 +812,7 @@ Production `kiro-iso` **v26.06.28** (`ISO_BUILD` 11:03) — the **July-1 `v26.07
 in everything but the version string (the release-day build bumps the version only). It carries the
 completed **bash → fish default**: the live `liveuser` and the installed user both log into fish, with
 the **Starship** prompt and the **fish-tweak-tool** GUI now shipped. Default-edition install validated
-over SSH (`erik@127.0.0.1:2020`):
+over SSH (`<user>@<vm-host>`):
 
 | Target (VBox) | FS / encryption | Bootloader | Result |
 |---------------|-----------------|------------|--------|
@@ -841,7 +841,7 @@ changes: the new **AI TOOLS** TIER-3 group (`kiro-assistant` + `claude-code`), t
 pre-seed** (kills the first-`-Syu` sdl2 replace prompt), and — promoted from `-next` —
 **package-signature enforcement** (global `SigLevel = Required DatabaseOptional`; signed
 `nemesis_repo`/`kiro_repo` verified out of the box). Default-edition install validated over SSH
-(erik@127.0.0.1:2022):
+(`<user>@<vm-host>`):
 
 | Target (VBox) | FS / encryption | Bootloader | Result |
 |---------------|-----------------|------------|--------|
@@ -867,7 +867,7 @@ New `kiro-iso` build carrying the **calamares-tweak-tool menu-launch fix** (`.de
 bare `sudo` for `pkexec`; no `exec` so the menu launcher doesn't leave pkexec a dead parent;
 socket-based Wayland detection — see `kiro-calamares-tweak-tool` CHANGELOG 2026.06.11). On the
 live **Budgie/Wayland** ISO, CTT now launches **from the menu** (previously did nothing) and
-Calamares launches. Two installs off this ISO, both UEFI, validated over SSH (erik@127.0.0.1):
+Calamares launches. Two installs off this ISO, both UEFI, validated over SSH (`<user>@<vm-host>`):
 
 | Target (VBox) | FS / encryption | Bootloader | Result |
 |---------------|-----------------|------------|--------|
@@ -1211,7 +1211,7 @@ Both inherit the same `quiet nowatchdog rw root=UUID=… resume=UUID=… systemd
 ### Dev-side wins from the same session (not user-visible)
 
 - `kiro-calamares-config-*.pkg.tar.zst` size dropped from **97 MB** to expected ~5–7 MB after stripping the makepkg `calamares/` bare-clone artifact from the package source.
-- `kiro-enable-ssh` now does `pacman -Sy` first and (on the live ISO only) sets `liveuser`'s password to `erik` so SSH actually works after the one-command opt-in — verified the live-ISO gate via `/run/archiso/bootmnt` is a no-op on the installed system (this install correctly logged "Not on live ISO… skipping").
+- `kiro-enable-ssh` now does `pacman -Sy` first and (on the live ISO only) sets `liveuser`'s password to a known value so SSH actually works after the one-command opt-in — verified the live-ISO gate via `/run/archiso/bootmnt` is a no-op on the installed system (this install correctly logged "Not on live ISO… skipping").
 
 ---
 
@@ -1338,7 +1338,7 @@ Erik asked whether `/syscheck` needs updating. It does not — the spec at [~/.c
 
 ## 2026-05-19 — v26.05.19 — VirtualBox (UEFI, Intel, NAT)
 
-**Environment:** VirtualBox 7.x, UEFI firmware, Intel CPU (6 cores), NAT networking with SSH port forwarding host:2022→guest:22
+**Environment:** VirtualBox 7.x, UEFI firmware, Intel CPU (6 cores), NAT networking with SSH port forwarding host:<port>→guest:22
 
 **Boot:** PASS — UEFI boot via systemd-boot, linux-lqx 7.0.9-lqx1-1-lqx kernel loaded
 

@@ -6,6 +6,83 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-13 — v26.09.13 rebuild, **`linux-lts` + `linux-cachyos`**, BIOS / GRUB: cachyos on the GRUB path for the first time, **kiro-audit 133 / 0 / 0**
+
+Fourth run of the day. Rebuilt v26.09.13 image (`ISO_BUILD` 07:28:52) with
+`kernel="linux-lts linux-cachyos"`, installed in the same BIOS VirtualBox VM on **ext4,
+unencrypted** — so the score is directly comparable to the first run of the day.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | BIOS / GRUB 2:2.14-1 | Clean install; **kiro-audit 133 / 0 / 0**, zero failed units |
+
+Booted `6.18.51-1-lts`; boot 15.691s (1.408s kernel + 7.800s initrd + 6.482s userspace).
+`133 / 0 / 0` is **identical to the `linux-lts linux-zen` ext4 run**, which is the expected result —
+the kernel pairing changes nothing the audit counts.
+
+### Two firsts for `linux-cachyos`
+
+The only previous cachyos install was UEFI / systemd-boot, and its entry carries a scope caveat:
+that pairing was the **identity case**, with `CANONICAL_KERNEL=linux-cachyos` equal to the primary,
+so it could not show that the machinery discriminates. This run breaks both limits — cachyos is on
+the **GRUB path for the first time**, and it is the **fallback rather than the primary**.
+
+```
+/etc/default/grub:  GRUB_TOP_LEVEL="/boot/vmlinuz-linux-lts"
+/etc/kiro/primary-kernel:  linux-lts
+
+grub.cfg menu:
+  kiro Linux
+  Advanced options for kiro Linux
+    kiro Linux, with Linux linux-lts        <- lts FIRST
+    kiro Linux, with Linux linux-cachyos
+uname -r: 6.18.51-1-lts
+```
+
+Falsifiable in the same way as the zen pairing — cachyos `7.2.4` beats lts `6.18.51` on
+`version_sort -r`, so lts leading is `grub_move_to_front` doing real work, this time on a kernel
+filename (`vmlinuz-linux-cachyos`) the GRUB path had never seen. Both `vmlinuz-*` images and both
+`/etc/mkinitcpio.d/*.preset` files are present and correct.
+
+### The repo question: cachyos kernels stay updatable — via chaotic-aur, not cachyos
+
+Going in, the concern was that installing a cachyos kernel would strand it: `[cachyos]` is commented
+out on an installed system by default, so the kernel would have no update path. **Measured, the
+concern does not materialise, but not for the reason expected:**
+
+```
+/etc/pacman.conf:106  [chaotic-aur]     <- enabled
+/etc/pacman.conf:109  #[cachyos]        <- commented out, as designed
+
+pacman -Si linux-cachyos
+  Repository : chaotic-aur
+  Version    : 7.2.4-1                  <- same version as installed
+```
+
+`chaotic-aur` carries `linux-cachyos` at the same version, so the installed kernel resolves and
+updates normally with the cachyos repo left disabled. **Offering `linux-cachyos` as a kernel choice
+does not require enabling `[cachyos]` post-install.** Worth recording explicitly, because the
+opposite assumption is the natural one to make from the commented-out block.
+
+### Noted, not attributed: initrd 7.800s
+
+Initrd is up from 2.809s on the morning's ext4 run, with no encryption in play. It is **not**
+attributable to the kernel pairing: both initramfs images are 18M, `HOOKS` is the standard
+unencrypted line, and `systemd-analyze blame` puts 4.586s of it in `initrd-switch-root.service`
+alone — host I/O contention on a machine that had been building ISOs throughout the session.
+Single-sample VM timing; recorded so a future comparison does not read it as a regression.
+
+### Feature status
+
+| Behaviour | Status |
+|---|---|
+| `GRUB_TOP_LEVEL` reordering | proven against zen, under cryptodisk, with the snapshot stack, **and now against cachyos** |
+| Primary ≠ canonical kernel (non-identity case) | **proven here on the GRUB path** |
+| `linux-cachyos` update path with `[cachyos]` disabled | **proven — served by chaotic-aur** |
+| Full-package ISO health, ext4 | 133 / 0 / 0, reproduced across two kernel pairings |
+
+---
+
 ## 2026-09-13 — v26.09.13 encrypted btrfs + **snapshot stack opted in**: **kiro-audit 146 / 0 / 0**, and Kiro ships no `grub-btrfs`
 
 Third run on the same **v26.09.13** image and the same encrypted-btrfs VM as the entry below, with

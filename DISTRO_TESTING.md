@@ -6,6 +6,99 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-13 — v26.09.13 full package set, **encrypted btrfs / BIOS / GRUB**: **kiro-audit 138 / 0 / 0**, GRUB unlocks LUKS and still reorders
+
+Second run on the same **v26.09.13** image (full TIER 3 set, 1508 packages, 6.69 GB), same
+VirtualBox VM still on `firmware="BIOS"`, same `kernel="linux-lts linux-zen"`. The only variables
+changed against the ext4 run above are **filesystem and encryption** — deliberately, so the score
+delta is attributable.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | **btrfs on LUKS2**, full-disk encryption | **BIOS / GRUB 2:2.14-1** | Clean install; **kiro-audit 138 / 0 / 0**, zero failed units |
+
+Booted `6.18.51-1-lts`; boot 15.171s (1.662s kernel + **6.624s initrd** + 6.884s userspace).
+Initrd is up from 2.809s on the ext4 run — that delta is the LUKS unlock, and it is the whole of
+the regression in boot time. Root is `compress=zstd:3,space_cache=v2` on subvolume `@`, with the
+Kiro layout pre-staged: `@ @home @root @srv @cache @log @tmp @snapshots`.
+
+### The result that matters: `/boot` lives *inside* the LUKS container
+
+`findmnt /boot` returns nothing — there is no separate boot partition. The kernels GRUB must
+enumerate are inside the encrypted volume, so GRUB has to unlock LUKS itself before it can read a
+kernel list at all:
+
+```
+/etc/default/grub:  GRUB_ENABLE_CRYPTODISK=y
+/boot/grub/grub.cfg: cryptomount ×5
+lsblk: sda1 crypto_LUKS -> luks-d475… (btrfs)
+```
+
+And the ordering work still holds on the far side of that unlock:
+
+```
+/etc/default/grub:  GRUB_TOP_LEVEL="/boot/vmlinuz-linux-lts"
+/etc/kiro/primary-kernel:  linux-lts
+
+grub.cfg menu:
+  kiro Linux                            <- top-level entry
+  Advanced options for kiro Linux       <- submenu
+    kiro Linux, with Linux linux-lts    <- lts FIRST
+    kiro Linux, with Linux linux-zen
+uname -r: 6.18.51-1-lts
+```
+
+Same falsifiable pairing as before — zen `7.2.4.zen2` would win `version_sort -r` against lts
+`6.18.51` — and lts still leads. `grub_move_to_front` is unaffected by cryptodisk.
+
+Encryption checks all clean: LUKS2, `sd-encrypt` present in a `systemd`-based `HOOKS` line,
+`/crypto_keyfile.bin` at `600 root:root`, one active dm-crypt mapping.
+
+### 138, not 146 — the snapshot stack is opt-in
+
+The prediction going in was that btrfs + LUKS would add roughly 13 checks and land near the
+**146 / 0 / 0** of the 2026-08-25 run. It added **5**, for 138. The reason is visible in the audit
+output itself:
+
+```
+PASS  /.snapshots subvolume mounted (Kiro layout pre-staged by Calamares)
+PASS  Snapshot stack not installed — opt-in via ATT > Btrfs (expected default)
+```
+
+Calamares pre-stages the `@snapshots` subvolume, but `snapper`, `snap-pac` and `grub-btrfs` are
+**not installed by default** — they are an opt-in from ATT. So a default encrypted-btrfs install
+exercises the LUKS and layout checks but not the snapshot stack, and 138 is the correct ceiling for
+it. The 08-25 run reached 146 because that stack was present. **These two numbers are not
+comparable, and neither is a regression against the other.**
+
+### Correction to the earlier "UEFI / GRUB" framing
+
+The 08-25 entry is logged as `UEFI / GRUB`. That combination is no longer reachable:
+`efiBootLoader: "systemd-boot"` is hardcoded in `kiro_bootloader.conf`, so a UEFI install always
+takes the systemd-boot branch and the GRUB path runs only when `fw_type != "efi"`. **BIOS is now
+the only way to exercise GRUB at all** — including GRUB-on-LUKS, as here. Any future plan that says
+"UEFI + GRUB" needs rewriting as "BIOS + GRUB" or "UEFI + systemd-boot".
+
+### Feature status
+
+| Behaviour | Status |
+|---|---|
+| Full-package ISO health, ext4 | proven — 133 / 0 / 0 |
+| Full-package ISO health, encrypted btrfs | **proven here — 138 / 0 / 0** |
+| `GRUB_TOP_LEVEL` reordering | proven on ext4 and **now under cryptodisk** |
+| GRUB unlocking LUKS with `/boot` inside the container | **proven here** |
+| `netdev_budget_usecs` fix | proven (earlier runs) |
+| Snapshot stack (snapper / snap-pac / grub-btrfs) | **still unexercised — opt-in via ATT > Btrfs** |
+
+### Next
+
+The snapshot stack is the remaining gap, and this install is the right host for it: opt in via
+**ATT > Btrfs** on this same encrypted-btrfs system and re-audit. That should be the run that
+reaches the 146-class score, and it is the first time `grub-btrfs` snapshot boot entries would meet
+the `GRUB_TOP_LEVEL` reordering — the one interaction in this series that has never been observed.
+
+---
+
 ## 2026-09-13 — v26.09.13 lts+zen, **full package set**, BIOS / GRUB: first **kiro-audit 133 / 0 / 0**
 
 First ISO of the day, and the first **built with the complete package set** — the

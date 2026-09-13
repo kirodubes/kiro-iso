@@ -153,7 +153,11 @@ resolve_ssh() {
 # timestamp on the unlikely chance the marker isn't present.
 fetch_facts() {
     local ssh_cmd="$1"
-    ${ssh_cmd} '
+    # The payload is fed over stdin to an explicit `bash -s` rather than passed
+    # as a remote command: ssh strips the local quoting and lets the target's
+    # LOGIN shell re-parse whatever is left. Kiro defaults to fish, which cannot
+    # parse bash assignments, so any inline form fails on a Kiro target.
+    ${ssh_cmd} bash -s <<'REMOTE'
         if [[ ! -f /var/log/Calamares.log ]]; then
             echo "ERROR: /var/log/Calamares.log not present on this target" >&2
             exit 1
@@ -167,7 +171,7 @@ fetch_facts() {
         iso_release=$(grep -oP "^ISO_RELEASE=\K.*" /etc/dev-rel 2>/dev/null || echo "?")
         mkinitcpio_passes=$(grep -c "==> Building image" /var/log/Calamares.log || true)
         printf "%s\n%s\n%s\n%s\n" "${first_ts}" "${last_ts}" "${iso_release}" "${mkinitcpio_passes}"
-    '
+REMOTE
 }
 
 compute_duration() {

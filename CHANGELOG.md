@@ -2,6 +2,48 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.13
+
+### `record-install-time.sh` fixed — it could never work against a Kiro target
+
+The script was unusable on any Kiro install. It fetched the Calamares facts by passing a bash
+payload as a remote command:
+
+```bash
+${ssh_cmd} '
+    first_ts=$(grep -E "Starting job ..." /var/log/Calamares.log | head -1)
+    ...
+'
+```
+
+SSH does not preserve the local quoting — it joins its arguments and hands the result to the
+target's **login shell**, which then re-parses the payload. Kiro defaults to **fish**, which cannot
+parse a bash assignment, so every run died on the first line with
+`fish: Unsupported use of '='` and the script reported "SSH fetch failed".
+
+Wrapping the payload in `bash -c '...'` does not fix it, for the same reason: the quotes are already
+gone by the time the remote shell sees it. The payload has to bypass remote-shell parsing entirely,
+so it is now fed over **stdin** to an explicit `bash -s`.
+
+**Why:** the script exists to close the install-time tracking loop, and the "## Calamares Installs"
+table had received no rows since 2026-06-09 — the first attempt to use it on a fish-default Kiro
+install is what surfaced the bug.
+
+### Technical Details
+
+`fetch_facts()` now runs `${ssh_cmd} bash -s <<'REMOTE' … REMOTE`. The quoted heredoc delimiter
+keeps the payload literal locally, stdin carries it past the login shell, and `bash -s` executes it,
+so the target's shell is irrelevant. Payload logic is unchanged.
+
+Known rough edge, left alone: the `vm` target keyword still defaults to port **2022**, so a VM
+forwarding on another port needs an explicit `--port`.
+
+### Files Modified
+
+- `build-scripts/record-install-time.sh`
+- `BUILD_TIMES.md` — first Calamares install row since June (v26.09.13, BIOS/GRUB, 3m55s)
+- `DISTRO_TESTING.md` — four v26.09.13 test runs logged today
+
 ## 2026.09.12
 
 ### `kiro-polybar` dropped from the shipped package list

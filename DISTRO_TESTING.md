@@ -6,6 +6,103 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-13 — v26.09.13 rebuild, **`linux-xanmod-lts` + `linux-xanmod-x64v3`**, BIOS / GRUB: first **same-family** pairing, first XanMod install, **kiro-check 0 problems**
+
+Fifth run of the day. Rebuilt v26.09.13 image (`ISO_BUILD` 08:42:53, 4.62 GB, 1118 packages) with
+`kernel="linux-xanmod-lts linux-xanmod-x64v3"`, installed in the same BIOS VirtualBox VM on
+**ext4, unencrypted** — directly comparable to the other runs of the day. Build took ~7 min
+(08:42 → 08:49). `build.conf.defaults` was left at `linux linux-lts`, so this was a local-only
+override; production defaults untouched.
+
+**This is a stripped test build.** The build tree's `package-selection.conf` excludes **115
+TIER 3 packages** (the kiro-iso-builder GUI profile) — the whole PRINTING & SCANNING and
+BLUETOOTH groups, plus most optional apps. The canonical repo's copy of that file is **empty**
+(ship everything), so a release build is a different, larger image. v26.09.12 was stripped the
+same way, which is why the two are comparable to each other but neither is comparable to a
+release ISO. 4.62 GB / 1118 packages is a figure for the stripped profile, not for v26.10.01.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | BIOS / GRUB | Clean install; **kiro-check 0 problems / 3 warnings**, zero failed units |
+
+Booted `6.18.51-xanmod1-2-lts`. Both kernels come from **chaotic-aur**
+(`linux-xanmod-lts 6.18.51-2`, `linux-xanmod-x64v3 7.2.5-1`), so they stay updatable on the
+installed system the same way the cachyos pairing did.
+
+### Two firsts for XanMod
+
+Every previous pairing mixed two kernel *families* (lts+zen, lts+cachyos). This is the first run
+where **both entries come from the same family**, and the first XanMod install on any path.
+
+```
+grub.cfg menu:
+  kiro Linux
+  Advanced options for kiro Linux
+    kiro Linux, with Linux linux-xanmod-lts      <- lts FIRST
+    kiro Linux, with Linux linux-xanmod-x64v3
+uname -r: 6.18.51-xanmod1-2-lts
+cmdline:  BOOT_IMAGE=/boot/vmlinuz-linux-xanmod-lts root=UUID=… rw quiet nowatchdog
+          splash loglevel=3 audit=0 nvme_load=yes
+```
+
+Falsifiable exactly like the zen and cachyos pairings: x64v3 `7.2.5` beats lts `6.18.51` on
+`version_sort -r`, so lts leading is `grub_move_to_front` doing real work — this time
+discriminating between two filenames that differ only by suffix (`vmlinuz-linux-xanmod-lts` vs
+`vmlinuz-linux-xanmod-x64v3`), the closest pair the ordering machinery has been given. Both
+`vmlinuz-*` images and both `/etc/mkinitcpio.d/*.preset` files are present and correct.
+
+### DKMS is the real result
+
+The open question going in was whether out-of-tree modules would build against XanMod headers,
+since the `-headers` packages install to a different path than the vanilla ones DKMS usually sees.
+They do, for both kernels, on both the live ISO and the installed system:
+
+```
+live ISO:   broadcom-wl/6.30.223.271  6.18.51-xanmod1-2-lts   installed
+            broadcom-wl/6.30.223.271  7.2.5-xanmod1-1-x64v3   installed
+            nvidia/615.71.09          6.18.51-xanmod1-2-lts   installed
+            nvidia/615.71.09          7.2.5-xanmod1-1-x64v3   installed
+
+installed:  broadcom-wl only — nvidia correctly dropped (VM has no NVIDIA GPU)
+```
+
+### Microcode: no `/boot/*-ucode.img`, and that is correct
+
+`/boot` holds only the two `vmlinuz-*`, the two `initramfs-*` and `grub/` — no
+`intel-ucode.img`/`amd-ucode.img`, and `grub.cfg` carries no ucode `initrd` line, despite both
+packages being installed. `HOOKS=(systemd autodetect microcode kms …)` means the **`microcode`
+hook embeds it in the initramfs early-CPIO** (640 KiB, mkinitcpio 42, zstd). Not a regression;
+worth stating because it reads like one on every fresh-install audit.
+
+### kiro-check: source-to-VM integrity CLEAN
+
+Install-time cleanup proven by `Remove installation files: SUCCESS` at 08:53:40 in
+`Calamares.log`, with every live-env survivor gone (`10-archiso.conf`, `do-not-suspend.conf`,
+`getty@tty1` autologin, `49-nopasswd_global.rules`, `sudoers.d/g_wheel`, archiso mkinitcpio
+hooks). The two 0750 dirs were read under `sudo`, not absence-tested. Sysctl 11/11, udev 10/10,
+24 `kiro-*` scripts + the `skell` symlink, no orphan man pages, no duplicate config in
+`sysctl.d`/`system.conf.d`. All three source repos clean in git.
+
+Three non-blocking warnings, none XanMod-related and none new:
+
+- `cups-permissions.conf` errors twice per boot — the `cups` group does not exist, so the tmpfiles
+  rule cannot apply. **This is an artifact of the stripped profile, not a source defect:** `cups`,
+  `cups-filters` and `cups-pdf` are present and uncommented in `packages.x86_64` (PRINTING &
+  SCANNING group) and the canonical `package-selection.conf` excludes nothing — the GUI profile
+  used for this build drops them. A release build ships cups and the rule goes silent. Nothing to
+  fix; expect this warning on every stripped test build.
+- `/usr/local/bin/slstatus` is unowned — suckless `make install` from ohmychadwm landing outside
+  pacman's file list.
+- `vboxvideo: vbva_enable failed` / `hgsmi_get_mode_hints failed: -5` at early boot, on both live
+  and installed. The driver binds anyway and mode-setting works (2560x1600 offered, auto-resize
+  functional). **Not established whether XanMod introduced this** — it would need a side-by-side
+  boot of the 07:28 `linux-lts linux-cachyos` image to tell.
+
+**Not captured:** `kiro-audit` score and `systemd-analyze` boot timing — the VM was powered off
+before those ran, so this entry has no comparable `133 / 0 / 0` figure.
+
+---
+
 ## 2026-09-13 — v26.09.13 rebuild, **`linux-lts` + `linux-cachyos`**, BIOS / GRUB: cachyos on the GRUB path for the first time, **kiro-audit 133 / 0 / 0**
 
 Fourth run of the day. Rebuilt v26.09.13 image (`ISO_BUILD` 07:28:52) with

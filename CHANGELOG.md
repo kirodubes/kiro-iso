@@ -35,8 +35,10 @@ install is what surfaced the bug.
 keeps the payload literal locally, stdin carries it past the login shell, and `bash -s` executes it,
 so the target's shell is irrelevant. Payload logic is unchanged.
 
-Known rough edge, left alone: the `vm` target keyword still defaults to port **2022**, so a VM
-forwarding on another port needs an explicit `--port`.
+The `vm` keyword's default port also moved **2022 → 2020**. The 2022 default dated from when the
+`template` VM forwarded that port; it has since moved back to 2020, and the Kiro ISO test VM
+forwards 2020 as well, so every invocation needed an explicit `--port`. `bash record-install-time.sh
+vm` now works unadorned against the standard test VM.
 
 ### Files Modified
 

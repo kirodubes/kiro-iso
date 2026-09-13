@@ -79,17 +79,17 @@ Usage:
     bash record-install-time.sh <target> [--user U] [--port P] [--password PW] [--notes "..."] [--dry-run]
 
 Target:
-    vm                  → 127.0.0.1 on port 2022 (VirtualBox NAT forward default)
+    vm                  → 127.0.0.1 on port 2020 (the Kiro test VM's NAT forward)
     [user@]host[:port]  → any reachable host (e.g. me@192.168.1.50, box.local:22)
 
 User / port / password resolve highest-precedence first:
     1. the user@ / :port in the target, or the --user / --port / --password flags
     2. the KIRO_SSH_USER / KIRO_SSH_PORT / KIRO_SSH_PASS environment variables
-    3. defaults: user=\$USER, port=22 (2022 for the 'vm' keyword), key/agent auth
+    3. defaults: user=\$USER, port=22 (2020 for the 'vm' keyword), key/agent auth
 
 Options:
     --user U       SSH user (default: \$USER or KIRO_SSH_USER).
-    --port P       SSH port (default: 22, or 2022 for 'vm').
+    --port P       SSH port (default: 22, or 2020 for 'vm').
     --password PW  Use sshpass with this password instead of key/agent auth.
                    Requires the 'sshpass' package. Prefer key auth where possible.
     --notes "..."  Free-text column for the table row (e.g. "post-fix",
@@ -114,7 +114,7 @@ resolve_ssh() {
 
     if [[ "${target}" == "vm" ]]; then
         t_host="127.0.0.1"
-        default_port=2022
+        default_port=2020
     else
         local raw="${target}"
         if [[ "${raw}" == *@* ]]; then

@@ -6,6 +6,85 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-13 — v26.09.13 encrypted btrfs + **snapshot stack opted in**: **kiro-audit 146 / 0 / 0**, and Kiro ships no `grub-btrfs`
+
+Third run on the same **v26.09.13** image and the same encrypted-btrfs VM as the entry below, with
+the one remaining variable flipped: the snapshot stack opted in through **ATT > Btrfs**. Nothing
+else changed — same BIOS VM, same `kernel="linux-lts linux-zen"`, same LUKS2 container.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | btrfs on LUKS2, **snapshot stack installed** | BIOS / GRUB 2:2.14-1 | **kiro-audit 146 / 0 / 0**, zero failed units |
+
+`snapper 0.13.1-3`, `snap-pac 3.0.1-3`, plus `btrfs-assistant` and `btrfsmaintenance`. ATT took a
+baseline snapshot on opt-in (`#1 single … "ATT baseline"`). **+8 checks over the 138 of the default
+encrypted install**, landing exactly on the 146-class score the previous entry predicted.
+
+### The prediction that was wrong: there is no `grub-btrfs`
+
+The previous entry closed by calling this "the first time `grub-btrfs` snapshot boot entries would
+meet the `GRUB_TOP_LEVEL` reordering — the one interaction in this series that has never been
+observed." **That interaction does not exist.** Kiro's snapshot stack is defined in
+`archlinux-tweak-tool/btrfs.py` as
+
+```python
+PACKAGES = ("snapper", "snap-pac", "btrfs-assistant", "btrfsmaintenance")
+```
+
+`grub-btrfs` is deliberately not in it, `kiro-audit` never looks for it, and `grub-btrfsd.service`
+comes back `not-found`. Measured on the installed system: **`grub.cfg` contains zero snapshot
+entries**, and the boot menu is unchanged from the run before the opt-in —
+
+```
+kiro Linux
+Advanced options for kiro Linux
+  kiro Linux, with Linux linux-lts     <- lts still first
+  kiro Linux, with Linux linux-zen
+```
+
+So snapshots on Kiro are a **rollback tool, not a boot-menu feature**. Nothing the snapshot stack
+does can perturb `GRUB_TOP_LEVEL` ordering, because it never writes boot entries at all. That is a
+stronger guarantee than the test was designed to look for, and it closes the question rather than
+leaving it open.
+
+### Kiro's snapshot policy, as the audit states it
+
+```
+PASS  TIMELINE_CREATE=no (Kiro policy — snapshots on pacman actions only)
+PASS  snapper-timeline.timer not enabled (Kiro policy)
+PASS  snapper-cleanup.timer enabled
+PASS  btrfsmaintenance-refresh.path enabled (scrub · balance · trim)
+PASS  snapper root config present (/etc/snapper/configs/root)
+```
+
+Snapshots are taken by `snap-pac` on pacman transactions; there is no hourly timeline. Cleanup and
+btrfs maintenance are both live. Worth knowing before reading a future audit: **`snapper-timeline.timer`
+showing `disabled` is a PASS, not a finding.**
+
+### Score ladder for the v26.09.13 image
+
+| Configuration | Score | What the delta is |
+|---|---|---|
+| ext4, unencrypted | 133 / 0 / 0 | baseline |
+| btrfs on LUKS2, default | 138 / 0 / 0 | +5 encryption + layout checks |
+| btrfs on LUKS2 + snapshot stack | **146 / 0 / 0** | +8 snapper / maintenance checks |
+
+All three are the same ISO on the same VM, and each step changed exactly one thing. The ladder is
+the useful artefact: **a Kiro audit score is only interpretable against its install configuration**,
+and 146 is the ceiling for the full opt-in path.
+
+### Feature status
+
+| Behaviour | Status |
+|---|---|
+| Full-package ISO health — ext4 / encrypted / encrypted+snapshots | proven at 133 / 138 / **146**, all 0 FAIL |
+| `GRUB_TOP_LEVEL` reordering | proven on ext4, under cryptodisk, **and with the snapshot stack live** |
+| GRUB unlocking LUKS with `/boot` inside the container | proven (entry below) |
+| Snapshot stack | **proven here — and shown not to touch the boot menu** |
+| `grub-btrfs` snapshot boot entries | **not applicable — Kiro does not ship `grub-btrfs`** |
+
+---
+
 ## 2026-09-13 — v26.09.13 full package set, **encrypted btrfs / BIOS / GRUB**: **kiro-audit 138 / 0 / 0**, GRUB unlocks LUKS and still reorders
 
 Second run on the same **v26.09.13** image (full TIER 3 set, 1508 packages, 6.69 GB), same
@@ -94,8 +173,12 @@ the only way to exercise GRUB at all** — including GRUB-on-LUKS, as here. Any 
 
 The snapshot stack is the remaining gap, and this install is the right host for it: opt in via
 **ATT > Btrfs** on this same encrypted-btrfs system and re-audit. That should be the run that
-reaches the 146-class score, and it is the first time `grub-btrfs` snapshot boot entries would meet
-the `GRUB_TOP_LEVEL` reordering — the one interaction in this series that has never been observed.
+reaches the 146-class score.
+
+> **Followed up the same day — see the entry above.** It reached 146 / 0 / 0. This paragraph
+> originally also predicted the run would be "the first time `grub-btrfs` snapshot boot entries
+> would meet the `GRUB_TOP_LEVEL` reordering"; that was wrong. Kiro does not ship `grub-btrfs`, so
+> no such interaction exists. Corrected here so the prediction is not read as a standing gap.
 
 ---
 

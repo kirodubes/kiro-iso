@@ -6,6 +6,75 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-13 — v26.09.13 lts+zen, **full package set**, BIOS / GRUB: first **kiro-audit 133 / 0 / 0**
+
+First ISO of the day, and the first **built with the complete package set** — the
+`package-selection.conf` exclusion list left empty, so the whole TIER 3 set shipped.
+**1508 packages, 6.69 GB**, against the 4.44 GB of the previous day's lean KIB test images.
+Built through KIB with `kernel="linux-lts linux-zen"`, installed in a VirtualBox VM still on
+`firmware="BIOS"`, booting live **entry 1 (`linux-lts`, the primary)**.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | **BIOS / GRUB 2:2.14-1** | Clean install; **kiro-audit 133 / 0 / 0**, zero failed units |
+
+Booted `6.18.51-1-lts`; boot 15.987s (1.724s kernel + 2.809s initrd + 11.453s userspace),
+`graphical.target` at 11.411s. Root `/dev/sda1` ext4 on a 48.8 GB disk, 8 GB zram swap.
+Carries `kiro-system-files 26.09-02`.
+
+### The clean sweep — and what it proves about the earlier FAILs
+
+Every prior run carried a residue of 3 FAIL / 4 WARN, consistently attributed to the
+xfce-only edition selection: `ananicy-cpp` ×2, Bluetooth `AutoEnable`, `firewalld`, `tuned`.
+That attribution was plausible but never tested, because every one of those runs was a lean
+build with the apps deselected for speed.
+
+This run removes the variable. With the full TIER 3 set shipped, **all five findings are gone
+and the audit reports 133 PASS / 0 WARN / 0 FAIL.** The residue was a build-profile artifact
+of the test images, not a defect in the distro. Worth stating plainly for future readers:
+**a lean test ISO cannot produce a clean audit, and its FAILs should never be read as
+regressions.** Only a full-package build is a valid input to a health verdict.
+
+### Boot order — `GRUB_TOP_LEVEL` reordering holds on the full image
+
+```
+/etc/default/grub:  GRUB_TOP_LEVEL="/boot/vmlinuz-linux-lts"
+/etc/kiro/primary-kernel:  linux-lts
+
+grub.cfg menu:
+  kiro Linux                            <- top-level entry
+  Advanced options for kiro Linux       <- submenu
+    kiro Linux, with Linux linux-lts    <- lts FIRST
+    kiro Linux, with Linux linux-zen
+uname -r: 6.18.51-1-lts
+```
+
+Same falsifiable pairing as the 09-12 run: `10_linux` sorts with `version_sort -r`, so zen
+`7.2.4.zen2` would precede lts `6.18.51` on version order alone. lts leads regardless, at the
+top level and inside the submenu — `grub_move_to_front` is unaffected by the larger package set.
+
+### `netdev_budget_usecs` — still correct
+
+`systemd-sysctl.service` **active**, `systemctl --failed` empty, and
+`/proc/sys/net/core/netdev_budget_usecs` at the kernel default **6666** — the shipped
+`-net.core.netdev_budget_usecs = 2000` key continues to no-op cleanly on `CONFIG_HZ=300` lts.
+
+### Feature status
+
+| Behaviour | Status |
+|---|---|
+| `apply_kernel()` fallback retarget | proven (earlier runs) |
+| Primary = the kernel actually booted | proven both ways (earlier runs) |
+| systemd-boot sort-key ordering | proven (earlier runs) |
+| `GRUB_TOP_LEVEL` written, surviving, reordering | proven on BIOS — **re-confirmed here on the full image** |
+| `netdev_budget_usecs` fix | proven on live medium and installed system |
+| Full-package ISO health | **proven here — 133 / 0 / 0** |
+
+> `kiro-audit` closes with its standing note that it targets bare metal and that VM artifacts
+> may appear. On this run nothing appeared to discount.
+
+---
+
 ## 2026-09-12 — v26.09.12 lts+zen, **BIOS / GRUB**: `GRUB_TOP_LEVEL` reordering proven, sysctl fix confirmed in a real install
 
 Seventh and final run of the day. Rebuilt ISO (`kernel="linux-lts linux-zen"`) carrying

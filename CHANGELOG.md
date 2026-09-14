@@ -2,6 +2,39 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.14
+
+### v26.09.14 — full-profile rebuild, and the first UEFI proof of the kernel sort-key
+
+Version bump to `v26.09.14` (`dev-rel`, `profiledef.sh`, `build-the-iso.sh`, `BUILD_TIMES.md`),
+built 06:52 in 8m43s, 6.3 GB, 1508 packages. Built with `kernel="linux-lts linux-zen"` as a
+local `build.conf` override; `build.conf.defaults` stayed at `linux linux-lts` and the local
+`build.conf` has since been realigned to it, so both now agree on the production pairing.
+
+**Why this build matters:** unlike v26.09.12 and v26.09.13, it is **not** a TIER 3 stripped
+image — the full package set shipped, making it the first release-shaped ISO of the month and
+a valid comparison point for v26.10.01.
+
+**What it proved:** the `linux-lts` + `linux-zen` pairing is the hardest case the boot-ordering
+machinery has been given on UEFI. `linux-zen 7.2.4.zen2-1` outranks `linux-lts 6.18.51-1` by more
+than a major release, so Arch's stock `90-loaderentry` — which derives the sort-key from the
+version — would make zen the default. `95-kiro-sort-key.install` (kiro-system-files) rewrote the
+entries to `kiro-0` for the primary and `kiro-1` for the rest, and systemd-boot offered
+`Arch Linux (6.18.51-1-lts)` as `(default) (selected)`. This is the systemd-boot counterpart to
+the `grub_move_to_front` BIOS proofs logged on 2026-09-13.
+
+`kiro-audit` on the installed system: **132 PASS / 0 WARN / 0 FAIL**, zero failed units. The
+Calamares offline microcode bundles were verified on both sides (ISO `/etc/calamares/packages/`
+against `git ls-files`) — `amd-ucode-20260910-1` and `intel-ucode-20260812-1`, current.
+
+### Files Modified
+
+- `archiso/airootfs/etc/dev-rel` — `ISO_RELEASE=v26.09.14`
+- `archiso/profiledef.sh` — `iso_label` / `iso_version`
+- `build-scripts/build-the-iso.sh` — `kiroVersion`
+- `BUILD_TIMES.md` — build row for v26.09.14
+- `DISTRO_TESTING.md` — install test entry for v26.09.14
+
 ## 2026.09.13
 
 ### `record-install-time.sh` fixed — it could never work against a Kiro target

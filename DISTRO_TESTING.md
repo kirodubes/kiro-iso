@@ -6,6 +6,76 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-14 — v26.09.14, **`linux-lts` + `linux-zen`**, UEFI / systemd-boot: the sort-key mechanism's hardest case, **kiro-audit 132 / 0 / 0**
+
+Full (unstripped) v26.09.14 image (`ISO_BUILD` 06:44:01, 6.3 GB, 1508 packages on the ISO),
+installed in the VirtualBox VM on **ext4, unencrypted**, **UEFI / systemd-boot**. 1461 packages
+on the installed system. Install finished 07:00:23 (`Remove installation files: SUCCESS`),
+Calamares 3.4.3.20260822-841b4785.
+
+**Unlike the v26.09.12 and v26.09.13 runs, this is NOT a stripped test build.** The build tree's
+`package-selection.conf` was not applied, so all 1508 packages shipped — this image is
+release-shaped and directly comparable to what v26.10.01 will be, which the 1118-package
+TIER 3 runs were not.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units |
+
+### The boot-ordering mechanism, tested where version-sort must lose
+
+Every previous ordering run put the primary kernel first in a field where plain version sort
+*might* have produced the same answer by luck. This pairing removes that luck:
+
+```
+linux-lts   6.18.51-1        <- primary (booted live), sort-key kiro-0, (default) (selected)
+linux-zen   7.2.4.zen2-1     <- secondary,             sort-key kiro-1
+```
+
+The secondary kernel's version is **more than a full major release higher** than the primary's.
+Any version-derived ordering — including Arch's stock `90-loaderentry`, which builds the sort-key
+from the version — puts `7.2.4-zen2` above `6.18.51-lts`. systemd-boot nevertheless offers
+`Arch Linux (6.18.51-1-lts)` as **(default) (selected)**, and the machine booted `6.18.51-1-lts`.
+
+The full chain is verifiable on the installed system:
+
+```
+/etc/kiro/primary-kernel                     -> linux-lts          (written from the booted live kernel)
+/etc/kernel/install.d/95-kiro-sort-key.install -> rewrites sort-key: kiro-0 primary, kiro-1 rest
+bootctl list                                  -> kiro-0 = lts (default), kiro-1 = zen
+uname -r                                      -> 6.18.51-1-lts
+```
+
+So `95-kiro-sort-key.install` is doing real, falsifiable work here: remove it and systemd-boot
+would default to zen. This is the UEFI/systemd-boot counterpart to the `grub_move_to_front`
+proofs logged for BIOS/GRUB on 2026-09-13.
+
+### Microcode: still no `/boot/*-ucode.img`, still correct
+
+`/boot` holds only the two `vmlinuz-*` and their initramfs. Both ucode packages are installed
+(`amd-ucode 20260910-1`, `intel-ucode 20260812-1`) and the `microcode` mkinitcpio hook embeds
+them in the early CPIO. Reads like a regression on every fresh-install audit; it is not.
+
+The Calamares offline ucode bundles were verified on both sides for this build —
+`/etc/calamares/packages/` on the ISO ships `amd-ucode-20260910-1` and `intel-ucode-20260812-1`,
+matching `git ls-files` in kiro-calamares-config and the installed package versions. The §1 P1
+staleness gate is satisfied for this image.
+
+### Install-time cleanup clean
+
+`/etc/calamares` is absent and `kiro-calamares-config` is no longer installed on the target —
+`kiro_final` removed both as designed.
+
+### Caveats
+
+- One failed unit exists on the **live** ISO only (`systemd-loop@…sr0.service`), the VirtualBox
+  CD-ROM loopback artifact. The installed system has zero failed units.
+- VM install, so chwd/NVIDIA paths are the no-GPU branches.
+- This run validates the `linux-lts` + `linux-zen` pairing. Production `build.conf.defaults`
+  remains `linux linux-lts`; the local `build.conf` was realigned to that pairing after this run.
+
+---
+
 ## 2026-09-13 — v26.09.13 rebuild, **`linux-xanmod-lts` + `linux-xanmod-x64v3`**, BIOS / GRUB: first **same-family** pairing, first XanMod install, **kiro-check 0 problems**
 
 Fifth run of the day. Rebuilt v26.09.13 image (`ISO_BUILD` 08:42:53, 4.62 GB, 1118 packages) with

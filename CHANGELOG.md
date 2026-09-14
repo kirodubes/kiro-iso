@@ -4,6 +4,57 @@
 
 ## 2026.09.14
 
+### `nvidia_driver=none` no longer ships boot entries it cannot deliver
+
+Ported from `kiro-iso-next` after the fix was build- and boot-tested there.
+
+A `none` build strips every NVIDIA package from `packages.x86_64`, but the **boot menus are
+static** and kept advertising two NVIDIA entries. Those entries boot with `nouveau.modeset=0` and
+nouveau in `module_blacklist`, disabling the open-source driver on the assumption that the
+proprietary driver is present to take over. On a `none` ISO nothing takes over — **NVIDIA hardware
+got a black screen in the live session**, before the installer was ever reached.
+`inject_nvidia_packages()` now removes those entries when `nvidia_driver=none`.
+
+This was reachable by users, not a dead branch: **kiro-iso-builder** offers `none` in its GUI
+dropdown (`NVIDIA = ["open", "580xx", "390xx", "none"]`). Its hint worked around the bug in prose,
+telling the user to pick the first boot entry by hand; the entries are now simply absent.
+
+Production ISOs were never affected — every one is built `open`, where the entries are correct.
+
+**Technical Details**
+
+- Reuses the existing `KIRO_FALLBACK_BEGIN/END` idiom from the same file: `archiso_sys-linux.cfg`
+  and `grub/grub.cfg` gained a `KIRO_NVIDIA_BEGIN/END` marker pair around their two NVIDIA blocks,
+  stripped with one `sed '/BEGIN/,/END/d'` each — a range-delete removes *every* matching range, so
+  one pair per file covers both blocks. The UEFI entries are standalone files, so they are `rm -f`'d
+  like `04-fallback.conf` is when a single kernel is selected.
+- **The two stale hint lines are deleted by pattern, not by marker.** They sit inside a syslinux
+  `TEXT HELP` block, where every line renders literally and `#` is *not* a comment — a marker there
+  would have printed `# >>> KIRO_NVIDIA_BEGIN >>>` in the BIOS menu of every production ISO.
+- `grub.cfg` gets the markers for consistency, but `profiledef.sh` sets
+  `bootmodes=('bios.syslinux' 'uefi.systemd-boot')`, so grub is not an enabled boot mode and that
+  file does not ship. Inert today, correct if grub is ever enabled.
+- **Evidence from the `-next` line before porting.** A `none` ISO booted with only three UEFI
+  entries (open-drivers / nomodeset / fallback) and no NVIDIA entries; its syslinux menu carried 0
+  `nonfree` references and no leftover markers. An `open` ISO built from the same tree was identical
+  to the pre-change baseline — 5 UEFI entries, 4 `nonfree` references — and installed cleanly to a
+  VM with `kiro-audit` reporting 0 FAIL / 0 WARN.
+- Verified again after the port: `inject_nvidia_packages()` byte-identical to the tested version, no
+  marker inside a `TEXT HELP` block, the `open` path differing from git HEAD by comment lines only,
+  and a simulated `none` run leaving 3 UEFI entries, 0 `nonfree`, `TEXT HELP`/`ENDTEXT` balanced 3/3
+  and `KIRO_FALLBACK` intact.
+- `build.conf.defaults` and `CLAUDE.md` both listed only `open | 580xx | 390xx`. `none` has been a
+  fully supported value with its own branch; the docs never caught up.
+
+**Files Modified**
+
+- `build-scripts/build-the-iso.sh`
+- `archiso/syslinux/archiso_sys-linux.cfg`
+- `archiso/grub/grub.cfg`
+- `build-scripts/build.conf.defaults`
+- `CLAUDE.md`
+- `CHANGELOG.md`
+
 ### v26.09.14 — full-profile rebuild, and the first UEFI proof of the kernel sort-key
 
 Version bump to `v26.09.14` (`dev-rel`, `profiledef.sh`, `build-the-iso.sh`, `BUILD_TIMES.md`),

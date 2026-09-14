@@ -63,8 +63,14 @@ In **`build-scripts/build.conf`**, set the `nvidia_driver` variable before build
 - `open` — nvidia-open-dkms (default, modern GPUs)
 - `580xx` — nvidia-580xx-dkms (legacy)
 - `390xx` — nvidia-390xx-dkms (legacy)
+- `none` — no NVIDIA driver at all (AMD / Intel / VM); a slimmer ISO
 
 The script manipulates `packages.x86_64` in the build folder to inject the chosen driver set.
+
+`none` additionally strips the two NVIDIA entries from the boot menus — they blacklist nouveau
+expecting the proprietary driver to take over, which a `none` ISO does not ship. The UEFI entries are
+removed as files; syslinux and grub carry `KIRO_NVIDIA_BEGIN/END` marker blocks, stripped the same
+way the `KIRO_FALLBACK` block is when a single kernel is selected.
 
 ## Architecture
 

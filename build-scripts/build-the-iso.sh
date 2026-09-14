@@ -569,6 +569,32 @@ inject_nvidia_packages() {
             sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
             log_info "NVIDIA driver: none — AMD/Intel/VM, relying on in-kernel drivers + mesa."
+
+            # The boot menus are static, so stripping the packages is not enough: the two
+            # NVIDIA entries boot with nouveau.modeset=0 + nouveau blacklisted, expecting the
+            # proprietary driver to take over. On a none ISO nothing does, so NVIDIA hardware
+            # gets a black screen in the live session. Remove the entries they can no longer
+            # deliver — UEFI entries are files of their own, syslinux/grub carry marker blocks.
+            log_info "Stripping the NVIDIA entries from the boot menus (nvidia_driver=none)"
+            rm -f "${buildFolder}"/archiso/efiboot/loader/entries/02-nvidianouveau.conf \
+                  "${buildFolder}"/archiso/efiboot/loader/entries/02b-nvidiachwd.conf
+            local nv
+            for nv in \
+                "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
+                "${buildFolder}"/archiso/grub/grub.cfg; do
+                [[ -f "${nv}" ]] && sed -i '/KIRO_NVIDIA_BEGIN/,/KIRO_NVIDIA_END/d' "${nv}"
+            done
+
+            # The surviving open-drivers entry's help text points at the entries just removed.
+            # Deleted by pattern, not by marker: these lines live inside a syslinux
+            # TEXT HELP block, where every line renders literally and '#' is not a comment.
+            local syslinux_menu="${buildFolder}/archiso/syslinux/archiso_sys-linux.cfg"
+            if [[ -f "${syslinux_menu}" ]]; then
+                sed -i \
+                    -e '/^On NVIDIA hardware the bundled proprietary driver is removed during install\.$/d' \
+                    -e "/^If you have an NVIDIA card, pick a 'NVIDIA proprietary' entry instead\.$/d" \
+                    "${syslinux_menu}"
+            fi
             ;;
         *)
             log_error "Unknown NVIDIA driver option: ${nvidia_driver}\nValid options: open | 580xx | 390xx | none"

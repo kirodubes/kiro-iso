@@ -32,7 +32,7 @@ version_override=             # empty = use today's date (vYY.MM.DD). Set e.g. v
                               # a release built ahead of time. Only applies when bump_version=yes. Format: vYY.MM.DD
 
 # ── Hardware ─────────────────────────────────────────────────────────────────
-nvidia_driver=open            # open | 580xx | 390xx
+nvidia_driver=open            # open | 580xx | 390xx | none
 kernel="linux linux-lts"   # space-separated kernel(s); "ask" = interactive menu. First = live-boot kernel
 picker="auto"                 # auto | dialog | gum — picker UI for kernel="ask" (auto = dialog if installed, else gum)
 

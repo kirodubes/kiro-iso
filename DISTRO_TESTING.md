@@ -6,7 +6,48 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
-## 2026-09-14 — v26.09.14, **`linux-lts` + `linux-zen`**, UEFI / systemd-boot: the sort-key mechanism's hardest case, **kiro-audit 132 / 0 / 0**
+## 2026-09-14 (build 07:07) — v26.09.14 rebuild, **`linux` + `linux-lts`**, UEFI / systemd-boot: the production pairing, **kiro-audit 131 / 0 / 0**
+
+Same-day rebuild (`ISO_BUILD` 07:07:53, built 07:16 in 8m31s, 6.3 GB) after realigning the local
+`build-scripts/build.conf` to the tracked `build.conf.defaults` pairing, `linux linux-lts` — the
+pairing planned for v26.10.01. Installed in the VirtualBox VM on **ext4, unencrypted**,
+**UEFI / systemd-boot**; 1461 packages on the installed system.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 131 PASS / 0 WARN / 0 FAIL**, zero failed units |
+
+### Boot ordering: correct, but not falsifiable
+
+```
+linux      7.2.4-arch1-2    sort-key kiro-0   (default) (selected)   <- primary, booted
+linux-lts  6.18.51-1-lts    sort-key kiro-1
+/etc/kiro/primary-kernel -> linux
+```
+
+The primary is also the higher-versioned kernel, so **plain version order and the plugin's order
+agree**. The result is right, but this pairing cannot detect a `95-kiro-sort-key.install`
+regression — remove the plugin and the default would not change. The falsifiable evidence for
+UEFI remains the `linux-lts` + `linux-zen` run below, where the plugin had to override version
+order; for BIOS/GRUB it is the `grub_move_to_front` runs of 2026-09-13. **Keep a
+primary-lower-than-secondary pairing in the test rotation** — the production pairing alone cannot
+prove the machinery still works.
+
+### Audit count differs from the 06:52 run
+
+131 PASS here vs 132 on the lts+zen install, both with 0 WARN / 0 FAIL. The full output of the
+06:52 run was not captured, so the extra check was not identified; with zero failures on both it
+is not treated as a regression. Capture complete `kiro-audit` output on paired runs in future so
+the delta can be diffed.
+
+---
+
+## 2026-09-14 (build 06:52) — v26.09.14, **`linux-lts` + `linux-zen`**, UEFI / systemd-boot: the sort-key mechanism's hardest case, **kiro-audit 132 / 0 / 0**
+
+> **Two different images shipped as `v26.09.14`.** The version string is derived from the build
+> date, so the same-day rebuild at 07:07 reused the label with a different kernel pairing and
+> overwrote the ISO in `kiro-Out`. This entry describes the **06:52** build only; the 07:07
+> rebuild is logged in its own entry above.
 
 Full (unstripped) v26.09.14 image (`ISO_BUILD` 06:44:01, 6.3 GB, 1508 packages on the ISO),
 installed in the VirtualBox VM on **ext4, unencrypted**, **UEFI / systemd-boot**. 1461 packages

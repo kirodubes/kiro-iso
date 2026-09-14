@@ -27,6 +27,32 @@ the `grub_move_to_front` BIOS proofs logged on 2026-09-13.
 Calamares offline microcode bundles were verified on both sides (ISO `/etc/calamares/packages/`
 against `git ls-files`) — `amd-ucode-20260910-1` and `intel-ucode-20260812-1`, current.
 
+### v26.09.14 rebuilt on the production kernel pairing
+
+The 06:52 image was built from a local `build.conf` override (`linux-lts linux-zen`) that had
+drifted from the tracked `build.conf.defaults` (`linux linux-lts`). `build.conf` is gitignored,
+which is why the zen pairing never appeared on GitHub and the drift went unnoticed. The local file
+was realigned and the ISO rebuilt at 07:16 (8m31s, 6.3 GB) on `linux linux-lts` — the pairing
+planned for v26.10.01.
+
+**Two images therefore shipped as `v26.09.14`.** `apply_version_bump` derives the version from the
+build date (`v$(date +%y.%m.%d)`), so a same-day rebuild reuses the label and overwrites the ISO in
+`kiro-Out`; `BUILD_TIMES.md` now carries two `v26.09.14` rows. Both are logged separately in
+`DISTRO_TESTING.md`, keyed by build time rather than version.
+
+Install-tested: **131 PASS / 0 WARN / 0 FAIL**, zero failed units.
+
+**Testing note worth carrying forward:** `linux` + `linux-lts` puts the primary kernel *above* the
+secondary in version order, so the plugin's ordering and plain version ordering agree and the run
+cannot detect a `95-kiro-sort-key.install` regression. The production pairing validates the
+release; it does not exercise the mechanism. Keep a primary-lower-than-secondary pairing (like
+lts+zen) in the rotation for that.
+
+### Files Modified
+
+- `BUILD_TIMES.md` — second build row for v26.09.14
+- `DISTRO_TESTING.md` — entry for the 07:07 rebuild; the 06:52 entry retitled and scoped
+
 ### Files Modified
 
 - `archiso/airootfs/etc/dev-rel` — `ISO_RELEASE=v26.09.14`

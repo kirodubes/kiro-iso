@@ -2,6 +2,31 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.17
+
+### `RELEASES.md` — the v26.10.01 release section written
+
+Documented every build since the v26.09.01 baseline (v26.09.08 through the current v26.09.15 dev
+stamp) as one user-facing entry for the upcoming October release, following the same
+gather-diffs-then-filter-to-user-feel procedure as the v26.09.01 section.
+
+**What made the cut:** the kernel-ordering fix so systemd-boot/GRUB always default to the intended
+kernel regardless of version numbers (and the fallback boot entry now tracks whatever kernel
+actually shipped instead of being hardcoded to `linux-zen`), the default kernel pairing moving from
+`linux-cachyos` + `linux-zen` to `linux` + `linux-lts`, the ISO Builder's `nvidia_driver=none`
+option no longer offering dead NVIDIA boot entries, and `kiro-polybar` dropping out of the default
+install.
+
+**Deliberately left out** as dev/internal noise: the `record-install-time.sh` SSH/fish quoting fix,
+stray `.claude` directories that were leaking into the live filesystem, and the `BUILD_TIMES.md` /
+`DISTRO_TESTING.md` privacy scrub (hostnames and LAN addresses replaced with generic labels) —
+none of these are things an end user feels.
+
+`(current)` moved from the v26.09.01 heading to the new v26.10.01 heading; the intro line was
+updated to match. Not pushed to origin yet — held locally pending a website release pass.
+
+**Files Modified** — `RELEASES.md`.
+
 ## 2026.09.14
 
 ### `nvidia_driver=none` no longer ships boot entries it cannot deliver

@@ -25,9 +25,27 @@ current ESP, `/boot/loader/entries` is empty (systemd-boot correctly not install
 generated `grub.cfg` carries the themed `kiro Linux` entry plus an advanced submenu with `linux`
 and `linux-lts` — and no NVIDIA entries, as expected for `nvidia_driver=none`.
 
+### Release-readiness dry run — NO-GO on stale offline microcode
+
+Ran the full readiness audit against the v26.09.19 image as a dry run toward v26.10.01. Everything
+passed except the Calamares offline-microcode gate: `kiro-calamares-config` bundles
+`amd-ucode-20260910-1` while upstream ships `20260916-1`. The published package matches git and the
+ISO postdates the package, so the bundle itself is simply six days behind — and because the module
+installs it offline, every AMD machine installing without a network would get outdated microcode.
+`intel-ucode-20260812-1` is current.
+
+Advisories, not blockers: upstream `chwd` has moved past the pinned `1.23.0` tag
+(`d63f8277` → `2ae2c369`), so the downstream `profiles.toml` patch wants a look before the next
+rebuild; and `flameshot-git` — the only stale third-party package that ships on the ISO — drifted
+upstream, which `-git` packages do most days.
+
+The staleness check was red only because the seven code commits since 2026-09-14 had never been
+written up. They were verified present in this image, so `DISTRO_TESTING.md` now carries the run.
+
 ### Files Modified
 
 - `BUILD_TIMES.md` — Calamares install row for v26.09.19 (UEFI/GRUB, 3m28s)
+- `DISTRO_TESTING.md` — v26.09.19 test entry: first UEFI/GRUB install, kiro-audit 133/0/0
 
 ## 2026.09.17
 

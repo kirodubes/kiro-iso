@@ -6,6 +6,71 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-19 (build 06:51) — v26.09.19, **`linux` + `linux-lts`**, **UEFI / GRUB**: the bootloader combination no earlier run covered, **kiro-audit 133 / 0 / 0**
+
+Release-shaped build (`ISO_BUILD` 06:51:29, built 06:59 in 8m24s, 6.3 GB, **1508 packages on the
+ISO** — not a TIER 3 stripped test image, so directly comparable to what v26.10.01 will be).
+Installed in the VirtualBox VM on **ext4, unencrypted**, and — for the first time on a UEFI
+machine — with **GRUB** rather than systemd-boot. 1465 packages on the installed system,
+Calamares `3.4.3.20260822-841b4785-dirty`, install 07:06:08 → 07:09:36 (**3m28s**, 2 mkinitcpio
+passes; logged in `BUILD_TIMES.md`).
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / GRUB | Clean install; **kiro-audit 133 PASS / 0 WARN / 0 FAIL**, zero failed units |
+
+### UEFI + GRUB: the gap in the matrix
+
+Every earlier GRUB row in this log is a **BIOS** install, and every earlier UEFI row uses
+**systemd-boot** — so UEFI+GRUB had never actually been exercised. It works:
+
+- `kiro_bootloader` ran `grub-install --target=x86_64-efi --efi-directory=/boot/efi
+  --bootloader-id=kiro` followed by `grub-mkconfig -o /boot/grub/grub.cfg` →
+  `Configure bootloader: SUCCESS`
+- `/boot/efi/EFI/kiro/grubx64.efi` present, and NVRAM `BootCurrent` points at the `kiro` entry on
+  the ESP the system actually booted from
+- `/boot/loader/entries` is empty — systemd-boot correctly **not** installed alongside, which is
+  the branch the "remove GRUB if systemd-boot detected" step exists to get right
+- the generated `grub.cfg` carries the themed `kiro Linux` top-level entry, an
+  `Advanced options` submenu with `linux` and `linux-lts`, and the theme's UEFI Firmware Settings
+  / Restart / Shutdown entries — and **no NVIDIA entries**, as expected for `nvidia_driver=none`
+
+### Boot ordering: the default resolved to the primary kernel
+
+`GRUB_DEFAULT=0`, `GRUB_TOP_LEVEL="/boot/vmlinuz-linux"`, `/etc/kiro/primary-kernel -> linux`.
+The first boot after install (07:10:08) came up on `BOOT_IMAGE=/boot/vmlinuz-linux`
+(7.2.6-arch2-1) — the default entry did what it should. The second boot (07:10:44) was a
+deliberate pick of the `linux-lts` entry from the Advanced submenu and came up equally clean
+(6.18.52-1-lts), so both halves of the pairing are known-good.
+
+**Same caveat as the 2026-09-14 07:07 run:** the primary is also the higher-versioned kernel, so
+plain version order and the intended order agree — this pairing cannot falsify a regression in the
+ordering machinery. The falsifiable evidence remains the `linux-lts` + `linux-zen` run for UEFI and
+the `grub_move_to_front` runs of 2026-09-13 for BIOS.
+
+### What this run clears
+
+Seven code commits landed after the 2026-09-14 test, which left the release-readiness staleness
+check red. They are **in** this image — verified on the installed system rather than assumed:
+
+- `kiro-system-files 26.09-09` ships the alsactl shell wrapper
+  (`RUN+="/usr/bin/bash -c '/usr/bin/alsactl restore …'"`, commit `318ab3e`) and `--json` support
+  in `kiro-audit` (`c32098a`)
+- the image was built from `89dd407`, which contains the NVIDIA boot-entry strip (`cdb655b`)
+
+So the 133/0/0 above genuinely covers them.
+
+### Not clean: offline microcode is stale
+
+The release-readiness run on the same day found `kiro-calamares-config` bundling
+`amd-ucode-20260910-1` while upstream is `20260916-1` (`intel-ucode` is current, and the published
+package matches git). That is not an install defect — this install is clean — but it is a **NO-GO
+for shipping**: the bundle has to be refreshed in both `kiro-calamares-config` and
+`kiro-calamares-config-next`, both packages rebuilt into `kiro_repo`, and **the ISO rebuilt
+afterwards**, or every offline AMD install gets outdated microcode.
+
+---
+
 ## 2026-09-14 (build 07:07) — v26.09.14 rebuild, **`linux` + `linux-lts`**, UEFI / systemd-boot: the production pairing, **kiro-audit 131 / 0 / 0**
 
 Same-day rebuild (`ISO_BUILD` 07:07:53, built 07:16 in 8m31s, 6.3 GB) after realigning the local

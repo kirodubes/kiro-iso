@@ -115,6 +115,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-09-19 07:15 | v26.09.19 | vm | 3m28s | 2 | kvm-vm (VirtualBox) — test build, UEFI/GRUB (grub-install x86_64-efi, bootloader-id kiro; BootCurrent = kiro on the ESP), no systemd-boot loader entries; grub.cfg lists linux + linux-lts, ext4 unencrypted |
 | 2026-09-13 07:51 | v26.09.13 | vm | 3m55s | 2 | kvm-vm (VirtualBox) — BIOS/GRUB, ext4 unencrypted, linux-lts + linux-cachyos; kiro-audit 133/0/0 |
 | 2026-06-09 21:52 | v26.06.09 | metal-C | 5m58s | 2 | metal-C — real metal BIOS/grub; new kiro_bootloader GRUB branch ran (grub-install i386-pc -> /dev/sda, SUCCESS); Fermi on nouveau |
 | 2026-06-09 21:48 | v26.06.09 | metal-A | 3m21s | 2 | metal-A — real metal UEFI/systemd-boot; new Calamares modules ran; kiro-audit 135/0/0 |

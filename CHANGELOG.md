@@ -2,6 +2,33 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.19
+
+### v26.09.19 test build — UEFI/GRUB install logged
+
+Installed the v26.09.19 test build in the VirtualBox test VM and recorded the run in the
+"## Calamares Installs" table: **3m28s**, 2 mkinitcpio passes. This is the first **UEFI/GRUB**
+row in the table — every previous GRUB row was a BIOS install, and every previous UEFI row used
+systemd-boot, so the UEFI+GRUB combination had never been timed.
+
+### Technical Details
+
+Row pulled with `build-scripts/record-install-time.sh vm`. Duration is measured from the
+`Starting job … ( 1 / 42 )` marker (07:06:08) to the last log line (07:09:36), so the wizard-UI
+time is excluded — relevant here because the guest clock jumps from UTC to CEST mid-wizard when
+the timezone job runs, which makes a naive first-to-last-timestamp span read as ~2h.
+
+Bootloader state verified on the target before logging the row: `kiro_bootloader` ran
+`grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=kiro`,
+`/boot/efi/EFI/kiro/grubx64.efi` exists, NVRAM `BootCurrent` points at the `kiro` entry on the
+current ESP, `/boot/loader/entries` is empty (systemd-boot correctly not installed), and the
+generated `grub.cfg` carries the themed `kiro Linux` entry plus an advanced submenu with `linux`
+and `linux-lts` — and no NVIDIA entries, as expected for `nvidia_driver=none`.
+
+### Files Modified
+
+- `BUILD_TIMES.md` — Calamares install row for v26.09.19 (UEFI/GRUB, 3m28s)
+
 ## 2026.09.17
 
 ### `RELEASES.md` — the v26.10.01 release section written

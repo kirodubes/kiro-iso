@@ -2,6 +2,23 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.24
+
+### v26.09.24 release-candidate rebuild — tested on bare metal
+
+Version bump to v26.09.24 and rebuild (7m45s, 6.3 GB; logged in `BUILD_TIMES.md`). This is the
+first ISO built after the `kiro-calamares-config` `amd-ucode` 20260916 bundle refresh, so it is the
+first image that actually ships current offline AMD microcode. Installed on a bare-metal UEFI /
+systemd-boot box: **kiro-audit 132 / 0 / 0**, logged in `DISTRO_TESTING.md`. No shipped content
+changed beyond the version bump.
+
+### Files Modified
+
+- `archiso/airootfs/etc/dev-rel`, `archiso/profiledef.sh`, `build-scripts/build-the-iso.sh` — version bump
+- `BUILD_TIMES.md` — build row
+- `DISTRO_TESTING.md` — bare-metal test entry
+- `CHANGELOG.md`
+
 ## 2026.09.19
 
 ### v26.09.19 test build — UEFI/GRUB install logged
@@ -1516,7 +1533,7 @@ The ISO's canonical kernel was switched from `linux-lqx` (Liquorix) to `linux-ca
 
 ### Why
 
-Why now: latest test ISO showed the picker pre-selecting `linux-lqx` (the canonical), and the builder's auto-rewrite logic at `apply_kernel()` (line 526) only fires when the user's pick differs from the canonical — so the default build path was emitting `linux-lqx`-based boot entries unchanged. With cachyos chosen as the new community default (responsiveness + active upstream + healthier security track than lqx), the canonical needs to match that decision so the default flow produces a cachyos ISO without depending on the user picking it explicitly.
+Why now: latest test ISO showed the picker preselecting `linux-lqx` (the canonical), and the builder's auto-rewrite logic at `apply_kernel()` (line 526) only fires when the user's pick differs from the canonical — so the default build path was emitting `linux-lqx`-based boot entries unchanged. With cachyos chosen as the new community default (responsiveness + active upstream + healthier security track than lqx), the canonical needs to match that decision so the default flow produces a cachyos ISO without depending on the user picking it explicitly.
 
 The build-time default `kernel=` is now `"linux-cachyos linux-zen"` — both kernels are installed in the live ISO by default. `linux-zen` is the chosen fallback for users whose hardware doesn't accept cachyos; see the separate entry below for the live-boot-menu wiring that exposes it at boot time.
 

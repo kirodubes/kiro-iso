@@ -6,6 +6,31 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-24 (build 07:49) — v26.09.24, **`linux` + `linux-lts`**, bare metal UEFI / systemd-boot: release candidate, **kiro-audit 132 / 0 / 0**
+
+Release-shaped build (`ISO_BUILD` 07:49:21, built 07:56 in 7m45s, 6.3 GB), installed on a
+**bare-metal** test box (Intel i7-7700K, real UEFI firmware) on **ext4, unencrypted**,
+**UEFI / systemd-boot**; 1459 packages on the installed system.
+
+| Target (bare metal) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units |
+
+- Booted `linux` 7.2.6-arch2-1 from the systemd-boot default entry; `linux-lts` 6.18.53-1 installed
+  alongside.
+- `intel-ucode 20260812-1` installed — the current upstream version.
+
+### What this run clears
+
+The last code commit in the ISO-affecting repos, `kiro-calamares-config` `cc423e9` (2026-09-19
+07:38, the `amd-ucode` 20260910 → 20260916 bundle refresh), landed **after** the 2026-09-19 06:51
+test build, so the release-readiness staleness check was red. This image postdates the rebuilt
+`kiro-calamares-config 26.09-04` package (07:39), and the package's bundled microcode matches git.
+**Caveat:** the test box has an Intel CPU, so the refreshed `amd-ucode` bundle was verified by
+package contents only — not by an offline install on AMD hardware.
+
+---
+
 ## 2026-09-19 (build 06:51) — v26.09.19, **`linux` + `linux-lts`**, **UEFI / GRUB**: the bootloader combination no earlier run covered, **kiro-audit 133 / 0 / 0**
 
 Release-shaped build (`ISO_BUILD` 06:51:29, built 06:59 in 8m24s, 6.3 GB, **1508 packages on the

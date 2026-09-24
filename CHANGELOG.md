@@ -9,8 +9,9 @@
 Version bump to v26.09.24 and rebuild (7m45s, 6.3 GB; logged in `BUILD_TIMES.md`). This is the
 first ISO built after the `kiro-calamares-config` `amd-ucode` 20260916 bundle refresh, so it is the
 first image that actually ships current offline AMD microcode. Installed on a bare-metal UEFI /
-systemd-boot box: **kiro-audit 132 / 0 / 0**, logged in `DISTRO_TESTING.md`. No shipped content
-changed beyond the version bump.
+systemd-boot box: **kiro-audit 132 / 0 / 0** on ext4, and on a second bare-metal box with
+**LUKS-encrypted Btrfs** + encrypted swap: **138 / 0 / 0** — both logged in `DISTRO_TESTING.md`. No
+shipped content changed beyond the version bump.
 
 ### Files Modified
 

@@ -6,6 +6,29 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-24 (build 07:49) — v26.09.24, **`linux` + `linux-lts`**, bare metal UEFI / systemd-boot, **LUKS-encrypted Btrfs**: **kiro-audit 138 / 0 / 0**
+
+Same release-candidate image as the ext4 run below, installed on a second **bare-metal** test box
+(Intel i7-7700K, real UEFI firmware) with the encrypted layout; 1459 packages on the installed system.
+
+| Target (bare metal) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | Btrfs on LUKS, encrypted swap | UEFI / systemd-boot | Clean install; **kiro-audit 138 PASS / 0 WARN / 0 FAIL**, zero failed units |
+
+- Root on `/dev/mapper/luks-…` subvol `@` (`noatime,compress=zstd:3`); the full subvolume set
+  `@ @home @root @srv @cache @log @tmp @snapshots` created; swap on its own LUKS partition.
+- Kernel cmdline carries `rd.luks.uuid=` + `rootflags=subvol=/@`; the passphrase prompt unlocked
+  cleanly and booted `linux` 7.2.6-arch2-1 from the systemd-boot default entry (`linux-lts`
+  6.18.53-1 alongside).
+- No snapshot stack (`snapper` / `snap-pac`) — expected, it is an ATT opt-in. The 138 score is the
+  known encrypted-Btrfs baseline (ext4 scores lower on the same image because the Btrfs checks
+  don't apply).
+
+Together with the ext4 run below, v26.09.24 is now verified on bare metal for both the plain and
+the encrypted install paths.
+
+---
+
 ## 2026-09-24 (build 07:49) — v26.09.24, **`linux` + `linux-lts`**, bare metal UEFI / systemd-boot: release candidate, **kiro-audit 132 / 0 / 0**
 
 Release-shaped build (`ISO_BUILD` 07:49:21, built 07:56 in 7m45s, 6.3 GB), installed on a

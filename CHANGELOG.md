@@ -2,6 +2,35 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.25
+
+### Build-host prep no longer wipes the host's own repos from pacman.conf
+
+**What changed.** `get-pacman-repos-keys-and-mirrors.sh` → `configure_pacman_conf()` backed up the
+build host's `/etc/pacman.conf` to `pacman.conf.kiro` and then **copied the ISO's template over it**.
+On a Kiro host the template is the same as the real file, so nobody noticed. On any other distro that
+runs KIB it deleted that distro's own repositories: on a Ryoku test VM, KIB's prerequisite step removed
+`[ryoku]`. CachyOS, EndeavourOS or Garuda build hosts would lose theirs the same way. The function now
+**appends only the repo sections the host lacks** (`[nemesis_repo]`, `[chaotic-aur]`) and never
+replaces the file; the host's own repos and `[options]` stay untouched. `[cachyos]` was already handled
+append-only by `host-prep.sh`.
+
+**Technical details.**
+- Per repo: `grep` for an uncommented `[repo]` header; if absent, `awk` copies that section from the
+  template (header up to the first blank line or next header, so trailing comments such as the
+  commented-out `#[cachyos]` block don't come along) and `sudo tee -a` appends it.
+- The `.kiro` backup is still written once, before any change.
+- Tested on the Ryoku VM against copies of real host files, with the target pointed at a temp file:
+  Ryoku before any Kiro tooling and Ryoku + nemesis_repo both keep `[ryoku]` and gain the missing
+  sections (`pacman-conf --repo-list`: core extra ryoku nemesis_repo chaotic-aur); the Kiro template
+  itself comes out byte-identical, so Kiro build hosts see no change.
+- Mirrored between kiro-iso and kiro-iso-next (the file was identical in both).
+
+### Files Modified
+
+- `build-scripts/get-pacman-repos-keys-and-mirrors.sh`
+- `CHANGELOG.md`
+
 ## 2026.09.24
 
 ### v26.09.24 release-candidate rebuild — tested on bare metal

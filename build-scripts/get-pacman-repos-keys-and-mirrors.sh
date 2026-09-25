@@ -139,9 +139,33 @@ configure_pacman_conf() {
         sudo cp -v "${target}" "${backup}"
     fi
 
-    log_info "Installing ${source_conf} → ${target}"
-    sudo cp -v "${source_conf}" "${target}"
-    log_success "pacman.conf updated — nemesis_repo and chaotic-aur are now configured"
+    # Append only the repo sections the host lacks. Never copy the template over the host file:
+    # on a non-Kiro build host (Ryoku, CachyOS, EndeavourOS, Garuda…) that deletes the distro's own repos.
+    local repo block added=0
+    for repo in nemesis_repo chaotic-aur; do
+        if grep -qE "^[[:space:]]*\[${repo}\][[:space:]]*$" "${target}"; then
+            log_info "[${repo}] already in ${target} — leaving it as is"
+            continue
+        fi
+        block="$(awk -v hdr="[${repo}]" '
+            $0 == hdr { p = 1; print; next }
+            p && (/^\[/ || !NF) { exit }
+            p { print }
+        ' "${source_conf}")"
+        if [[ -z "${block}" ]]; then
+            log_error "[${repo}] not found in ${source_conf}"
+            exit 1
+        fi
+        log_info "Appending [${repo}] to ${target}"
+        printf '\n%s\n' "${block}" | sudo tee -a "${target}" >/dev/null
+        added=$((added + 1))
+    done
+
+    if (( added == 0 )); then
+        log_success "pacman.conf already has nemesis_repo and chaotic-aur — nothing changed"
+    else
+        log_success "pacman.conf updated — ${added} repo section(s) appended, existing repos untouched"
+    fi
 }
 
 #####################################################################

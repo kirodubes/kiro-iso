@@ -6,7 +6,22 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
-## 2026-09-28 (build 10:47) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **final release ISO**, **kiro-audit 132 / 0 / 0**
+## 2026-09-28 (build 13:03) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **final release ISO**, **kiro-audit 132 / 0 / 0**
+
+Rebuild of the 10:47 image with no source change in `kiro-iso`, `kiro-calamares-config` or
+`kiro-system-files` since that build (same `kiro-calamares-config` 26.09-06). `ISO_BUILD` 12:55:21,
+image written 13:03 (8m39s).
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units, boot ~8 s |
+
+- 1461 packages; `linux` 7.2.7-arch1-1 booted, `linux-lts` alongside; `intel-ucode 20260925-1` / `amd-ucode 20260916-1`.
+- `journalctl -b -p err`: only VirtualBox noise (vboxvideo, TDX) and the known autologin `gkr-pam` line.
+
+---
+
+## 2026-09-28 (build 10:47) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: superseded by the 13:03 build, **kiro-audit 132 / 0 / 0**
 
 Rebuild of the 09:27 image to pick up `kiro-calamares-config` 26.09-06 (installer slideshow: 29 desktops,
 14 Wayland sessions, Miracle dropped). No other change. `ISO_BUILD` 10:39:28, image written 10:47.

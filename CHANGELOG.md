@@ -20,7 +20,7 @@ is back to Kiro, Advanced options and UEFI Firmware Settings (plus os-prober ent
 
 - This build (2026-09-28 08:49) is recorded as the **v26.10.01 release ISO**. `RELEASES.md` gained two
   bullets for it (the GRUB menu fix and the ISO Builder's `pacman.conf` fix from 2026.09.25), and
-  `DISTRO_TESTING.md` logs the build, noting that the menu on a UEFI / GRUB install is not visually verified yet.
+  `DISTRO_TESTING.md` logs the build, and the release checks: BIOS / GRUB and UEFI / GRUB installs both score kiro-audit 133 / 0 / 0, and the UEFI GRUB menu fits on one page (4 firmware entries suppressed).
 
 **Files modified.**
 - `archiso/airootfs/etc/default/grub`

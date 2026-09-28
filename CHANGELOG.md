@@ -29,7 +29,7 @@ is back to Kiro, Advanced options and UEFI Firmware Settings (plus os-prober ent
   UEFI / systemd-boot with kiro-audit 132 / 0 / 0.
 
 - A last rebuild at 10:47 picks up `kiro-calamares-config` 26.09-06, whose installer slideshow now lists
-  29 desktops and 14 Wayland sessions (Miracle dropped). The 10:47 build
+  29 desktops and 14 Wayland sessions (Miracle dropped). The 10:47 build passed too:
   a fresh VirtualBox UEFI / systemd-boot install scores kiro-audit 132 / 0 / 0 with zero failed units.
   The 10:28 ruff lint commit in `kiro-calamares-config` is not in that package; it changes no behaviour.
 

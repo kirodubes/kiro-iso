@@ -62,3 +62,7 @@ GRUB_THEME="/boot/grub/themes/kiro/theme.txt"
 # functionality install os-prober and uncomment to detect and include other
 # operating systems.
 GRUB_DISABLE_OS_PROBER=false
+
+# grub 2.16 31_efi_bootnext lists every firmware boot entry (PXE, disks, stale
+# boot managers) as a menu item; too much clutter for a normal install.
+GRUB_DISABLE_BOOTNEXT=true

@@ -2,6 +2,25 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.28
+
+### GRUB menu no longer lists every firmware boot entry
+
+**What changed.** grub 2.16 ships a new `/etc/grub.d/31_efi_bootnext` script that adds a
+"(EFI BootNext)" menu item for every firmware boot entry: PXE IPv4/IPv6, the raw disks and CD-ROM,
+UiApp, and stale "Linux Boot Manager" entries left in NVRAM by earlier installs. On a VirtualBox install
+the menu ran onto a second page. `/etc/default/grub` now sets `GRUB_DISABLE_BOOTNEXT=true`, so the menu
+is back to Kiro, Advanced options and UEFI Firmware Settings (plus os-prober entries for other OSes).
+
+**Technical details.**
+- The script exits immediately when `GRUB_DISABLE_BOOTNEXT` is `true`; no grub.d script is removed or
+  overridden, so grub package upgrades stay clean.
+- It only filters non-OS entries when `os-prober` is installed, which is why a stock install showed all of them.
+- The lowercase "kiro Linux" menu title is kept as is.
+
+**Files modified.**
+- `archiso/airootfs/etc/default/grub`
+
 ## 2026.09.25
 
 ### Build-host prep no longer wipes the host's own repos from pacman.conf

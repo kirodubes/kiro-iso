@@ -25,8 +25,13 @@ is back to Kiro, Advanced options and UEFI Firmware Settings (plus os-prober ent
 - The release gate (`/kiro-ready` step 6c) failed on the 08:49 build: the Calamares config bundled
   `intel-ucode` 20260812-1 while 20260925-1 was current, so every offline Intel install would have got
   outdated microcode. The bundle was refreshed in `kiro-calamares-config` (+ `-next`), the package
-  rebuilt, and the ISO rebuilt at 09:27. That build is the final v26.10.01 release ISO, installed on
+  rebuilt, and the ISO rebuilt at 09:27. That build was installed on
   UEFI / systemd-boot with kiro-audit 132 / 0 / 0.
+
+- A last rebuild at 10:47 picks up `kiro-calamares-config` 26.09-06, whose installer slideshow now lists
+  29 desktops and 14 Wayland sessions (Miracle dropped). **The 10:47 build is the v26.10.01 release ISO**:
+  a fresh VirtualBox UEFI / systemd-boot install scores kiro-audit 132 / 0 / 0 with zero failed units.
+  The 10:28 ruff lint commit in `kiro-calamares-config` is not in that package; it changes no behaviour.
 
 **Files modified.**
 - `archiso/airootfs/etc/default/grub`

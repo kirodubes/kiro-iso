@@ -6,7 +6,25 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
-## 2026-09-28 (build 09:27) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **final release ISO**, **kiro-audit 132 / 0 / 0**
+## 2026-09-28 (build 10:47) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **final release ISO**, **kiro-audit 132 / 0 / 0**
+
+Rebuild of the 09:27 image to pick up `kiro-calamares-config` 26.09-06 (installer slideshow: 29 desktops,
+14 Wayland sessions, Miracle dropped). No other change. `ISO_BUILD` 10:39:28, image written 10:47.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot 262-1 | Clean install; **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed system or user units, boot ~11 s |
+
+- 1461 packages; booted `linux` 7.2.7-arch1-1 from the default loader entry, `linux-lts` alongside.
+- Installed system carries `intel-ucode 20260925-1` / `amd-ucode 20260916-1`.
+- `journalctl -b -p err`: only VirtualBox noise (vboxvideo, TDX) and the known autologin `gkr-pam` line.
+- `kiro-calamares-config` commit `9ca7d63` (10:28, ruff lint only: unused `re` import, a comment typo,
+  a stray semicolon in `kiro_packages/main.py`) is not in 26.09-06; behaviour is identical, the next
+  package rebuild picks it up.
+
+---
+
+## 2026-09-28 (build 09:27) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: superseded by the 10:47 build, **kiro-audit 132 / 0 / 0**
 
 Rebuild of the 08:49 image after the **release gate caught stale offline microcode**:
 `kiro-calamares-config` bundled `intel-ucode` 20260812-1 while 20260925-1 was current. The bundle was
@@ -1386,7 +1404,7 @@ Verification on the installed system:
 - Service baseline: firewalld active+enabled (zone `public`), `cups.socket` enabled+active, `logrotate.timer` enabled+active, tuned `throughput-performance` (ppd inactive), all 10 udev rules present.
 - Signing: Kiro key **TRUSTED**, global `SigLevel = Required DatabaseOptional`.
 - Name-leakage clean (only `/home/erik` archive-doc prose under `kiro-assistant/knowledge`, not config).
-- Host `erik-systemproductname` (installer left default hostname). NIC quiet (no e1000e/ethtool noise). Only benign journal lines (`alsactl restore` exit 19, `gkr-pam` first-login keyring note).
+- Host `<host>` (installer left default hostname). NIC quiet (no e1000e/ethtool noise). Only benign journal lines (`alsactl restore` exit 19, `gkr-pam` first-login keyring note).
 
 This validates the **v26.07.01 production release ISO on real metal** in addition to the VBox run.
 

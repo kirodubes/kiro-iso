@@ -6,6 +6,24 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-28 (build 08:49) — v26.10.01, **`linux` + `linux-lts`**: **release ISO for v26.10.01**
+
+The image that ships on October 1. Only one change since the v26.09.24 release candidate that passed
+bare-metal testing: `GRUB_DISABLE_BOOTNEXT=true` in `/etc/default/grub`. That stops grub 2.16's new
+`31_efi_bootnext` script from listing every firmware boot entry (PXE, raw disks, CD-ROM, stale boot
+managers) on the GRUB menu, which had pushed it onto a second page on a UEFI VirtualBox install.
+
+| Target (VirtualBox) | Check | Result |
+|---------------------|-------|--------|
+| Live session (BIOS) | `/etc/default/grub` in the squashfs and on the running live system | `GRUB_DISABLE_BOOTNEXT=true` present; grub 2.16-1, `GRUB_DISTRIBUTOR="Kiro"` unchanged |
+
+- **Not verified yet:** the tidied GRUB menu after a **UEFI / GRUB** install. The test VM was in
+  BIOS mode, where `31_efi_bootnext` exits early anyway. To confirm: switch the VM to EFI, install
+  with GRUB, and check the menu fits on one page.
+- The lowercase "kiro Linux" GRUB title is intentional and was left as is.
+
+---
+
 ## 2026-09-24 (build 07:49) — v26.09.24, **`linux` + `linux-lts`**, bare metal UEFI / systemd-boot, **LUKS-encrypted Btrfs**: **kiro-audit 138 / 0 / 0**
 
 Same release-candidate image as the ext4 run below, installed on a second **bare-metal** test box

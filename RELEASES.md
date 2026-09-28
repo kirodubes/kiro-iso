@@ -8,6 +8,8 @@ Each release entry answers the same three things: why it was worth a new ISO, wh
 - **A steadier default kernel pairing:** October ships on the standard **`linux` + `linux-lts`** kernels instead of `linux-cachyos` + `linux-zen`. Want CachyOS, Zen, XanMod or hardened instead? Pick any pairing yourself in the **Kiro ISO Builder**.
 - **The ISO Builder's "no NVIDIA driver" option actually works now:** building with NVIDIA set to **none** used to still offer two NVIDIA-only boot entries on the live menu — on NVIDIA hardware they black-screened before the installer even opened. A `none` build no longer offers them.
 - **One less orphaned config folder in your home directory:** `kiro-polybar` shipped 25 files of config for a status bar that no Kiro desktop actually installs or starts, so every new user got a folder for a bar that wasn't there. It's off the default install now; still available with `pacman -S kiro-polybar` if you want polybar on purpose.
+- **A GRUB menu that fits on one screen again:** grub 2.16 started adding a boot entry for every item in your firmware's boot list — network boot, raw disks, the CD drive, leftovers from earlier installs — which pushed the menu onto a second page. Kiro turns that off, so GRUB shows Kiro, its advanced options and UEFI Firmware Settings (other operating systems are still detected).
+- **The Kiro ISO Builder leaves other distros' repos alone:** preparing a non-Kiro build machine used to replace its `pacman.conf` with Kiro's, removing that distro's own repositories. It now only adds the repos Kiro needs.
 - **Packages:** − `kiro-polybar` (dropped from the default install, still in `nemesis_repo`); `archlinux-tweak-tool-gtk4` renamed to `archlinux-tweak-tool`.
 
 ## v26.09.01 — September 1

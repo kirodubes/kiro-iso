@@ -18,8 +18,15 @@ is back to Kiro, Advanced options and UEFI Firmware Settings (plus os-prober ent
 - It only filters non-OS entries when `os-prober` is installed, which is why a stock install showed all of them.
 - The lowercase "kiro Linux" menu title is kept as is.
 
+- This build (2026-09-28 08:49) is recorded as the **v26.10.01 release ISO**. `RELEASES.md` gained two
+  bullets for it (the GRUB menu fix and the ISO Builder's `pacman.conf` fix from 2026.09.25), and
+  `DISTRO_TESTING.md` logs the build, noting that the menu on a UEFI / GRUB install is not visually verified yet.
+
 **Files modified.**
 - `archiso/airootfs/etc/default/grub`
+- `RELEASES.md`
+- `DISTRO_TESTING.md`
+- `archiso/profiledef.sh`, `archiso/airootfs/etc/dev-rel`, `build-scripts/build-the-iso.sh`, `BUILD_TIMES.md` (version bump to v26.10.01)
 
 ## 2026.09.25
 

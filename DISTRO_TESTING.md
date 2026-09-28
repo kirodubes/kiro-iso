@@ -6,6 +6,26 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-09-28 (build 09:27) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **final release ISO**, **kiro-audit 132 / 0 / 0**
+
+Rebuild of the 08:49 image after the **release gate caught stale offline microcode**:
+`kiro-calamares-config` bundled `intel-ucode` 20260812-1 while 20260925-1 was current. The bundle was
+refreshed in both config repos, `kiro-calamares-config` 26.09-05 rebuilt into `kiro_repo` (09:22), and
+the ISO rebuilt on top of it. No other change.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | ext4, unencrypted | UEFI / systemd-boot | Clean install; **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units, boot ~14 s |
+
+- ISO squashfs and the installed system both carry `intel-ucode 20260925-1` / `amd-ucode 20260916-1`;
+  the audit confirms microcode is embedded in the initramfs by the mkinitcpio hook.
+- Default kernel = the one booted live: `/etc/kiro/primary-kernel` = `linux`, its loader entry has
+  sort-key `kiro-0` (`linux-lts` `kiro-1`), and it is the entry that booted.
+- `journalctl -b -p err`: only VirtualBox noise (vboxvideo, TDX), the autologin `gkr-pam` line, and
+  `pam_loginuid` from `VBoxService` (guest control login used for this check; sshd is off on a fresh install).
+
+---
+
 ## 2026-09-28 (build 08:49) — v26.10.01, **`linux` + `linux-lts`**, VirtualBox BIOS / GRUB + **UEFI / GRUB**: **release ISO for v26.10.01**, **kiro-audit 133 / 0 / 0** on both
 
 The image that ships on October 1. Only one change since the v26.09.24 release candidate that passed

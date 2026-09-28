@@ -22,6 +22,12 @@ is back to Kiro, Advanced options and UEFI Firmware Settings (plus os-prober ent
   bullets for it (the GRUB menu fix and the ISO Builder's `pacman.conf` fix from 2026.09.25), and
   `DISTRO_TESTING.md` logs the build, and the release checks: BIOS / GRUB and UEFI / GRUB installs both score kiro-audit 133 / 0 / 0, and the UEFI GRUB menu fits on one page (4 firmware entries suppressed).
 
+- The release gate (`/kiro-ready` step 6c) failed on the 08:49 build: the Calamares config bundled
+  `intel-ucode` 20260812-1 while 20260925-1 was current, so every offline Intel install would have got
+  outdated microcode. The bundle was refreshed in `kiro-calamares-config` (+ `-next`), the package
+  rebuilt, and the ISO rebuilt at 09:27. That build is the final v26.10.01 release ISO, installed on
+  UEFI / systemd-boot with kiro-audit 132 / 0 / 0.
+
 **Files modified.**
 - `archiso/airootfs/etc/default/grub`
 - `RELEASES.md`

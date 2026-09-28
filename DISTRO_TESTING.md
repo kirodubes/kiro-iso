@@ -16,6 +16,7 @@ managers) on the GRUB menu, which had pushed it onto a second page on a UEFI Vir
 | Target (VirtualBox) | Check | Result |
 |---------------------|-------|--------|
 | Live session (BIOS) | `/etc/default/grub` in the squashfs and on the running live system | `GRUB_DISABLE_BOOTNEXT=true` present; grub 2.16-1, `GRUB_DISTRIBUTOR="Kiro"` unchanged |
+| Installed (BIOS / GRUB, ext4) | `/etc/default/grub` + generated `grub.cfg` | Setting survives Calamares (`GRUB_DISTRIBUTOR` rewritten to `'kiro'` by the installer, hence the lowercase title); menu = kiro Linux, Advanced options (`linux`, `linux-lts`), Restart, Shutdown; zero `EFI BootNext` entries |
 
 - **Not verified yet:** the tidied GRUB menu after a **UEFI / GRUB** install. The test VM was in
   BIOS mode, where `31_efi_bootnext` exits early anyway. To confirm: switch the VM to EFI, install

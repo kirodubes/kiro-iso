@@ -121,6 +121,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-09-29 09:03 | v26.10.01 | vm | 4m43s | 2 | kvm-vm (VirtualBox) — UEFI/systemd-boot, erase disk, JFS root unencrypted + zram swap, driver=free; live-booted linux-lts → primary-kernel linux-lts (sort-key kiro-0, default entry), linux + linux-lts installed |
 | 2026-09-19 07:15 | v26.09.19 | vm | 3m28s | 2 | kvm-vm (VirtualBox) — test build, UEFI/GRUB (grub-install x86_64-efi, bootloader-id kiro; BootCurrent = kiro on the ESP), no systemd-boot loader entries; grub.cfg lists linux + linux-lts, ext4 unencrypted |
 | 2026-09-13 07:51 | v26.09.13 | vm | 3m55s | 2 | kvm-vm (VirtualBox) — BIOS/GRUB, ext4 unencrypted, linux-lts + linux-cachyos; kiro-audit 133/0/0 |
 | 2026-06-09 21:52 | v26.06.09 | metal-C | 5m58s | 2 | metal-C — real metal BIOS/grub; new kiro_bootloader GRUB branch ran (grub-install i386-pc -> /dev/sda, SUCCESS); Fermi on nouveau |
@@ -148,7 +149,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 - **ISO Builds** — [`build-scripts/build-the-iso.sh`](build-scripts/build-the-iso.sh) captures start epoch in `main()`, calls `record_build_time()` after `create_checksums`, and inserts a row at the top of the table. Squashfs setting is read live from `archiso/profiledef.sh`. Failure is non-fatal (logs a warning, build still succeeds).
 - **Calamares Installs** — run [`build-scripts/record-install-time.sh`](build-scripts/record-install-time.sh) after each test install. It SSHes into the target, reads `/var/log/Calamares.log` (first/last timestamp = duration; `==> Building image` count = mkinitcpio passes), reads ISO version from `/etc/dev-rel`, and prepends a row. No kiro_final / package-rebuild needed — Calamares already timestamps every log line, so the data is right there. Usage:
   ```bash
-  bash build-scripts/record-install-time.sh vm                          # VirtualBox guest on port 2022
+  bash build-scripts/record-install-time.sh vm                          # VirtualBox guest on port 2020
   bash build-scripts/record-install-time.sh metal-A --notes "bare metal" # named host
   bash build-scripts/record-install-time.sh metal-B  --notes "post-fix"   # named host
   bash build-scripts/record-install-time.sh vm     --dry-run            # print, don't write

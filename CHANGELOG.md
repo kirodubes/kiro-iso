@@ -2,6 +2,21 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.09.29
+
+### BUILD_TIMES: v26.10.01 install recorded, usage example fixed to port 2020
+
+**What changed.** Recorded the v26.10.01 VirtualBox install (4m43s, 2 mkinitcpio passes): UEFI/systemd-boot,
+erase disk, JFS root unencrypted, zram swap, driver=free, live-booted with linux-lts, so linux-lts became
+the primary kernel and default boot entry. The usage example in `BUILD_TIMES.md` still said the `vm`
+target used port 2022. It now says 2020, matching the script's default.
+
+**Technical details.** The row was written by `record-install-time.sh vm`. The install notes come from the
+target: `findmnt`, `lsblk`, `/etc/kiro/primary-kernel` and `bootctl list`.
+
+**Files modified.**
+- `BUILD_TIMES.md`
+
 ## 2026.09.28
 
 ### GRUB menu no longer lists every firmware boot entry

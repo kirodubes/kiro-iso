@@ -4,6 +4,15 @@
 
 ## 2026.10.01
 
+### systemd-boot entries: trailing newline restored
+
+**What changed.** The archiso 91 sync dropped the newline at the end of the five
+`efiboot/loader/entries/*.conf` files: the pattern that appended `%KERNEL_PARAMS%` to the `options` line
+also swallowed the line ending of the file's last line. systemd-boot still read them (UEFI boots of the
+07:08 v26.10.01 build worked), but the newlines are restored so the files are well-formed text again.
+
+**Files modified.** `archiso/efiboot/loader/entries/*.conf` (5 files)
+
 ### host-prep.sh: upgrade_system for the Kiro ISO Builder's archiso fix (from kiro-iso-next)
 
 **What changed.** New `upgrade_system` function in `build-scripts/host-prep.sh`: a full

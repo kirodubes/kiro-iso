@@ -26,8 +26,18 @@ ISOs passed live boots in VirtualBox in both UEFI (systemd-boot) and BIOS (sysli
   value never matched the machine. A percentage scales with each machine's RAM, and it is only a limit:
   memory is used only as the session writes. On a 10 GB VM, both boot modes showed a 7.4G cowspace.
 
-**Not carried over yet.** kiro-iso-next also switched the console font to `eurlatgr`. On the live TTY it
-shows é è à ç, and `gr737c-8x16` does not. That change still needs an install test before it comes here.
+### Console font switched to eurlatgr (from kiro-iso-next)
+
+**What changed.** `/etc/vconsole.conf` now sets `FONT=eurlatgr` instead of `FONT=gr737c-8x16`. The old font
+came from the ArcoLinux ISO import. It is a Greek DOS codepage 737 font without most Western accented
+letters, so Belgian and other European users got missing glyphs on a TTY.
+
+**Why it's safe.** Tested on the v26.10.01 kiro-iso-next live ISO in VirtualBox by switching both fonts in
+the same session: é è à ç show with `eurlatgr` and do not show with `gr737c-8x16`. Both are 8x16, so text
+size on the console is unchanged. Calamares only rewrites KEYMAP and XKB* in vconsole.conf, so the FONT
+line carries over to the installed system. KIROTUX ISOs are frozen and keep gr737c.
+
+**Files modified.** `archiso/airootfs/etc/vconsole.conf`
 
 **Technical details.** The boot files were copied whole from kiro-iso-next: before today they were identical
 in both repos, and only today's commits touched them in -next. `docs/ARCHISO_BASELINE` records

@@ -4,6 +4,28 @@
 
 ## 2026.10.01
 
+### kernel_params phase 2: copytoram=n moves into kernel_params_x86_64 (from kiro-iso-next)
+
+**What changed.** `copytoram=n` comes off the 15 boot entries that had it, and `profiledef.sh` now sets
+`kernel_params_x86_64="cow_spacesize=75% copytoram=n"`. The two GRUB loopback entries get it too. The three
+PXE entries end in `%KERNEL_PARAMS% copytoram=y`, so NBD/NFS network boots still copy the live system to RAM
+instead of running off the network share. archiso's `getarg` takes the last occurrence, so that final value
+wins. On USB, CD and loopback boots nothing changes in practice: archiso's automatic copy-to-RAM never
+copies from an optical drive or a squashfs over 4 GiB, and Kiro's is about 6 GB.
+
+**Tested.** On the 08:35 kiro-iso-next build in VirtualBox, UEFI and BIOS: `copytoram=n` appears exactly
+once on `/proc/cmdline`, `/run/archiso/bootmnt` is still mounted from `/dev/sr0`, there is no
+`/run/archiso/copytoram`, the cowspace is 7.4G, and the PXE lines on the ISO end in `copytoram=y`.
+
+**Technical details.** The nine boot files were copied whole from kiro-iso-next: they were identical
+before the change. `profiledef.sh` only had its `kernel_params_x86_64` value extended.
+
+**Files modified.**
+- `archiso/profiledef.sh`
+- `archiso/grub/grub.cfg`, `archiso/grub/loopback.cfg`
+- `archiso/syslinux/archiso_sys-linux.cfg`, `archiso/syslinux/archiso_pxe-linux.cfg`
+- `archiso/efiboot/loader/entries/*.conf` (5 files)
+
 ### kernel_params phase 1: cow_spacesize moves into kernel_params_x86_64 (from kiro-iso-next)
 
 **What changed.** `cow_spacesize=75%` is no longer written into each of the 20 boot entries. It is set once in

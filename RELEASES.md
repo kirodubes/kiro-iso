@@ -2,6 +2,13 @@
 
 Each release entry answers the same three things: why it was worth a new ISO, what functionality it added, and the package moves behind it. Newest first. From **2026/07/01** Kiro switches to **one official ISO per month**; the v26.07.01 ISO was the first, and **v26.10.01** is the current release (there is no August build — July and August are the holiday period).
 
+## v26.11.01 — November 1 (upcoming — not yet released)
+**Why a new ISO:** _(in progress — collecting changes for the November release)_
+- **Accented letters on the text console:** the console font Kiro inherited could not show most Western accented letters, so typing `é è à ç` on a text console (Ctrl+Alt+F2, or a rescue session) showed blanks. Kiro now uses **eurlatgr**, which covers Western European and Greek characters at the same size as before. Tested side by side on the live ISO and on a fresh install.
+- **The live session sizes its scratch space to your RAM:** everything you do on the live ISO before installing (updates, downloads, browser cache) is written into memory, up to a fixed limit. That limit used to be 4 GB or 10 GB depending on which boot menu your machine happened to use, and only 256 MB on some boot paths. It is now **75% of your RAM** on every boot entry: a 16 GB machine gets about 12 GB, a 4 GB laptop gets about 3 GB, and memory is only used as you actually write.
+- **Built on archiso 91:** Kiro's ISO profile is synced with the latest upstream **archiso**: a tidier UEFI Shell entry on the boot menu, a leftover Broadcom Wi-Fi config file that did nothing removed, and every boot entry is ready for per-architecture kernel parameters. The **Kiro ISO Builder** now checks that your build machine has archiso 91 or newer and stops with a clear message if it doesn't, instead of producing an ISO with a broken boot line.
+- **Packages:** _(none yet)_
+
 ## v26.10.01 — October 1 (current)
 **Why a new ISO:** Kiro now boots the kernel it says it will, no matter which pairing shipped that month — plus a cleaner default kernel choice, a busier **Arch Linux Tweak Tool**, fresh CPU microcode and a couple of leftover rough edges gone.
 - **The right kernel boots by default, every time:** systemd-boot and GRUB order their menu by kernel version, so pairing a lower-numbered primary kernel with a newer secondary one (for example `linux-lts` + `linux-zen`) could silently make the *wrong* kernel the default. Fixed at the source, and the "backup kernel" fallback entry on the boot menu now always points at whichever second kernel actually shipped, instead of being hardcoded to `linux-zen`. Verified on both BIOS/GRUB and UEFI/systemd-boot, on plain and LUKS-encrypted Btrfs with snapshots enabled, and across every kernel family Kiro currently offers.

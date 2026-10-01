@@ -35,7 +35,9 @@ letters, so Belgian and other European users got missing glyphs on a TTY.
 **Why it's safe.** Tested on the v26.10.01 kiro-iso-next live ISO in VirtualBox by switching both fonts in
 the same session: é è à ç show with `eurlatgr` and do not show with `gr737c-8x16`. Both are 8x16, so text
 size on the console is unchanged. Calamares only rewrites KEYMAP and XKB* in vconsole.conf, so the FONT
-line carries over to the installed system. KIROTUX ISOs are frozen and keep gr737c.
+line carries over to the installed system. Verified on a VirtualBox install from the 07:08 v26.10.01 ISO
+(BIOS, GRUB): the installed `/etc/vconsole.conf` reads `FONT=eurlatgr` with `KEYMAP=be-latin1`. KIROTUX ISOs
+are frozen and keep gr737c.
 
 **Files modified.** `archiso/airootfs/etc/vconsole.conf`
 

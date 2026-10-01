@@ -4,6 +4,21 @@
 
 ## 2026.10.01
 
+### host-prep.sh: upgrade_system for the Kiro ISO Builder's archiso fix (from kiro-iso-next)
+
+**What changed.** New `upgrade_system` function in `build-scripts/host-prep.sh`: a full
+`pacman -Syyu --noconfirm`, followed by a warning to reboot if the running kernel's modules were replaced.
+The Kiro ISO Builder offers it as the one-click fix when its pre-flight finds archiso older than the
+91-1 minimum that `check_archiso_version` enforces.
+
+**Technical details.** It is a full upgrade on purpose: `pacman -S archiso` on its own after a database refresh would
+be a partial upgrade. `host-prep-run.sh` runs any host-prep function, so it needed no change. With
+`--noconfirm` pacman takes the default answer, which is "no" for conflicts and replacements, so a rare
+interactive transaction fails visibly in the builder's Fix log. Tested on the testing line: KIB-nemesis
+took a downgraded archiso 90-1 back to 91-1 with one click.
+
+**Files modified.** `build-scripts/host-prep.sh`
+
 ### archiso 91 sync, archiso version check and cow_spacesize=75% (from kiro-iso-next)
 
 **What changed.** Three changes tested in kiro-iso-next today are now in production. The v26.10.01 -next

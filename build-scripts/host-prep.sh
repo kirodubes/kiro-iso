@@ -47,6 +47,17 @@ ensure_package() {
     fi
 }
 
+upgrade_system() {
+    # Full upgrade, never a lone `pacman -S <pkg>`: that would be a partial upgrade.
+    # Used by the GUI's fix for a too-old archiso (check_archiso_version needs 91+).
+    log_info "Full system upgrade (pacman -Syyu)"
+    sudo pacman -Syyu --noconfirm
+    # The running kernel's modules vanish when its package is upgraded.
+    if [[ ! -d "/usr/lib/modules/$(uname -r)" ]]; then
+        log_warn "The kernel was upgraded — reboot before building"
+    fi
+}
+
 setup_chaotic() {
     [[ "${chaoticsrepo}" == "true" ]] || return 0
 

@@ -4,6 +4,30 @@
 
 ## 2026.10.01
 
+### kernel_params phase 4: no_timer_check dropped, UEFI safe graphics verbose again (from kiro-iso-next)
+
+**What changed.** In the five systemd-boot entries, the only ones that carried them:
+- `no_timer_check` is removed. It skips the kernel's boot-time check that the hardware timer interrupt
+  works, a virtual-machine workaround. On real hardware that check lets the kernel notice and work around a
+  broken timer.
+- `03-nomodeset.conf` (safe graphics) loses `quiet loglevel=3` and now matches its syslinux and GRUB
+  counterparts exactly.
+
+**Why.** All of these came in with `173dce5` (2026-04-14, "update"), a boot-speed pass that only touched the
+systemd-boot entries and recorded no reason. The Plymouth work later documented that `03-nomodeset` stays
+**verbose** in every bootloader, but on UEFI it had been quiet since April. `quiet splash loglevel=3`
+stays on the four normal UEFI entries. `loglevel=3` does not go into `kernel_params_x86_64`, because the
+variable would also reach safe graphics.
+
+**Tested.** On the 10:29 kiro-iso-next build in VirtualBox: a normal UEFI boot has no `no_timer_check`, no
+timer or clocksource warnings and clocksource `tsc`; UEFI safe graphics shows boot text; BIOS is clean. In
+VirtualBox only, UEFI safe graphics goes dark after the desktop appears. `VBoxClient --vmsvga` tries to switch the
+fixed 1024x768 firmware framebuffer (`simpledrm`) to a `1920x1080_vbox` mode and fails. That was not caused by
+this change and can't happen on real hardware: VBoxClient exits without `/dev/vboxguest`. A real-hardware
+test of all of today's ISO changes is tracked in MASTER_TODO.
+
+**Files modified.** `archiso/efiboot/loader/entries/*.conf` (5 files)
+
 ### kernel_params phase 3: nvme_load=yes removed (from kiro-iso-next)
 
 **What changed.** `nvme_load=yes` is gone from the 15 live boot entries and from

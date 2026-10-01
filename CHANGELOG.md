@@ -4,6 +4,32 @@
 
 ## 2026.10.01
 
+### kernel_params phase 3: nvme_load=yes removed (from kiro-iso-next)
+
+**What changed.** `nvme_load=yes` is gone from the 15 live boot entries and from
+`airootfs/etc/default/grub` (`GRUB_CMDLINE_LINUX_DEFAULT`, which every GRUB install inherited). It was meant
+to move into `kernel_params_x86_64`, but research showed it does nothing on Linux, so it is removed
+instead.
+
+**Evidence.** `nvme_load="YES"` is a FreeBSD `loader.conf` setting for loading FreeBSD's NVMe driver. It
+isn't a Linux kernel parameter: NVMe options are `nvme.*` module params. EndeavourOS added it to its ISO in
+2021 "to solve issues with intel vmd", and it reached Kiro through the 2025-04-27 ArcoLinux import. On the
+live ISO the kernel logs it under "Unknown kernel command line parameters … will be passed to user space", and
+nothing in user space reads it: 0 hits in the unpacked initramfs, archiso's hooks, systemd, udev, modprobe,
+Calamares and every Kiro repo. The real fix for Intel VMD laptops, the `vmd` driver in the initramfs, is
+already there: mkinitcpio's `block` hook adds every driver under `drivers/pci/controller/`, which includes
+`vmd.ko`.
+
+**Tested.** On the 09:59 kiro-iso-next build in VirtualBox: UEFI and BIOS live boots show no `nvme_load` on
+`/proc/cmdline` or in the kernel's unknown-parameter list, and `vmd.ko` is in the live initramfs. A BIOS/GRUB
+install has neither `/etc/default/grub` nor `/proc/cmdline` carrying it, and no failed units.
+
+**Files modified.**
+- `archiso/grub/grub.cfg`
+- `archiso/syslinux/archiso_sys-linux.cfg`
+- `archiso/efiboot/loader/entries/*.conf` (5 files)
+- `archiso/airootfs/etc/default/grub`
+
 ### kernel_params phase 2: copytoram=n moves into kernel_params_x86_64 (from kiro-iso-next)
 
 **What changed.** `copytoram=n` comes off the 15 boot entries that had it, and `profiledef.sh` now sets

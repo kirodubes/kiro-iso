@@ -4,6 +4,21 @@
 
 ## 2026.10.01
 
+### Vulkan drivers: vulkan-intel + vulkan-radeon
+
+**What changed.** The ISO (and so every install) shipped `mesa` without any Vulkan driver: on a Yoga 510
+install (Intel HD 620 + AMD Radeon R5 M330) `vulkaninfo` reported "Found no drivers". Vulkan games,
+Steam/Proton and DXVK can't run without them, and GTK4 falls back to its GL renderer. `vulkan-intel` (ANV)
+and `vulkan-radeon` (RADV) are now in the graphics section, next to `intel-media-driver`. Installs keep only
+their own vendor's driver: kiro-calamares-config's kiro_final removes the rest.
+
+**Technical details.** About 62 MB installed (44 + 18), less compressed in the squashfs. NVIDIA's Vulkan ICD
+comes with `nvidia-utils`; `vulkan-nouveau` is left out. Promoted from kiro-iso-next after installs from the
+18:07 -next ISO: the Yoga 510 lists ANV + RADV, picard (Intel only) lists ANV with `vulkan-radeon` removed.
+
+**Files modified.**
+- `archiso/packages.x86_64`
+
 ### archlinux-logout-gtk4 is now archlinux-logout
 
 **What Changed.** The logout app's package and repo names carried a GTK version suffix that says nothing to users. Everything it installs was already named `archlinux-logout`, so only the package name and the references to it change.

@@ -380,6 +380,19 @@ check_required_packages() {
     log_section "Phase 4 — Checking required packages"
     ensure_package archiso
     ensure_package grub
+    check_archiso_version
+}
+
+check_archiso_version() {
+    # The boot entries end in %KERNEL_PARAMS%, which only mkarchiso 91+ substitutes.
+    # An older mkarchiso leaves the literal token on the kernel command line.
+    local required="91-1" installed
+    installed="$(pacman -Q archiso | awk '{print $2}')"
+    if (( $(vercmp "${installed}" "${required}") < 0 )); then
+        log_error "archiso ${installed} is too old — this profile needs archiso ${required} or newer. Update it with: sudo pacman -Syu archiso"
+        exit 1
+    fi
+    status_ok "${GREEN}archiso ${installed} (>= ${required})${RESET}"
 }
 
 fetch_skel_bashrc() {

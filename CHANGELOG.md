@@ -2,6 +2,47 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.01
+
+### archiso 91 sync, archiso version check and cow_spacesize=75% (from kiro-iso-next)
+
+**What changed.** Three changes tested in kiro-iso-next today are now in production. The v26.10.01 -next
+ISOs passed live boots in VirtualBox in both UEFI (systemd-boot) and BIOS (syslinux) mode.
+
+- **archiso 91 sync.** Compared upstream's releng profile from archiso 90-1 with 91-1 and took what applies
+  to Kiro. `buildmodes=('iso')` is gone from `profiledef.sh`, since `iso` is mkarchiso's default. The empty
+  `airootfs/etc/modprobe.d/broadcom-wl.conf` is removed: it overrode a file from the old `broadcom-wl`
+  package, and Kiro ships `broadcom-wl-dkms`, whose blacklist is named `broadcom-wl-dkms.conf`. The GRUB
+  "UEFI Shell" entry is simplified to one `uefi_machine_type_lower` variable. Every boot entry now ends with
+  `%KERNEL_PARAMS%`, which archiso 91 fills from `kernel_params_<arch>` in `profiledef.sh`. That variable is
+  not set, so the token becomes empty. Kiro keeps its own `mkinitcpio.d/linux.preset`; upstream removed its
+  copy.
+- **archiso version check.** `%KERNEL_PARAMS%` is only replaced by mkarchiso 91 or later. An older build
+  host would put the literal text on the kernel command line. Phase 4 of `build-the-iso.sh` now runs
+  `check_archiso_version`, which stops the build if `vercmp` finds archiso older than 91-1.
+- **`cow_spacesize=75%` on all 20 live boot entries.** This sets how much the live session can write. It
+  was `4G` in GRUB and syslinux, `10G` in systemd-boot, and missing from the loopback and PXE entries (so
+  archiso's 256M default). Which live boot menu runs depends on the firmware, not on RAM, so a per-bootloader
+  value never matched the machine. A percentage scales with each machine's RAM, and it is only a limit:
+  memory is used only as the session writes. On a 10 GB VM, both boot modes showed a 7.4G cowspace.
+
+**Not carried over yet.** kiro-iso-next also switched the console font to `eurlatgr`. On the live TTY it
+shows é è à ç, and `gr737c-8x16` does not. That change still needs an install test before it comes here.
+
+**Technical details.** The boot files were copied whole from kiro-iso-next: before today they were identical
+in both repos, and only today's commits touched them in -next. `docs/ARCHISO_BASELINE` records
+`archiso 91-1` as the last synced upstream version for `/kiro-archiso`. The upstream copies used for the diff
+are in `/usr/share/archiso-90-1` and `/usr/share/archiso-91-1`.
+
+**Files modified.**
+- `archiso/profiledef.sh`
+- `archiso/airootfs/etc/modprobe.d/broadcom-wl.conf` (removed)
+- `archiso/grub/grub.cfg`, `archiso/grub/loopback.cfg`
+- `archiso/syslinux/archiso_sys-linux.cfg`, `archiso/syslinux/archiso_pxe-linux.cfg`
+- `archiso/efiboot/loader/entries/*.conf` (5 files)
+- `build-scripts/build-the-iso.sh`
+- `docs/ARCHISO_BASELINE` (new)
+
 ## 2026.09.29
 
 ### BUILD_TIMES: v26.10.01 install recorded, usage example fixed to port 2020

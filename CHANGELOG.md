@@ -4,6 +4,15 @@
 
 ## 2026.10.01
 
+### archlinux-logout-gtk4 is now archlinux-logout
+
+**What Changed.** The logout app's package and repo names carried a GTK version suffix that says nothing to users. Everything it installs was already named `archlinux-logout`, so only the package name and the references to it change.
+
+**Technical Details.** The active package line and the seven commented edition-block lines in `packages.x86_64` now use the new name.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+
 ### kernel_params phase 4: no_timer_check dropped, UEFI safe graphics verbose again (from kiro-iso-next)
 
 **What changed.** In the five systemd-boot entries, the only ones that carried them:

@@ -271,7 +271,7 @@ sddm-git
 #kiro-bspwm
 #kiro-xfce
 #kiro-polybar
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-rofi
 #kiro-rofi-themes
 #awesome-terminal-fonts
@@ -296,7 +296,7 @@ sddm-git
 ### <<< EDITION-BLOCK budgie <<<
 ### >>> EDITION-BLOCK chadwm >>>
 #alacritty
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-chadwm
 #kiro-rofi
 #kiro-rofi-themes
@@ -332,7 +332,7 @@ sddm-git
 ### <<< EDITION-BLOCK cinnamon <<<
 ### >>> EDITION-BLOCK dusk >>>
 #alacritty
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-dusk
 #kiro-rofi
 #kiro-rofi-themes
@@ -362,7 +362,7 @@ sddm-git
 ### <<< EDITION-BLOCK gnome <<<
 ### >>> EDITION-BLOCK hlwm >>>
 #alacritty
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-hlwm
 #kiro-polybar
 #kiro-rofi
@@ -392,7 +392,7 @@ sddm-git
 ### >>> EDITION-BLOCK i3 >>>
 #alacritty
 #kiro-i3
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-xfce
@@ -415,7 +415,7 @@ sddm-git
 ### <<< EDITION-BLOCK i3 <<<
 ### >>> EDITION-BLOCK leftwm >>>
 #alacritty
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-leftwm
 #kiro-polybar
 #kiro-rofi
@@ -474,7 +474,7 @@ sddm-git
 ### <<< EDITION-BLOCK plasma <<<
 ### >>> EDITION-BLOCK qtile >>>
 #alacritty
-#archlinux-logout-gtk4
+#archlinux-logout
 #kiro-qtile
 #kiro-rofi
 #kiro-rofi-themes
@@ -621,7 +621,7 @@ zsh-syntax-highlighting
 ###  KIRO BRANDING / IDENTITY — the kiro-* config + branded look
 alacritty-tweak-tool
 arc-gtk-theme
-archlinux-logout-gtk4
+archlinux-logout
 archlinux-tweak-tool
 fastfetch-tweak-tool
 fish-tweak-tool

@@ -4,6 +4,27 @@
 
 ## 2026.10.01
 
+### kernel_params phase 1: cow_spacesize moves into kernel_params_x86_64 (from kiro-iso-next)
+
+**What changed.** `cow_spacesize=75%` is no longer written into each of the 20 boot entries. It is set once in
+`profiledef.sh` as `kernel_params_x86_64="cow_spacesize=75%"`, and mkarchiso (91+) puts it into every
+entry through the `%KERNEL_PARAMS%` token. This is phase 1 of moving the parameters shared by all entries
+into this one variable. `copytoram=n`, `nvme_load=yes` and `loglevel=3 no_timer_check` follow one at a time,
+each tested in kiro-iso-next first.
+
+**Tested.** On the 08:18 kiro-iso-next build in VirtualBox, UEFI and BIOS: `/proc/cmdline` has
+`cow_spacesize=75%` exactly once, the cowspace is 7.4G on a 10 GB VM, and every systemd-boot, syslinux,
+PXE and loopback entry on the ISO carries it.
+
+**Technical details.** The nine boot files were copied whole from kiro-iso-next: they were identical
+before the change. `profiledef.sh` got only the new line, since its name and version lines differ.
+
+**Files modified.**
+- `archiso/profiledef.sh`
+- `archiso/grub/grub.cfg`, `archiso/grub/loopback.cfg`
+- `archiso/syslinux/archiso_sys-linux.cfg`, `archiso/syslinux/archiso_pxe-linux.cfg`
+- `archiso/efiboot/loader/entries/*.conf` (5 files)
+
 ### systemd-boot entries: trailing newline restored
 
 **What changed.** The archiso 91 sync dropped the newline at the end of the five

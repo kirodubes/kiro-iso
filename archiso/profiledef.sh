@@ -7,6 +7,8 @@ iso_publisher="kiro"
 iso_application="Kiro Live/Rescue CD"
 iso_version="v26.10.01"
 install_dir="arch"
+# Appended to every boot entry via its %KERNEL_PARAMS% token (archiso 91+).
+kernel_params_x86_64="cow_spacesize=75%"
 bootmodes=('bios.syslinux'
            'uefi.systemd-boot')
 pacman_conf="pacman.conf"

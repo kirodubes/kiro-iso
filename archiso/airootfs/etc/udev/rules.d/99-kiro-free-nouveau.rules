@@ -1,0 +1,7 @@
+# Live-only. nvidia-utils (baked into the ISO for the nonfree entries) blacklists nouveau in
+# /usr/lib/modprobe.d/nvidia-utils.conf, and nouveau.modeset=1 on the cmdline does not undo that.
+# Without this rule the driver=free entry boots NVIDIA GPUs on simpledrm: one monitor, 1024x768,
+# software rendering. An explicit modprobe ignores modprobe.d blacklists; the nonfree entries still
+# block nouveau via module_blacklist= on the cmdline. kiro_final removes this file from installs.
+IMPORT{cmdline}="driver"
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x03*", ENV{driver}=="free", RUN+="/usr/bin/modprobe nouveau"

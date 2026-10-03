@@ -4,6 +4,37 @@
 
 ## 2026.10.03
 
+### NVIDIA: graphics on the default boot entry, and VA-API on the nonfree entry (ported from kiro-iso-next)
+
+**What Changed.** Three fixes for NVIDIA cards, found on an RTX 3070 desktop with three monitors and verified
+there on the kiro-iso-next 22:20 ISO before porting:
+- The default `driver=free` entry now loads `nouveau`. Before, the live session came up on one monitor at 1024x768
+  with software rendering; now all monitors run at native resolution.
+- `vulkan-nouveau` (NVK) is on the ISO, which gives Turing and newer cards hardware OpenGL on nouveau, in the live
+  session and on `driver=free` installs.
+- ISOs built with the open or 580xx driver carry `libva-nvidia-driver`, so browsers and mpv decode video on the GPU
+  on the `nonfree` entry and on `nonfree` installs.
+
+**Why.** The baked `nvidia-utils` ships `/usr/lib/modprobe.d/nvidia-utils.conf` with `blacklist nouveau`, which
+`nouveau.modeset=1` on the cmdline does not undo, and the free entry blacklists the nvidia modules, so no GPU driver
+loaded at all. With nouveau loaded, Mesa still runs OpenGL on Turing+ through zink on NVK, which wasn't on the ISO,
+so it stayed on llvmpipe. And browsers only use VA-API; the `nonfree` session had only VDPAU.
+
+**Technical Details.**
+- `99-kiro-free-nouveau.rules`: `IMPORT{cmdline}="driver"`, then `modprobe nouveau` for PCI vendor `0x10de`
+  display-class devices when `driver=free`. An explicit modprobe ignores modprobe.d blacklists; the nonfree entries
+  still block nouveau with `module_blacklist=nouveau`. `kiro_final` (kiro-calamares-config) removes the rule from
+  installs.
+- `inject_nvidia_packages` strips any `libva-nvidia-driver` line, then adds it for open and 580xx only (the same
+  rule as chwd's profiles; 390xx is too old). `kiro_remove_nvidia` removes it with the driver on `driver=free` installs.
+- Test results on the RTX 3070: entry 1: nouveau with no manual step, 3 monitors, zink on NVK. Entry 2: nvidia,
+  nouveau stays out, NVDEC VA-API with 19 decode profiles. The install-side cleanup is not yet tested in a VM.
+
+**Files Modified.**
+- `archiso/airootfs/etc/udev/rules.d/99-kiro-free-nouveau.rules` (new)
+- `archiso/packages.x86_64`
+- `build-scripts/build-the-iso.sh`
+
 ### Graphics diagnostics: libva-utils, mesa-utils, vulkan-tools
 
 **What Changed.** While testing a new AMD Ryzen laptop on the live ISO, `vainfo` was missing, so whether hardware

@@ -549,6 +549,10 @@ prepopulate_keyring() {
 inject_nvidia_packages() {
     log_section "Phase 8 — Injecting NVIDIA driver: ${nvidia_driver}"
 
+    # VA-API hardware video decode on the proprietary driver (browsers/mpv; VDPAU alone isn't used by
+    # browsers). Same rule as chwd's profiles: open + 580xx get it, 390xx is too old for it.
+    sed -i '/^libva-nvidia-driver/d' "${PACKAGES_FILE}"
+
     case "${nvidia_driver}" in
         open)
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
@@ -556,14 +560,14 @@ inject_nvidia_packages() {
             sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
-            printf 'nvidia-open-dkms\nnvidia-utils\nnvidia-settings\n' >> "${PACKAGES_FILE}"
+            printf 'nvidia-open-dkms\nnvidia-utils\nnvidia-settings\nlibva-nvidia-driver\n' >> "${PACKAGES_FILE}"
             ;;
         580xx)
             sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
-            printf 'nvidia-580xx-dkms\nnvidia-580xx-utils\nnvidia-580xx-settings\n' >> "${PACKAGES_FILE}"
+            printf 'nvidia-580xx-dkms\nnvidia-580xx-utils\nnvidia-580xx-settings\nlibva-nvidia-driver\n' >> "${PACKAGES_FILE}"
             ;;
         390xx)
             sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"

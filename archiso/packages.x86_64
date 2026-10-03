@@ -168,9 +168,12 @@ mesa
 # Intel iGPU VA-API hardware video decode/encode (Broadwell/Gen8+).
 # AMD/Radeon get VA-API via mesa; Intel needs this driver explicitly.
 intel-media-driver
-# Vulkan drivers (Intel ANV, AMD RADV). Without them Vulkan finds no driver: games, Steam/Proton
-# and DXVK fail, and GTK4 falls back to GL. NVIDIA's Vulkan comes with nvidia-utils.
+# Vulkan drivers (Intel ANV, AMD RADV, NVIDIA NVK). Without them Vulkan finds no driver: games, Steam/Proton
+# and DXVK fail, and GTK4 falls back to GL. The proprietary NVIDIA Vulkan comes with nvidia-utils.
+# vulkan-nouveau is needed for OpenGL too: on Turing+ cards Mesa runs GL on nouveau through zink on NVK,
+# so without it the driver=free entry and driver=free installs fall back to llvmpipe.
 vulkan-intel
+vulkan-nouveau
 vulkan-radeon
 # Graphics diagnostics: vainfo (VA-API), glxinfo/eglinfo, vulkaninfo. mesa-utils and vulkan-tools
 # were only pulled in by hardinfo2; listed here so the tools stay if hardinfo2 goes.

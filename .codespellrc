@@ -1,0 +1,3 @@
+[codespell]
+# zink = Mesa's OpenGL-on-Vulkan driver, not a typo of zinc
+ignore-words-list = zink

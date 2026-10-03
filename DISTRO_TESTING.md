@@ -31,6 +31,17 @@ glamor on llvmpipe"). Installs from entry 1 are not affected (`kiro_remove_nvidi
 NVIDIA user who boots the default entry of an ISO with `nvidia_driver` other than `none` gets this. Fix tracked in
 MASTER_TODO §1.
 
+**Entry 1 fix proven by hand** (second boot of entry 1, same ISO):
+1. `sudo modprobe nouveau`: loads cleanly, GSP firmware 570.144 initialises, all four connectors probed, three
+   monitors `connected`, `nouveaudrmfb` replaces `simpledrm`. After an SDDM restart Xorg drives all 3 monitors at
+   native resolution (1440p@60, 1440p@144, 1080p).
+2. OpenGL was still **llvmpipe**: `vulkan-nouveau` (NVK) is not on the ISO, and on Turing+ Mesa runs GL through zink
+   on NVK. Installing the matching `vulkan-nouveau 1:26.2.4-1` and restarting SDDM gave
+   `zink Vulkan 1.4 (NVIDIA GeForce RTX 3070 (NVK GA104))`, glamor up, Vulkan on NVK.
+
+So entry 1 needs both a `modprobe nouveau` on `driver=free` and `vulkan-nouveau` on the ISO. The second also matters
+for `driver=free` **installs** on modern NVIDIA, which otherwise end up on nouveau with software GL.
+
 Also found:
 - No VA-API driver for NVIDIA (`libva-nvidia-driver` not on the ISO), so browsers decode video on the CPU. VDPAU is
   present. Tracked in MASTER_TODO §1.

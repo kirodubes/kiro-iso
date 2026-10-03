@@ -2,6 +2,22 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.03
+
+### Graphics diagnostics: libva-utils, mesa-utils, vulkan-tools
+
+**What Changed.** While testing a new AMD Ryzen laptop on the live ISO, `vainfo` was missing, so whether hardware
+video decoding worked couldn't be checked until `libva-utils` was installed by hand. It's now on the ISO.
+`mesa-utils` (`glxinfo`, `eglinfo`) and `vulkan-tools` (`vulkaninfo`) were already on it, but only because
+`hardinfo2` depends on them. They're now listed explicitly, so they stay if `hardinfo2` is ever removed.
+
+**Technical Details.** Added below the Vulkan drivers in the GRAPHICS / XORG block. `libva-utils` is under 1 MB,
+and the other two add nothing because they were already installed. On the test laptop (Lucienne iGPU, radeonsi),
+`vainfo` reports H.264/HEVC/VP9 decode and H.264/HEVC encode.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+
 ## 2026.10.01
 
 ### Vulkan drivers: vulkan-intel + vulkan-radeon

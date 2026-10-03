@@ -172,6 +172,11 @@ intel-media-driver
 # and DXVK fail, and GTK4 falls back to GL. NVIDIA's Vulkan comes with nvidia-utils.
 vulkan-intel
 vulkan-radeon
+# Graphics diagnostics: vainfo (VA-API), glxinfo/eglinfo, vulkaninfo. mesa-utils and vulkan-tools
+# were only pulled in by hardinfo2; listed here so the tools stay if hardinfo2 goes.
+libva-utils
+mesa-utils
+vulkan-tools
 xf86-input-elographics
 xf86-input-libinput
 xorg-apps

@@ -35,6 +35,32 @@ so it stayed on llvmpipe. And browsers only use VA-API; the `nonfree` session ha
 - `archiso/packages.x86_64`
 - `build-scripts/build-the-iso.sh`
 
+### v26.10.03 builds and the first modern-NVIDIA test (RTX 3070, live only)
+
+**What Changed.** Version bump to v26.10.03, with builds at 06:23 (8m28s, 6.3 GB) and 21:42 (8m4s, 6.4 GB), both
+logged in `BUILD_TIMES.md`. The 06:23 ISO was booted on a new test box, **metal-D**: a Ryzen desktop with a
+**GeForce RTX 3070** and three monitors. It may only run the live ISO and is never installed on. It is the first
+modern (Ampere) NVIDIA card in the test fleet, and it found the NVIDIA problems fixed in the entry above.
+
+**Why.** Every earlier NVIDIA test ran on a Fermi laptop (metal-C), which chwd routes to nouveau, so neither the
+`nvidia-open-dkms` path nor the free entry's behaviour on a modern card had been seen on real hardware.
+
+**Technical Details.**
+- Entry 2 (`nonfree`) passed on the 06:23 ISO: nvidia-open 615.71.09, all three monitors, hardware OpenGL and
+  Vulkan. This closes the live half of the 2026-05-29 known gap; the installed path on modern NVIDIA stays untested.
+- Entry 1 (`driver=free`) failed (no GPU driver, `simpledrm` 1024x768, llvmpipe). The fix (`modprobe nouveau` +
+  `vulkan-nouveau`) was proven by hand in that live session before it was written.
+- Also noted in `DISTRO_TESTING.md`: systemd-networkd and NetworkManager both manage the wired interface in the
+  live session (no visible effect, kept for review), and the `kiro-system-files` PAT modprobe option that the open
+  module ignores (kept on purpose for the closed drivers).
+- Added `.codespellrc` so the pre-commit spellcheck accepts `zink`, Mesa's OpenGL-on-Vulkan driver.
+
+**Files Modified.**
+- `archiso/airootfs/etc/dev-rel`, `archiso/profiledef.sh`, `build-scripts/build-the-iso.sh`: version bump
+- `BUILD_TIMES.md`: build rows
+- `DISTRO_TESTING.md`: metal-D test entry, with the by-hand proof of the entry 1 fix
+- `.codespellrc` (new)
+
 ### Graphics diagnostics: libva-utils, mesa-utils, vulkan-tools
 
 **What Changed.** While testing a new AMD Ryzen laptop on the live ISO, `vainfo` was missing, so whether hardware

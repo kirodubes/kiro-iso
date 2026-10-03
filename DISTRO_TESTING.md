@@ -2,7 +2,44 @@
 
 Results of boot and install testing for kiro-iso builds. Newest first.
 
-> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+
+---
+
+## 2026-10-03 (build 06:23) — v26.10.03, **`linux` + `linux-lts`**, bare metal **UEFI**, **live session only**: modern NVIDIA (RTX 3070) on boot entries 1 and 2
+
+First real **Ampere** NVIDIA test. metal-D is a Ryzen 7 3700X / B550 desktop with a **GeForce RTX 3070 (GA104)** driving
+three monitors (DP 1080p, HDMI 1440p, DP 1440p@144). It may only boot the live ISO, so nothing was installed.
+`ISO_BUILD` 06:15:21, `nvidia_driver=open` (`nvidia-open-dkms` 615.71.09).
+
+| Boot entry | Kernel driver | Display | Result |
+|------------|---------------|---------|--------|
+| 1 `driver=free` | **none** | `simpledrm` 1024x768, one output, llvmpipe | **FAIL**: no GPU driver loads in the live session |
+| 2 `driver=nonfree` | `nvidia` (open) 615.71.09 | all 3 monitors at native resolution, laid out side by side | **PASS** |
+
+**Entry 2 (`nonfree`): PASS.** DKMS module built for both `7.2.8-arch1-2` and `6.18.54-2-lts`; `nvidia-drm`
+modeset=Y and fbdev=Y; `nvidia-smi` shows the RTX 3070 with Xorg + xfwm4 on it; OpenGL 4.6 NVIDIA with direct
+rendering; Vulkan on the NVIDIA driver; HDMI/DP audio lists every monitor by name; zero failed units. This closes the
+**live** half of the 2026-05-29 known gap (`nvidia-open-dkms` never run on modern NVIDIA hardware); the installed path
+on modern NVIDIA stays untested, because metal-D cannot be installed on.
+
+**Entry 1 (`driver=free`): FAIL in the live session.** The baked `nvidia-utils` ships
+`/usr/lib/modprobe.d/nvidia-utils.conf` with `blacklist nouveau`, so udev never autoloads nouveau. The cmdline
+`nouveau.modeset=1` does not undo a modprobe.d blacklist, and the entry itself `module_blacklist`s nvidia. Neither
+driver loads: Xorg runs `modesetting` on `simpledrm` at a fixed 1024x768 with software rendering ("Refusing to try
+glamor on llvmpipe"). Installs from entry 1 are not affected (`kiro_remove_nvidia` removes `nvidia-utils`), but every
+NVIDIA user who boots the default entry of an ISO with `nvidia_driver` other than `none` gets this. Fix tracked in
+MASTER_TODO §1.
+
+Also found:
+- No VA-API driver for NVIDIA (`libva-nvidia-driver` not on the ISO), so browsers decode video on the CPU. VDPAU is
+  present. Tracked in MASTER_TODO §1.
+- `kiro-system-files` `etc/modprobe.d/nvidia.conf` sets `NVreg_UsePageAttributeTable=1`, which the open module rejects
+  (`unknown parameter ... ignored`). Harmless; tracked in MASTER_TODO §1.
+- systemd-networkd and NetworkManager both manage the wired interface in the live session (networkd reports it
+  `configured`; the journal logs both changing the IPv6 sysctls). No user-visible effect; noted for review.
+- Hardware/BIOS noise, not ISO issues: `amd_pstate` -19 (old BIOS, CPPC off), "No irq handler" lines, jc42 sensor
+  false alarms, `set-wireless-regdom` exit 1 (no wifi card), the known autologin `gkr-pam` line.
 
 ---
 

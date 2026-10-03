@@ -11,6 +11,13 @@ video decoding worked couldn't be checked until `libva-utils` was installed by h
 `mesa-utils` (`glxinfo`, `eglinfo`) and `vulkan-tools` (`vulkaninfo`) were already on it, but only because
 `hardinfo2` depends on them. They're now listed explicitly, so they stay if `hardinfo2` is ever removed.
 
+**Why.** These three are the standard way to check whether a machine's graphics are working properly. `vainfo`
+shows whether video plays on the GPU or falls back to the CPU, which means more heat, noise and battery drain
+on laptops. `glxinfo` and `vulkaninfo` show whether 3D runs hardware-accelerated or on the slow software
+renderer, and whether games, Steam/Proton and DXVK will find a Vulkan driver. With all three on the live ISO,
+anyone can check new hardware before installing, and we can ask users for that output when they report
+graphics, video or battery problems, both live and on installs.
+
 **Technical Details.** Added below the Vulkan drivers in the GRAPHICS / XORG block. `libva-utils` is under 1 MB,
 and the other two add nothing because they were already installed. On the test laptop (Lucienne iGPU, radeonsi),
 `vainfo` reports H.264/HEVC/VP9 decode and H.264/HEVC encode.

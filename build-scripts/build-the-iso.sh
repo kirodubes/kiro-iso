@@ -686,17 +686,19 @@ apply_editions() {
 
 #####################################################################
 # Qt/GTK theme-override rules — applied when plasma or a GTK-stack
-# desktop (gnome, budgie, …) is in editions=. Kiro ships XFCE-oriented
-# Qt/GTK theme settings (the qt5ct package plus QT_QPA_PLATFORMTHEME /
-# QT_STYLE_OVERRIDE / GTK_THEME in /etc/environment). Desktops that
-# manage their own theming fight those settings:
+# desktop (gnome, budgie, …) is in editions=. Kiro ships Qt theming for
+# its X11 desktops: the qt5ct/qt6ct packages plus QT_QPA_PLATFORMTHEME=qt5ct
+# in /etc/environment (GTK comes from per-user settings.ini and the dconf
+# defaults in kiro-dot-files, not from GTK_THEME). Desktops that manage
+# their own theming fight those settings:
 #   1. Strip qt5ct/qt6ct from the package list — PLASMA ONLY: they
 #      conflict with plasma-integration and break Qt apps' look-and-feel.
 #      The GTK-stack desktops have no such conflict, so qt5ct stays.
-#   2. Comment QT_QPA_PLATFORMTHEME / QT_STYLE_OVERRIDE / GTK_THEME in
-#      /etc/environment — PLASMA AND the GTK-stack desktops: these
-#      overrides stomp the desktop's own theming and trigger the yellow
-#      "could not apply theme" popup (the same fix ATT's themes.py applies).
+#   2. Comment QT_QPA_PLATFORMTHEME in /etc/environment (and any
+#      QT_STYLE_OVERRIDE / GTK_THEME line, should one be added) — PLASMA AND
+#      the GTK-stack desktops: these overrides stomp the desktop's own
+#      theming and trigger the yellow "could not apply theme" popup (the
+#      same fix ATT's themes.py applies).
 #   3. Warn (can't auto-fix) when gnome AND plasma are both selected: the
 #      gnome group pulls xdg-desktop-portal-gnome, which conflicts with
 #      xdg-desktop-portal-kde.
@@ -737,7 +739,7 @@ apply_plasma_rules() {
     local env_file="${buildFolder}/archiso/airootfs/etc/environment"
     if [[ -f "${env_file}" ]]; then
         sed -i -E 's/^(QT_QPA_PLATFORMTHEME=|QT_STYLE_OVERRIDE=|GTK_THEME=)/#\1/' "${env_file}"
-        log_info "Commented QT_QPA_PLATFORMTHEME / QT_STYLE_OVERRIDE / GTK_THEME in /etc/environment"
+        log_info "Commented the Qt/GTK theme override variables in /etc/environment"
     fi
 
     # 3. gnome + plasma: portal conflict we can't comment out (transitive via the gnome group).

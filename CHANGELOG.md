@@ -4,6 +4,21 @@
 
 ## 2026.10.08
 
+### build-the-iso.sh: theme-rule comments match the new /etc/environment
+
+**What Changed.** The comment above `apply_plasma_rules` still said Kiro ships `QT_STYLE_OVERRIDE` and `GTK_THEME`
+in `/etc/environment`. It now describes the current setup: qt5ct/qt6ct plus `QT_QPA_PLATFORMTHEME=qt5ct`, with GTK
+themed from per-user `settings.ini` and the kiro-dot-files dconf defaults. Comment and log text only.
+
+**Technical Details.** The `sed` that comments the variables out for Plasma and GTK-stack editions is unchanged: it
+still matches all three names, so a `GTK_THEME` or `QT_STYLE_OVERRIDE` line added later (by hand or by ATT's Themer)
+is caught too. Its log line now reads "Commented the Qt/GTK theme override variables". BUILD_TIMES.md also gets
+today's build rows.
+
+**Files Modified.**
+- `build-scripts/build-the-iso.sh`
+- `BUILD_TIMES.md`
+
 ### Live ISO: root GTK apps themed from the first boot
 
 **What Changed.** On the live ISO, GTK apps run as root (gparted, timeshift) opened in light Adwaita on window

@@ -2,6 +2,19 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.08
+
+### adw-gtk-theme added as an optional GTK theme
+
+**What Changed.** `adw-gtk-theme` (adw-gtk3 / adw-gtk3-dark) is now on the ISO, in the TIER 3 alternate-looks
+section. Users get the libadwaita look for GTK3 apps, so GTK3 and GTK4 apps match.
+
+**Technical Details.** The package comes from Arch `extra`. It sits in TIER 3, so it doesn't change the default Kiro
+look, and it can be removed without affecting the build. The KIROTUX ISOs already ship it.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+
 ## 2026.10.03
 
 ### NVIDIA: graphics on the default boot entry, and VA-API on the nonfree entry (ported from kiro-iso-next)

@@ -4,6 +4,22 @@
 
 ## 2026.10.08
 
+### Live ISO: root GTK apps themed from the first boot
+
+**What Changed.** On the live ISO, GTK apps run as root (gparted, timeshift) opened in light Adwaita on window
+managers like ohmychadwm until ATT had been started once, because live root had no GTK settings and no settings
+daemon themes it. Live root now carries the same GTK3/GTK4 settings as every user: Arc-Dawn-Dark, Surfn icons.
+
+**Technical Details.** `archiso/airootfs/root/.config/gtk-3.0/settings.ini` and `gtk-4.0/settings.ini` are copies
+of kiro-dot-files' skel (2026.10.08). XFCE hid the problem because xfsettingsd themes root windows too. Root's Qt
+config is deliberately left alone: the live root's only Qt app that matters is Calamares, styled by the KiroDark
+Kvantum theme. On install, `kiro_final` copies `/etc/skel` to `/root`, so these identical files change nothing
+there. Found with a clean root test on the v26.10.08 live ISO in VirtualBox (ohmychadwm, before ATT ran).
+
+**Files Modified.**
+- `archiso/airootfs/root/.config/gtk-3.0/settings.ini` (new)
+- `archiso/airootfs/root/.config/gtk-4.0/settings.ini` (new)
+
 ### Same look for GTK and Qt without forced theme variables; qt6ct added
 
 **What Changed.** `/etc/environment` now holds only `QT_QPA_PLATFORMTHEME=qt5ct` and `EDITOR=nano`. The forced

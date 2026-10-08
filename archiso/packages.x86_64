@@ -695,6 +695,7 @@ tuned-ppd
 ###  ICONS / CURSORS / THEMES  (alternate looks — keep at least the configured default)
 #sardi-icons   # opt-in; not shipped by default
 adw-gtk-theme
+celestial-dawn
 
 ###  WEB BROWSERS
 brave-bin

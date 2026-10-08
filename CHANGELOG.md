@@ -4,12 +4,13 @@
 
 ## 2026.10.08
 
-### adw-gtk-theme added as an optional GTK theme
+### adw-gtk-theme and celestial-dawn added as optional themes
 
-**What Changed.** `adw-gtk-theme` (adw-gtk3 / adw-gtk3-dark) is now on the ISO, in the TIER 3 alternate-looks
-section. Users get the libadwaita look for GTK3 apps, so GTK3 and GTK4 apps match.
+**What Changed.** `adw-gtk-theme` (adw-gtk3 / adw-gtk3-dark) and `celestial-dawn` are now on the ISO, in the TIER 3
+alternate-looks section. adw-gtk3 gives GTK3 apps the libadwaita look, so GTK3 and GTK4 apps match. celestial-dawn
+adds a GTK + Kvantum theme in dark, Dark and Light, with HiDPI xfwm4 decorations.
 
-**Technical Details.** The package comes from Arch `extra`. It sits in TIER 3, so it doesn't change the default Kiro
+**Technical Details.** `adw-gtk-theme` comes from Arch `extra`, `celestial-dawn` from `nemesis_repo`. It sits in TIER 3, so it doesn't change the default Kiro
 look, and it can be removed without affecting the build. The KIROTUX ISOs already ship it.
 
 **Files Modified.**

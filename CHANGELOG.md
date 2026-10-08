@@ -4,6 +4,25 @@
 
 ## 2026.10.08
 
+### Same look for GTK and Qt without forced theme variables; qt6ct added
+
+**What Changed.** `/etc/environment` now holds only `QT_QPA_PLATFORMTHEME=qt5ct` and `EDITOR=nano`. The forced
+`GTK_THEME=Arc-Dawn-Dark` is gone, so a theme the user picks actually applies everywhere, and `QT_STYLE_OVERRIDE`
+and `BROWSER` are gone too. The ISO installs `qt6ct`, so Qt6 apps (flameshot, qBittorrent, gittyup, …) get the same
+Kvantum dark style, Surfn icons and Noto Sans 11 as Qt5 apps; before, they had the style but no icons or fonts.
+
+**Technical Details.** GTK now takes its theme from the per-user settings: xsettings on XFCE, and on the TWMs
+`~/.config/gtk-4.0/settings.ini`, which names Arc-Dawn-Dark from kiro-dot-files 2026.10.08 on — build this ISO with
+that kiro-dot-files or newer, or GTK4 on ohmychadwm falls back to the default theme. `qt6ct` registers its
+platform-theme plugin under both `qt6ct` and `qt5ct`, so one variable covers Qt5 and Qt6. `QT_STYLE_OVERRIDE` was
+redundant (qt5ct/qt6ct set `style=kvantum-dark`) and made both tools warn "The application is not configured
+correctly". Verified on a live system (ohmychadwm, user and root); plan in the kiro-iso theming project doc. Mirrored
+to kiro-iso-next.
+
+**Files Modified.**
+- `archiso/airootfs/etc/environment`
+- `archiso/packages.x86_64`
+
 ### adw-gtk-theme and celestial-dawn added as optional themes
 
 **What Changed.** `adw-gtk-theme` (adw-gtk3 / adw-gtk3-dark) and `celestial-dawn` are now on the ISO, in the TIER 3

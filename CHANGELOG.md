@@ -2,6 +2,18 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.09
+
+### build-the-iso.sh waits for GitHub Pages before building
+
+**What Changed.** A build started right after publishing a package could ship the old version. GitHub Pages serves a freshly pushed repo db a few minutes late, and mkarchiso fetches whatever it gets (this hit the KiroTux DMS ISO on 2026-10-05). A new step, `wait_for_online_repos`, runs right after the Phase 1 preflight. It compares the local `nemesis_repo.db` and `kiro_repo.db` with the copies GitHub Pages serves, and waits until they match. If a db still differs after 10 minutes, the build stops and tells you to push the repo (`up.sh`) or wait.
+
+**Technical Details.** Both dbs are compared by sha256: the local file under `~/EDU/nemesis_repo/x86_64/` or `~/KIRO/kiro_repo/x86_64/` against the same path on `erikdubois.github.io` / `kirodubes.github.io`, fetched with `wget`. It re-checks every 15 s for up to 600 s. The check only runs on the build machine that publishes these repos (hostname `hq`). It is skipped when the Kiro ISO Builder (KIB) app starts the build, which KIB marks with its own `SUDO_PROMPT` value, so KIB is never held up. Anywhere else it logs a skip. On the publishing machine, a repo whose local db is missing is skipped too. Tested on the publishing machine run from a terminal (both repos pass), started from KIB (skipped) and on another hostname (skipped).
+
+**Files Modified.**
+- `build-scripts/build-the-iso.sh`
+- `CHANGELOG.md`
+
 ## 2026.10.08
 
 ### build-the-iso.sh: theme-rule comments match the new /etc/environment

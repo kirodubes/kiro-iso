@@ -280,6 +280,52 @@ packages and fetch the latest .bashrc. Check your network and re-run."
     sudo pacman -Sy
 }
 
+wait_for_online_repos() {
+    # GitHub Pages serves a freshly pushed repo db a few minutes late; a build started in
+    # that window silently ships the old packages (2026-10-05). Wait until the online db
+    # matches the local one. Only Erik's build machine (hq) publishes these repos, and a
+    # build started from the Kiro ISO Builder (KIB) app is never held up.
+    if [[ "$(cat /etc/hostname 2>/dev/null)" != "hq" ]]; then
+        log_info "Not on hq - skipping the online repo check"
+        return 0
+    fi
+    if [[ "${SUDO_PROMPT:-}" == "kiro-iso-builder: password required" ]]; then
+        log_info "Started from KIB - skipping the online repo check"
+        return 0
+    fi
+    local -a repos=(
+        "${HOME}/EDU/nemesis_repo/x86_64/nemesis_repo.db|https://erikdubois.github.io/nemesis_repo/x86_64/nemesis_repo.db"
+        "${HOME}/KIRO/kiro_repo/x86_64/kiro_repo.db|https://kirodubes.github.io/kiro_repo/x86_64/kiro_repo.db"
+    )
+    local max_wait=600 interval=15
+    local entry local_db url local_sum online_sum waited
+
+    for entry in "${repos[@]}"; do
+        local_db="${entry%%|*}"
+        url="${entry##*|}"
+        [[ -f "${local_db}" ]] || continue
+        local_sum=$(sha256sum < "${local_db}" | cut -d' ' -f1)
+        waited=0
+        while true; do
+            online_sum=$(wget -q -O - --timeout=15 "${url}" | sha256sum | cut -d' ' -f1) || online_sum=""
+            if [[ "${online_sum}" == "${local_sum}" ]]; then
+                status_ok "Online repo is current: $(basename "${local_db}")"
+                break
+            fi
+            if (( waited >= max_wait )); then
+                log_error "Online $(basename "${local_db}") still differs from the local one after ${max_wait}s.
+  local : ${local_db}
+  online: ${url}
+Push the repo (its up.sh) or wait for GitHub Pages, then re-run."
+                exit 1
+            fi
+            log_warn "Online $(basename "${local_db}") differs from local - waiting for GitHub Pages (${waited}s/${max_wait}s)"
+            sleep "${interval}"
+            waited=$((waited + interval))
+        done
+    done
+}
+
 clean_cache() {
     if [[ "${clean_pacman_cache}" == "yes" ]]; then
         log_section "Cleaning pacman package cache"
@@ -1053,6 +1099,7 @@ main() {
 
     check_not_root
     preflight_checks
+    wait_for_online_repos
     setup_chaotic
     ensure_chaotic_mirrors
     setup_cachyos

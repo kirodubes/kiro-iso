@@ -10,6 +10,8 @@
 
 **Technical Details.** Both dbs are compared by sha256: the local file under `~/EDU/nemesis_repo/x86_64/` or `~/KIRO/kiro_repo/x86_64/` against the same path on `erikdubois.github.io` / `kirodubes.github.io`, fetched with `wget`. It re-checks every 15 s for up to 600 s. The check only runs on the build machine that publishes these repos (hostname `hq`). It is skipped when the Kiro ISO Builder (KIB) app starts the build, which KIB marks with its own `SUDO_PROMPT` value, so KIB is never held up. Anywhere else it logs a skip. On the publishing machine, a repo whose local db is missing is skipped too. Tested on the publishing machine run from a terminal (both repos pass), started from KIB (skipped) and on another hostname (skipped).
 
+The step has its own heading, "Checking the online repos match local", so its result stands out in the preflight output.
+
 **Files Modified.**
 - `build-scripts/build-the-iso.sh`
 - `CHANGELOG.md`

@@ -437,6 +437,8 @@ Three non-blocking warnings, none XanMod-related and none new:
   SCANNING group) and the canonical `package-selection.conf` excludes nothing — the GUI profile
   used for this build drops them. A release build ships cups and the rule goes silent. Nothing to
   fix; expect this warning on every stripped test build.
+  **Fixed 2026.10.18:** the rule's group field is now `-`, so the warning is gone on stripped
+  builds too (CHANGELOG 2026.10.18).
 - `/usr/local/bin/slstatus` is unowned — suckless `make install` from ohmychadwm landing outside
   pacman's file list.
 - `vboxvideo: vbva_enable failed` / `hgsmi_get_mode_hints failed: -5` at early boot, on both live

@@ -4,6 +4,14 @@
 
 ## 2026.10.18
 
+### CUPS permissions rule no longer needs the cups group
+
+**What Changed.** `cups-permissions.conf` set the CUPS config files to `0600 root cups`. On a build without cups the `cups` group does not exist, so systemd-tmpfiles logged "Failed to resolve group 'cups'" twice per boot. The rule now leaves the group alone, so it is silent with or without cups.
+
+**Technical Details.** The group field went from `cups` to `-` on both `z` lines (`/etc/cups/classes.conf`, `/etc/cups/printers.conf`). Nothing is lost: with mode `0600` the group has no access, so naming it never protected anything. Both files stay root-only, and `z` still skips a file that does not exist. Seen on the v26.10.18 KIB test install in VirtualBox.
+
+**Files Modified.** `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf`, `DISTRO_TESTING.md`
+
 ### Promoted from kiro-iso-next
 
 **What Changed.** The edition package split, the optional-extras handling and the group drift check below were built and tested in kiro-iso-next, then promoted here together with the production Kiro ISO Builder. Test: a builder-made XFCE + Qtile ISO with Mousepad, Ristretto, Parole and Flameshot unticked, live and installed in a VM. The unticked apps were gone, the XFCE panel loaded all its plugins, and kiro-audit showed no new failures.

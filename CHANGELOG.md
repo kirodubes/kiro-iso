@@ -4,6 +4,14 @@
 
 ## 2026.10.18
 
+### New NVIDIA choice: 470xx for Kepler cards
+
+**What Changed.** `nvidia_driver=470xx` bakes the 470 driver into the ISO, for Kepler cards (GTX 600/700, 2012-2014). 470 is the last NVIDIA branch that supports Kepler and is newer than 390xx. The other options are unchanged.
+
+**Technical Details.** New `470xx)` case in `inject_nvidia_packages`: strips the open, 580xx and 390xx stacks and adds `nvidia-470xx-dkms`, `nvidia-470xx-utils`, `nvidia-470xx-settings` and `libva-nvidia-driver`, the same set chwd's `nvidia-dkms-470xx` profile installs. The open, 390xx and none cases now strip `nvidia-470xx` lines too. The packages are in chaotic-aur and cachyos. `kiro_remove_nvidia` already matches any `nvidia-*-dkms/utils/settings` by real name, so a 470xx install is handled with no calamares-config change. Not yet test-built: 390xx no longer builds on the 7.0 kernel, so check that the 470xx DKMS module builds before relying on it.
+
+**Files Modified.** `build-scripts/build-the-iso.sh`, `build-scripts/build.conf.defaults`, `build-scripts/BYOI.md`, `README.md`, `CLAUDE.md`
+
 ### leftwm edition brings python-pywal itself
 
 **What Changed.** A KIB test ISO with leftwm and `python-pywal` unticked booted to a leftwm bar whose icons were near-black on black. The kiro-leftwm theme takes its bar colours from pywal, so the leftwm edition block now lists `python-pywal`, and a build with leftwm ships it even when the package profile excludes it. kiro-leftwm also got a light fallback colour, so the bar stays readable without pywal.

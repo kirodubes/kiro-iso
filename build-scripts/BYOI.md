@@ -84,7 +84,7 @@ You don't have to change anything — the defaults are good. But if you want to,
 
 ```bash
 bump_version="yes"                 # auto-set the version to today's date
-nvidia_driver="open"               # open | 580xx | 390xx  (NVIDIA driver set)
+nvidia_driver="open"               # open | 580xx | 470xx | 390xx  (NVIDIA driver set)
 kernel="linux-cachyos linux-zen"   # which kernel(s) to include; first = the one it boots
 editions="xfce ohmychadwm"         # which desktop/WM session(s) to bake in
 default_session="xfce"             # which session the live ISO logs into
@@ -92,7 +92,7 @@ default_session="xfce"             # which session the live ISO logs into
 
 | Setting | What it does | Leave it as |
 |---------|--------------|-------------|
-| `nvidia_driver` | Which NVIDIA driver ships. `open` suits modern cards; `580xx`/`390xx` are for older ones | `open` if unsure |
+| `nvidia_driver` | Which NVIDIA driver ships. `open` suits modern cards; `580xx`/`470xx`/`390xx` are for older ones | `open` if unsure |
 | `kernel` | Which Linux kernel(s) the ISO carries | the default |
 | `bump_version` | Whether to stamp today's date as the version | `yes` |
 | `editions` | Which desktop/WM sessions to include. Add e.g. `i3` or `qtile`; or go minimal like `editions="cinnamon"` | `"xfce ohmychadwm"` |

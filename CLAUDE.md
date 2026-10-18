@@ -62,6 +62,7 @@ In **`build-scripts/build.conf`**, set the `nvidia_driver` variable before build
 
 - `open` — nvidia-open-dkms (default, modern GPUs)
 - `580xx` — nvidia-580xx-dkms (legacy)
+- `470xx` — nvidia-470xx-dkms (Kepler, GTX 600/700)
 - `390xx` — nvidia-390xx-dkms (legacy)
 - `none` — no NVIDIA driver at all (AMD / Intel / VM); a slimmer ISO
 

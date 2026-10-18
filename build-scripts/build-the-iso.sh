@@ -597,12 +597,13 @@ inject_nvidia_packages() {
     log_section "Phase 8 — Injecting NVIDIA driver: ${nvidia_driver}"
 
     # VA-API hardware video decode on the proprietary driver (browsers/mpv; VDPAU alone isn't used by
-    # browsers). Same rule as chwd's profiles: open + 580xx get it, 390xx is too old for it.
+    # browsers). Same rule as chwd's profiles: open + 580xx + 470xx get it, 390xx is too old for it.
     sed -i '/^libva-nvidia-driver/d' "${PACKAGES_FILE}"
 
     case "${nvidia_driver}" in
         open)
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-470xx/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
@@ -616,12 +617,22 @@ inject_nvidia_packages() {
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
             printf 'nvidia-580xx-dkms\nnvidia-580xx-utils\nnvidia-580xx-settings\nlibva-nvidia-driver\n' >> "${PACKAGES_FILE}"
             ;;
+        470xx)
+            sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-470xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
+            printf 'nvidia-470xx-dkms\nnvidia-470xx-utils\nnvidia-470xx-settings\nlibva-nvidia-driver\n' >> "${PACKAGES_FILE}"
+            ;;
         390xx)
             sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-470xx/d' "${PACKAGES_FILE}"
             printf 'nvidia-390xx-dkms\nnvidia-390xx-utils\nnvidia-390xx-settings\n' >> "${PACKAGES_FILE}"
             ;;
         none)
@@ -629,6 +640,7 @@ inject_nvidia_packages() {
             # AMD/Intel run on in-kernel drivers + mesa, which are already on the ISO.
             sed -i '/^nvidia-open-dkms/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-580xx/d' "${PACKAGES_FILE}"
+            sed -i '/^nvidia-470xx/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-390xx/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-utils/d' "${PACKAGES_FILE}"
             sed -i '/^nvidia-settings/d' "${PACKAGES_FILE}"
@@ -661,7 +673,7 @@ inject_nvidia_packages() {
             fi
             ;;
         *)
-            log_error "Unknown NVIDIA driver option: ${nvidia_driver}\nValid options: open | 580xx | 390xx | none"
+            log_error "Unknown NVIDIA driver option: ${nvidia_driver}\nValid options: open | 580xx | 470xx | 390xx | none"
             exit 1
             ;;
     esac

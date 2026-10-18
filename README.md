@@ -111,6 +111,7 @@ Before building, open **`build-scripts/build.conf`** and set `nvidia_driver`:
 ```bash
 nvidia_driver="open"    # nvidia-open-dkms  — modern GPUs (default)
 nvidia_driver="580xx"   # nvidia-580xx-dkms — legacy
+nvidia_driver="470xx"   # nvidia-470xx-dkms — Kepler (GTX 600/700)
 nvidia_driver="390xx"   # nvidia-390xx-dkms — older legacy
 ```
 

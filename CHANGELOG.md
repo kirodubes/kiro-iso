@@ -2,6 +2,85 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.18
+
+### Promoted from kiro-iso-next
+
+**What Changed.** The edition package split, the optional-extras handling and the group drift check below were built and tested in kiro-iso-next, then promoted here together with the production Kiro ISO Builder. Test: a builder-made XFCE + Qtile ISO with Mousepad, Ristretto, Parole and Flameshot unticked, live and installed in a VM. The unticked apps were gone, the XFCE panel loaded all its plugins, and kiro-audit showed no new failures.
+
+**Technical Details.** `build-the-iso.sh` and `archiso/packages.x86_64` are the kiro-iso-next files with the production names restored (ISO label `kiro-`, calamares, kiro-calamares-config, kiro-calamares-tweak-tool, kiro-bootloader-grub, plymouth-theme-kiro-logo, kiro-iso-builder). Version stamps (`dev-rel`, `profiledef.sh`) and `build.conf` stay as they were.
+
+**Files Modified.** `build-scripts/build-the-iso.sh`, `archiso/packages.x86_64`, `BUILD_TIMES.md`
+
+### XFCE: whiskermenu and the volume plugin are fixed again
+
+**What Changed.** A test ISO built from the Kiro ISO Builder with `xfce4-whiskermenu-plugin` and `xfce4-pulseaudio-plugin` unticked booted to an XFCE panel asking "Plugin 'whiskermenu' could not be loaded". Kiro's own panel layout (kiro-xfce's `xfce4-panel.xml`) uses both, so they are no longer optional: they sit in a fixed `xfce4-goodies` section above the optional one, and KIB no longer offers them as rows. The panel's other plugins (actions, clock, pager, separator, systray, tasklist) come with xfce4-panel itself. The other 34 goodies stay optional. The same build confirmed the rest: the unticked packages and chaotic's `xfce4-panel-compiz` were absent, and 31 of 36 goodies shipped.
+
+**Technical Details.** The xfce block now has three sections: `## group: xfce4`, a fixed `## group: xfce4-goodies` with the two plugins, and `## group: xfce4-goodies optional`. `check_group_drift` adds all sections of a group together, so it still matches Arch. An older saved selection that excludes either plugin no longer removes it, because only optional sections honour exclusions. MATE, GNOME, Plasma and Budgie were checked for the same trap: none of them has a Kiro panel layout that needs an optional package.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+- `CHANGELOG.md`
+
+### The Budgie edition: desktop icons can be left out
+
+**What Changed.** The budgie edition shipped the 6-package `budgie` group whole. It now lists the members: budgie-desktop, the session, the services, the control center and the backgrounds stay fixed. Only **budgie-desktop-view** (the desktop icons) becomes optional and shows in the Kiro ISO Builder (KIB) as "BUDGIE extras (budgie)". With this, every edition that used a package group lists its members: xfce, mate, gnome, plasma and budgie. The default ISO ships the same packages as before.
+
+**Technical Details.** budgie-backgrounds was first marked optional, but KIB hid it because budgie-desktop depends on it, so it moved to the fixed section. The drift check passes for all seven split groups.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+- `CLAUDE.md`
+- `CHANGELOG.md`
+
+### The Plasma edition: the Plasma extras can be left out
+
+**What Changed.** The plasma edition shipped the whole `plasma` group (68 packages). As with GNOME, Arch has no separate apps group, so the members were sorted by hand. 43 stay fixed: the workspace, KWin, the screen locker, power and network management, audio, Bluetooth, System Settings, Breeze, the portal, the polkit agent, the widgets and `sddm-kcm` (Kiro uses SDDM). 25 become optional and show in the Kiro ISO Builder (KIB) as "PLASMA extras (plasma)": Discover and Flatpak settings, Spectacle, System Monitor, Vault, Firewall, Welcome, browser integration, disk health, Thunderbolt, the virtual keyboard, print manager, remote desktop, backup (kup), the crash handler, the Plymouth settings and theme, the extra wallpapers, the Oxygen theme set, plasma-sdk, Plasma Bigscreen and **plasma-login-manager**, which Kiro never uses because it is SDDM-only. `kde-system-meta` and `konsole` stay fixed lines. The default ISO ships the same packages as before.
+
+**Technical Details.** Same two-section layout as gnome. `ocean-sound-theme` was first put with the extras, but KIB hid it because `plasma-workspace` depends on it, so it moved to the fixed section. The drift check passes, none of the extras is also a TIER 3 line, and KIB's contract test still passes.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+- `CLAUDE.md`
+- `CHANGELOG.md`
+
+### The GNOME edition: the GNOME apps can be left out
+
+**What Changed.** The gnome edition shipped the whole `gnome` group (58 packages), so none of its apps could be left out. Unlike XFCE and MATE, Arch has no separate apps group to split off, so the members were sorted by hand. 26 stay fixed: the shell, session, settings, keyring, Nautilus, GNOME Console, Orca, the portal and all gvfs backends. 32 become optional and show in the Kiro ISO Builder (KIB) as "GNOME extras (gnome)": the GNOME apps (Calculator, Calendar, Maps, Music, Weather, Text Editor, Papers, Loupe, Showtime, Epiphany and the rest), plus Software, Tour, Yelp and **gdm**, which Kiro never uses because it is SDDM-only. The default ISO ships the same packages as before.
+
+**Technical Details.** The block has two `## group: gnome` sections, one fixed and one `optional`. `check_group_drift` adds the names of both together, so it still compares against the full group; its group list now goes through `sort -u` so a split group is reported once. KIB hides a row that a fixed package depends on, so a wrong guess in the split can't break the desktop; with the current sync db none of the 32 is hidden.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+- `build-scripts/build-the-iso.sh`
+- `CLAUDE.md`
+- `CHANGELOG.md`
+
+### The MATE edition gets the same split: mate-extra can be left out
+
+**What Changed.** The mate edition block shipped the `mate` and `mate-extra` groups whole, so Pluma, Atril, Eye of MATE, Engrampa, MATE Terminal and the applets could not be left out. Like XFCE earlier today, the block now lists every member: the 14 `mate` packages are the desktop and always ship with the edition, and the 24 `mate-extra` packages are optional, so the Kiro ISO Builder (KIB) shows them as "MATE extras (mate-extra)" rows. The default ISO ships the same packages as before.
+
+**Technical Details.** Only `packages.x86_64` changed; `apply_optional_edition_excludes` and `check_group_drift` already handle any `## group:` section. All 38 members come from `[extra]`, so nothing from chaotic-aur was dropped. `kiro-mate` has no dependencies, so none of the extras is pinned by it. The drift check passes for all four groups, and KIB's contract test still passes.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+- `CLAUDE.md`
+- `CHANGELOG.md`
+
+### The XFCE edition lists its packages one by one, and the XFCE extras can be left out
+
+**What Changed.** The xfce edition block used to ship two package groups, `xfce4` and `xfce4-goodies`. A group can't be partly removed, so a YouTube review that unticked Mousepad, Ristretto and Parole in the Kiro ISO Builder (KIB) still found them after installing. The block now lists every member of both groups. The 14 `xfce4` packages are the desktop itself and always ship with the edition. The 36 `xfce4-goodies` packages (Mousepad, Ristretto, Parole, Xfburn, the panel plugins and the rest) are marked optional: KIB shows them as rows, and the build leaves out the ones you untick. Listing the members also ends a hidden conflict: with chaotic-aur enabled, the `xfce4` group also contains chaotic's `xfce4-panel-compiz`, which conflicts with `xfce4-panel`. The default ISO ships the same XFCE packages as before, minus that one.
+
+A list written out by hand can go stale when Arch changes a group, so every build now compares the lists with the groups in Arch's `[extra]` repo and warns about new or dropped members.
+
+**Technical Details.** An edition block can now hold `## group: NAME` sections, with `optional` at the end of the line for members the user may untick. The `##` lines survive the edition uncomment `sed` and are ignored by KIB's other parsers. After `apply_editions` uncomments a block, the new `apply_optional_edition_excludes` comments out the lines in optional sections whose name is in `package-selection.conf`, using the same literal whole-line match as `apply_package_selection`. Fixed sections and the other blocks are not touched, so a package another edition lists still ships. The new `check_group_drift` runs after `check_required_packages`, once `pacman -Sy` has refreshed the databases. For each `## group:` header it compares the listed names, commented or not, with `pacman -Sgq NAME` limited to `pacman -Slq extra`, so chaotic-aur members never count. It only warns and never stops the build. Both were tested on copies of `packages.x86_64`: with mousepad, ristretto and thunar excluded, the first two stay out and thunar still ships through the qtile block and `xfce4`. The drift check passes on the real file and catches a deleted and an invented member.
+
+**Files Modified.**
+- `archiso/packages.x86_64`
+- `build-scripts/build-the-iso.sh`
+- `CLAUDE.md`
+- `CHANGELOG.md`
+
 ## 2026.10.09
 
 ### build-the-iso.sh waits for GitHub Pages before building

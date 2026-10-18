@@ -729,6 +729,56 @@ apply_editions() {
         sed -i "/>>> EDITION-BLOCK ${ed} >>>/,/<<< EDITION-BLOCK ${ed} <<</ s/^#\([^#]\)/\1/" "${PACKAGES_FILE}"
         log_info "Enabled edition: ${ed}"
     done
+    apply_optional_edition_excludes
+}
+
+apply_optional_edition_excludes() {
+    # An edition block can expand a package group into its members under a
+    # "## group: NAME optional" header (xfce4-goodies → mousepad, ristretto, …).
+    # Those lines honour package-selection.conf like TIER 3 does: an unticked one
+    # is commented back out. Fixed sections ("## group: NAME") are never touched.
+    local sel="${SCRIPT_DIR}/package-selection.conf"
+    [[ -f "${sel}" ]] || return 0
+    local tmp n
+    tmp="$(mktemp)"
+    awk '
+        NR==FNR { line=$0; sub(/#.*/,"",line); gsub(/[ \t]/,"",line)
+                  if (line!="") excl[line]=1; next }
+        /^###/ { optional=0 }
+        /^## group: / { optional=($NF=="optional") }
+        { key=$0; sub(/[ \t]+$/,"",key)
+          if (optional && (key in excl)) { print "#" $0; n++ } else print $0 }
+        END { print n+0 > "/dev/stderr" }
+    ' "${sel}" "${PACKAGES_FILE}" > "${tmp}" 2> "${tmp}.n" && mv "${tmp}" "${PACKAGES_FILE}"
+    n="$(cat "${tmp}.n")"
+    rm -f "${tmp}.n"
+    [[ "${n}" -gt 0 ]] && log_info "Optional edition packages left out: ${n}"
+    return 0
+}
+
+check_group_drift() {
+    # packages.x86_64 lists some package groups member by member ("## group: NAME"
+    # inside an edition block) so single members can be left out. Warn when Arch
+    # changed a group since: a new member is missing from the ISO, a dropped one
+    # fails the build. Only [extra] counts — chaotic-aur adds its own members
+    # (xfce4-panel-compiz) that must never land on the ISO.
+    local src="${REPO_DIR}/archiso/packages.x86_64"
+    local extra group listed online added removed
+    extra="$(pacman -Slq extra | sort -u)"
+    while IFS= read -r group; do
+        listed="$(awk -v g="${group}" '
+            /^###/ { on=0 }
+            /^## group: / { on=($3==g); next }
+            on && /^#?[^# \t]/ { sub(/^#/,""); print $1 }
+        ' "${src}" | sort -u)"
+        online="$(comm -12 <(pacman -Sgq "${group}" 2>/dev/null | sort -u) <(echo "${extra}"))"
+        added="$(comm -13 <(echo "${listed}") <(echo "${online}") | xargs)"
+        removed="$(comm -23 <(echo "${listed}") <(echo "${online}") | xargs)"
+        [[ -n "${added}" ]] && log_warn "Group ${group} has new members in Arch - add them to packages.x86_64: ${added}"
+        [[ -n "${removed}" ]] && log_warn "Group ${group} no longer has these members - remove them from packages.x86_64 or the build fails: ${removed}"
+        [[ -z "${added}${removed}" ]] && status_ok "Group ${group} matches Arch"
+    done < <(awk '/^## group: / { print $3 }' "${src}" | sort -u)
+    return 0
 }
 
 #####################################################################
@@ -1116,6 +1166,7 @@ main() {
     refresh_skel_bashrc
 
     check_required_packages
+    check_group_drift
     select_kernels
     show_overview
     prepare_build_tree

@@ -304,7 +304,14 @@ sddm-git
 #xfce4-terminal
 ### <<< EDITION-BLOCK bspwm <<<
 ### >>> EDITION-BLOCK budgie >>>
-#budgie
+## group: budgie
+#budgie-backgrounds
+#budgie-control-center
+#budgie-desktop
+#budgie-desktop-services
+#budgie-session
+## group: budgie optional
+#budgie-desktop-view
 ### <<< EDITION-BLOCK budgie <<<
 ### >>> EDITION-BLOCK chadwm >>>
 #alacritty
@@ -369,8 +376,67 @@ sddm-git
 #xfce4-terminal
 ### <<< EDITION-BLOCK dusk <<<
 ### >>> EDITION-BLOCK gnome >>>
-#gnome
 #gnome-tweaks
+## group: gnome
+#gnome-backgrounds
+#gnome-color-manager
+#gnome-console
+#gnome-control-center
+#gnome-keyring
+#gnome-menus
+#gnome-session
+#gnome-settings-daemon
+#gnome-shell
+#gst-thumbnailers
+#gvfs
+#gvfs-afc
+#gvfs-dnssd
+#gvfs-goa
+#gvfs-gphoto2
+#gvfs-mtp
+#gvfs-nfs
+#gvfs-onedrive
+#gvfs-smb
+#gvfs-wsdd
+#malcontent
+#nautilus
+#orca
+#tecla
+#xdg-desktop-portal-gnome
+#xdg-user-dirs-gtk
+## group: gnome optional
+#baobab
+#decibels
+#epiphany
+#gdm
+#gnome-calculator
+#gnome-calendar
+#gnome-characters
+#gnome-clocks
+#gnome-connections
+#gnome-contacts
+#gnome-disk-utility
+#gnome-font-viewer
+#gnome-logs
+#gnome-maps
+#gnome-music
+#gnome-remote-desktop
+#gnome-software
+#gnome-system-monitor
+#gnome-text-editor
+#gnome-tour
+#gnome-user-docs
+#gnome-user-share
+#gnome-weather
+#grilo-plugins
+#loupe
+#papers
+#rygel
+#showtime
+#simple-scan
+#snapshot
+#sushi
+#yelp
 ### <<< EDITION-BLOCK gnome <<<
 ### >>> EDITION-BLOCK hlwm >>>
 #alacritty
@@ -457,9 +523,47 @@ sddm-git
 #xfce4-terminal
 ### <<< EDITION-BLOCK leftwm <<<
 ### >>> EDITION-BLOCK mate >>>
-#mate
-#mate-extra
 #kiro-mate
+## group: mate
+#caja
+#marco
+#mate-backgrounds
+#mate-control-center
+#mate-desktop
+#mate-icon-theme
+#mate-menus
+#mate-notification-daemon
+#mate-panel
+#mate-polkit
+#mate-session-manager
+#mate-settings-daemon
+#mate-themes
+#mate-user-guide
+## group: mate-extra optional
+#atril
+#caja-actions
+#caja-audio-video-properties
+#caja-image-converter
+#caja-open-terminal
+#caja-sendto
+#caja-share
+#caja-wallpaper
+#caja-xattr-tags
+#engrampa
+#eom
+#mate-applets
+#mate-calc
+#mate-media
+#mate-netbook
+#mate-power-manager
+#mate-screensaver
+#mate-sensors-applet
+#mate-system-monitor
+#mate-terminal
+#mate-user-share
+#mate-utils
+#mozo
+#pluma
 ### <<< EDITION-BLOCK mate <<<
 ### >>> EDITION-BLOCK ohmychadwm >>>
 #ohmychadwm
@@ -480,9 +584,78 @@ sddm-git
 #xorg-xsetroot
 ### <<< EDITION-BLOCK ohmychadwm <<<
 ### >>> EDITION-BLOCK plasma >>>
-#plasma
 #kde-system-meta
 #konsole
+## group: plasma
+#aurorae
+#bluedevil
+#breeze
+#breeze-cursors
+#breeze-gtk
+#kactivitymanagerd
+#kde-cli-tools
+#kde-gtk-config
+#kdecoration
+#kdeplasma-addons
+#kglobalacceld
+#kinfocenter
+#kmenuedit
+#knighttime
+#kpipewire
+#kscreen
+#kscreenlocker
+#ksystemstats
+#kwallet-pam
+#kwayland
+#kwin
+#kwrited
+#layer-shell-qt
+#libkscreen
+#libksysguard
+#libplasma
+#milou
+#plasma-activities
+#plasma-activities-stats
+#plasma-desktop
+#plasma-integration
+#plasma-nm
+#plasma-pa
+#plasma-workspace
+#plasma5support
+#polkit-kde-agent
+#powerdevil
+#qqc2-breeze-style
+#sddm-kcm
+#systemsettings
+#union
+#xdg-desktop-portal-kde
+#ocean-sound-theme
+## group: plasma optional
+#breeze-plymouth
+#discover
+#drkonqi
+#flatpak-kcm
+#krdp
+#ksshaskpass
+#kup
+#oxygen
+#oxygen-cursors
+#oxygen-sounds
+#plasma-bigscreen
+#plasma-browser-integration
+#plasma-disks
+#plasma-firewall
+#plasma-keyboard
+#plasma-login-manager
+#plasma-sdk
+#plasma-systemmonitor
+#plasma-thunderbolt
+#plasma-vault
+#plasma-welcome
+#plasma-workspace-wallpapers
+#plymouth-kcm
+#print-manager
+#spectacle
 ### <<< EDITION-BLOCK plasma <<<
 ### >>> EDITION-BLOCK qtile >>>
 #alacritty
@@ -509,8 +682,59 @@ sddm-git
 #xfce4-terminal
 ### <<< EDITION-BLOCK qtile <<<
 ### >>> EDITION-BLOCK xfce >>>
-#xfce4
-#xfce4-goodies
+## group: xfce4
+#exo
+#garcon
+#thunar
+#thunar-volman
+#tumbler
+#xfce4-appfinder
+#xfce4-panel
+#xfce4-power-manager
+#xfce4-session
+#xfce4-settings
+#xfce4-terminal
+#xfconf
+#xfdesktop
+#xfwm4
+## group: xfce4-goodies
+#xfce4-pulseaudio-plugin
+#xfce4-whiskermenu-plugin
+## group: xfce4-goodies optional
+#mousepad
+#parole
+#ristretto
+#thunar-archive-plugin
+#thunar-media-tags-plugin
+#xfburn
+#xfce4-battery-plugin
+#xfce4-clipman-plugin
+#xfce4-cpufreq-plugin
+#xfce4-cpugraph-plugin
+#xfce4-dict
+#xfce4-diskperf-plugin
+#xfce4-eyes-plugin
+#xfce4-fsguard-plugin
+#xfce4-genmon-plugin
+#xfce4-mailwatch-plugin
+#xfce4-mount-plugin
+#xfce4-mpc-plugin
+#xfce4-netload-plugin
+#xfce4-notes-plugin
+#xfce4-notifyd
+#xfce4-places-plugin
+#xfce4-screensaver
+#xfce4-screenshooter
+#xfce4-sensors-plugin
+#xfce4-smartbookmark-plugin
+#xfce4-systemload-plugin
+#xfce4-taskmanager
+#xfce4-time-out-plugin
+#xfce4-timer-plugin
+#xfce4-verve-plugin
+#xfce4-wavelan-plugin
+#xfce4-weather-plugin
+#xfce4-xkb-plugin
 ### <<< EDITION-BLOCK xfce <<<
 
 

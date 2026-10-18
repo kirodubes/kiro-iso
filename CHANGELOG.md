@@ -4,6 +4,14 @@
 
 ## 2026.10.18
 
+### leftwm edition brings python-pywal itself
+
+**What Changed.** A KIB test ISO with leftwm and `python-pywal` unticked booted to a leftwm bar whose icons were near-black on black. The kiro-leftwm theme takes its bar colours from pywal, so the leftwm edition block now lists `python-pywal`, and a build with leftwm ships it even when the package profile excludes it. kiro-leftwm also got a light fallback colour, so the bar stays readable without pywal.
+
+**Technical Details.** Same mechanism as thunar in the qtile block: the TIER 3 exclusion comments out the general `python-pywal` line, and the edition block's own line still ships it once `apply_editions` uncomments the block. A build without leftwm is unchanged.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### CUPS permissions rule no longer needs the cups group
 
 **What Changed.** `cups-permissions.conf` set the CUPS config files to `0600 root cups`. On a build without cups the `cups` group does not exist, so systemd-tmpfiles logged "Failed to resolve group 'cups'" twice per boot. The rule now leaves the group alone, so it is silent with or without cups.

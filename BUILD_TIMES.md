@@ -10,6 +10,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-10-18 11:19 | v26.10.18 | linux linux-lts | zstd L3 -b 1M | 8m21s | 6.4G | |
 | 2026-10-09 13:46 | v26.10.09 | linux linux-lts | zstd L3 -b 1M | 8m21s | 6.4G | |
 | 2026-10-08 10:35 | v26.10.08 | linux linux-lts | zstd L3 -b 1M | 8m59s | 6.4G | |
 | 2026-10-08 09:01 | v26.10.08 | linux linux-lts | zstd L3 -b 1M | 8m26s | 6.4G | |
@@ -133,6 +134,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-10-18 11:25 | v26.10.18 | vm | 4m0s | 2 | Production v26.10.18 script build (xfce+ohmychadwm, default xfce): first ISO with the edition split + SDDM preselect promoted from -next. UEFI, systemd-boot, erase disk, ext4, zram swap, kernel linux primary. kiro-audit 131 PASS / 0 FAIL |
 | 2026-10-18 10:57 | v26.10.18 | vm | 2m45s | 2 | -next v26.10.18 KIB-nemesis lean test (xfce+qtile, default xfce, apps deselected). UEFI, systemd-boot, erase disk, ext4, zram swap, driver=free, kernel linux primary. kiro-audit 122 PASS / 3 FAIL (bluetooth, ananicy-cpp: deselected, expected) |
 | 2026-09-29 09:03 | v26.10.01 | vm | 4m43s | 2 | kvm-vm (VirtualBox) — UEFI/systemd-boot, erase disk, JFS root unencrypted + zram swap, driver=free; live-booted linux-lts → primary-kernel linux-lts (sort-key kiro-0, default entry), linux + linux-lts installed |
 | 2026-09-19 07:15 | v26.09.19 | vm | 3m28s | 2 | kvm-vm (VirtualBox) — test build, UEFI/GRUB (grub-install x86_64-efi, bootloader-id kiro; BootCurrent = kiro on the ESP), no systemd-boot loader entries; grub.cfg lists linux + linux-lts, ext4 unencrypted |

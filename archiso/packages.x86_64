@@ -572,6 +572,7 @@ sddm-git
 #dmenu
 #fastcompmgr-git
 #feh
+#lxappearance
 #maim
 #numlockx
 #picom-git
@@ -814,7 +815,6 @@ xdg-desktop-portal-gtk
 ###  THEMING ENGINES
 kvantum
 kvantum-qt5
-lxappearance
 qt5ct
 qt6ct
 vte4

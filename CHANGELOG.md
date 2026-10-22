@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.22
+
+### lxappearance moves from the core to the tiling WM editions
+
+**What Changed.** `lxappearance` was in TIER 2, so every ISO shipped it, including Plasma, GNOME, Cinnamon, MATE, Budgie and XFCE, which all have their own appearance settings. It now ships only with the tiling WM editions that use it. This is the first step of the TIER 2 audit: packages only some editions need move out of the core and into the edition blocks.
+
+**Technical Details.** The 8 tiling WM blocks (awesome, bspwm, chadwm, dusk, hlwm, i3, leftwm, qtile) already listed `#lxappearance`; ohmychadwm did not, so it got the line after `#feh`. No Kiro package `depends=` on lxappearance (checked across the four KIRO-PKG-BUILD repos), so no core package pulls it back in. The audit used one KIB build summary per edition, made with KIB's `build_summary()` without building an ISO. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ## 2026.10.18
 
 ### New NVIDIA choice: 470xx for Kepler cards

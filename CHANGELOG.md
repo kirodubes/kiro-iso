@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### kiro-powermenu moves to the X11 tiling WMs
+
+**What Changed.** `kiro-powermenu` was in TIER 2, so Plasma, GNOME, Cinnamon, MATE, Budgie and XFCE ISOs shipped a tiling WM power menu they never call. It now ships only with the 9 X11 tiling WMs, whose keybindings run it.
+
+**Technical Details.** Removed from TIER 2. Each of the 9 tiling WM blocks lists `#kiro-powermenu` after `#kiro-rofi-themes`. The edition packages depend on it as well, and ATT's desktop lists include it (same day). Checked per edition with KIB's `_shipped_names()`. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### kiro-rofi and kiro-rofi-themes leave the core
 
 **What Changed.** A KIB Cinnamon build still shipped `kiro-rofi` and `kiro-rofi-themes` from TIER 2, but rofi itself is not on a Cinnamon ISO, so it was configuration for an app that is not there. The pair now ships only with editions that run rofi: the 9 X11 tiling WMs.

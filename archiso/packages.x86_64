@@ -272,6 +272,7 @@ sddm-git
 #rofi
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #thunar
 #thunar-archive-plugin
 #thunar-volman
@@ -296,6 +297,7 @@ sddm-git
 #archlinux-logout
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #awesome-terminal-fonts
 #bspwm
 #dmenu
@@ -337,6 +339,7 @@ sddm-git
 #kiro-chadwm
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #kiro-xfce
 #dmenu
 #feh
@@ -381,6 +384,7 @@ sddm-git
 #kiro-dusk
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #kiro-xfce
 #dmenu
 #feh
@@ -479,6 +483,7 @@ sddm-git
 #kiro-polybar
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #kiro-xfce
 #herbstluftwm
 #polybar
@@ -515,6 +520,7 @@ sddm-git
 #archlinux-logout
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #kiro-xfce
 #autotiling
 #dmenu
@@ -548,6 +554,7 @@ sddm-git
 #kiro-polybar
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #kiro-xfce
 #dmenu
 #feh
@@ -638,6 +645,7 @@ sddm-git
 #rofi
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #scrot
 #sxhkd
 #volctl
@@ -733,6 +741,7 @@ sddm-git
 #kiro-qtile
 #kiro-rofi
 #kiro-rofi-themes
+#kiro-powermenu
 #kiro-xfce
 #awesome-terminal-fonts
 #dmenu
@@ -948,7 +957,6 @@ kiro-fish-config
 kiro-iso-builder
 kiro-keybindings
 kiro-kvantum
-kiro-powermenu
 kiro-sddm-simplicity
 kiro-shells
 kiro-starship

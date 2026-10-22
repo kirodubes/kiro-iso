@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### kiro-variety-config moves to TIER 3 with variety
+
+**What Changed.** `variety` is a TIER 3 package that can be unticked in KIB, but its Kiro config `kiro-variety-config` sat in TIER 2, so it shipped on every ISO anyway, and brought `feh` with it. Both now sit together in a new TIER 3 `WALLPAPER` category, so each one can be deselected.
+
+**Technical Details.** Removed `kiro-variety-config` from TIER 2 (KIRO BRANDING) and `variety` from MEDIA / GRAPHICS; the new `###  WALLPAPER` category lists both under a `## … keep together` comment, because `kiro-variety-config` depends on `variety`: unticking only variety still installs it through that dependency. Checked with KIB's `read_tier3()` and `_shipped_names()` on a Cinnamon build. The 9 Wayland edition packages still depend on `kiro-variety-config`; the KIROTUX lists are unchanged. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### udiskie dropped
 
 **What Changed.** `udiskie` shipped on the ISO but never ran. It is an automount daemon that only works when something starts it, and nothing does: it has no autostart file or systemd unit, no edition config launches it, and no package requires it. gvfs with thunar-volman, or the desktop's own file manager, already does the mounting. Installed systems keep it; anyone who wants it can install it with pacman.

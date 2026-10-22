@@ -960,7 +960,6 @@ kiro-sddm-simplicity
 kiro-shells
 kiro-starship
 kiro-system-files
-kiro-variety-config
 kiro-zsh-config
 sparklines-git
 
@@ -1021,12 +1020,16 @@ nomacs
 obs-studio
 peek
 shortwave
-variety
 vlc
 vlc-plugins-base
 vlc-plugins-extra
 vlc-plugins-video-output
 xcolor
+
+###  WALLPAPER
+## variety + its Kiro config — keep together (kiro-variety-config depends on variety)
+variety
+kiro-variety-config
 
 ###  PRODUCTIVITY / EDITORS
 baobab

@@ -270,6 +270,8 @@ sddm-git
 #fastcompmgr-git
 #polkit-gnome
 #rofi
+#kiro-rofi
+#kiro-rofi-themes
 #thunar
 #thunar-archive-plugin
 #thunar-volman
@@ -634,6 +636,8 @@ sddm-git
 #picom-git
 #playerctl
 #rofi
+#kiro-rofi
+#kiro-rofi-themes
 #scrot
 #sxhkd
 #volctl
@@ -945,8 +949,6 @@ kiro-iso-builder
 kiro-keybindings
 kiro-kvantum
 kiro-powermenu
-kiro-rofi
-kiro-rofi-themes
 kiro-sddm-simplicity
 kiro-shells
 kiro-starship

@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### kiro-rofi and kiro-rofi-themes leave the core
+
+**What Changed.** A KIB Cinnamon build still shipped `kiro-rofi` and `kiro-rofi-themes` from TIER 2, but rofi itself is not on a Cinnamon ISO, so it was configuration for an app that is not there. The pair now ships only with editions that run rofi: the 9 X11 tiling WMs.
+
+**Technical Details.** Removed from TIER 2. Seven tiling WM blocks already listed both; awesome and ohmychadwm got `#kiro-rofi` and `#kiro-rofi-themes` after their `#rofi` line. kiro-rofi installs `~/.config/rofi/config.rasi`, which rofi reads on every plain `rofi` call, so the two belong wherever rofi runs. The edition packages now depend on them too (KIRO-PKG-BUILD-APPS, same day). Checked per edition with KIB's `_shipped_names()`. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### XFCE packages and the Thunar thumbnailers leave the core
 
 **What Changed.** A KIB Cinnamon build shipped `xfce4-terminal`, `libxfce4ui`, `libxfce4util`, `xfconf`, `tumbler` and the XFCE configuration, none of which Cinnamon uses. They came from TIER 2: `kiro-xfce`, `dracula-colors-xfce4-terminal` and `tumbler`. Those three and tumbler's helpers (`ffmpegthumbnailer`, `libgepub`, `libgsf`, `libopenraw`, `poppler-glib`) now ship only with the editions that use Thunar or xfce4-terminal: xfce, ohmychadwm and the 8 tiling WMs. Desktop editions (Plasma, GNOME, Cinnamon, MATE, Budgie) no longer get them.

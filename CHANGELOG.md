@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### OVERVIEW aligned between kiro-iso and kiro-iso-next
+
+**What Changed.** The two OVERVIEW docs had drifted: kiro-iso-next still named ATT by its old package name `archlinux-tweak-tool-gtk4-git`, and kiro-iso's sample `[kiro_repo]` block showed a `SigLevel = Never` line the real `pacman.conf` does not have. Both now say `archlinux-tweak-tool` and show the block as shipped. Docs only.
+
+**Technical Details.** One line each. The docs now match kiro-iso-next.
+
+**Files Modified.** `docs/OVERVIEW.md`
+
 ### TIER 2 thumbnails header corrected
 
 **What Changed.** The `THUMBNAILS — tumbler + thumbnailers` header no longer matched its section: tumbler and its thumbnailers moved to the Thunar editions this morning, and poppler-qt5 was dropped, so only `freetype2` is left. The header now says so. Comment only; nothing ships differently.

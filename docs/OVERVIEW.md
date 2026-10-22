@@ -190,7 +190,6 @@ kiro-iso/
 ### Repository Integration
 ```ini
 [kiro_repo]
-SigLevel = Never
 Server = https://kirodubes.github.io/$repo/$arch
 ```
 

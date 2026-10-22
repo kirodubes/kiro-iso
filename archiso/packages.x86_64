@@ -273,6 +273,7 @@ sddm-git
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #thunar
 #thunar-archive-plugin
 #thunar-volman
@@ -294,10 +295,12 @@ sddm-git
 #kiro-bspwm
 #kiro-xfce
 #kiro-polybar
+#ttf-font-awesome
 #archlinux-logout
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #awesome-terminal-fonts
 #bspwm
 #dmenu
@@ -340,6 +343,7 @@ sddm-git
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #kiro-xfce
 #dmenu
 #feh
@@ -481,9 +485,11 @@ sddm-git
 #archlinux-logout
 #kiro-hlwm
 #kiro-polybar
+#ttf-font-awesome
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #kiro-xfce
 #herbstluftwm
 #polybar
@@ -521,6 +527,7 @@ sddm-git
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #kiro-xfce
 #autotiling
 #dmenu
@@ -552,9 +559,11 @@ sddm-git
 #archlinux-logout
 #kiro-leftwm
 #kiro-polybar
+#ttf-font-awesome
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #kiro-xfce
 #dmenu
 #feh
@@ -646,6 +655,7 @@ sddm-git
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #scrot
 #sxhkd
 #volctl
@@ -742,6 +752,7 @@ sddm-git
 #kiro-rofi
 #kiro-rofi-themes
 #kiro-powermenu
+#pamixer
 #kiro-xfce
 #awesome-terminal-fonts
 #dmenu
@@ -784,6 +795,7 @@ sddm-git
 #xfdesktop
 #xfwm4
 #kiro-xfce
+#pamixer
 #dracula-colors-xfce4-terminal
 ## thumbnails for Thunar — keep together
 #tumbler
@@ -851,7 +863,6 @@ gst-plugins-good
 gst-plugins-ugly
 gstreamer
 libdvdcss
-pamixer
 pavucontrol
 pipewire
 pipewire-alsa
@@ -972,14 +983,12 @@ neo-candy-icons-git
 numix-circle-icon-theme-git
 numix-icon-theme-git
 surfn-icons-git
-ttf-material-design-iconic-font
 vimix-cursors
 
 ###  FONTS  (load-bearing — referenced by shipped Kiro configs / toolkit fallback)
 noto-fonts
 noto-fonts-emoji
 ttf-dejavu
-ttf-font-awesome
 ttf-hack
 ttf-hack-nerd
 

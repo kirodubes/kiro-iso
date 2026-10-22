@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### pamixer and the bar icon fonts leave the core
+
+**What Changed.** `pamixer`, `ttf-font-awesome` and `ttf-material-design-iconic-font` were in TIER 2, so Plasma, GNOME, Cinnamon, MATE and Budgie ISOs shipped a volume CLI and two bar icon fonts they never use. They now ship only with the editions whose configs call them.
+
+**Technical Details.** `#pamixer` goes after `#kiro-powermenu` in the awesome, bspwm, chadwm, hlwm, i3, leftwm, ohmychadwm and qtile blocks (their volume keys run it) and after `#kiro-xfce` in the fixed xfce part (xfce4-keyboard-shortcuts.xml binds it); dusk does not use it. `#ttf-font-awesome` goes after `#kiro-polybar` in bspwm, hlwm and leftwm, the three polybar editions (`font-1 = "FontAwesome"`). `ttf-material-design-iconic-font` is only dropped from TIER 2: leftwm already lists it and depends on it. The edition packages and ATT's desktop lists match (same day). Checked per edition with KIB's `_shipped_names()`. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### kiro-variety-config moves to TIER 3 with variety
 
 **What Changed.** `variety` is a TIER 3 package that can be unticked in KIB, but its Kiro config `kiro-variety-config` sat in TIER 2, so it shipped on every ISO anyway, and brought `feh` with it. Both now sit together in a new TIER 3 `WALLPAPER` category, so each one can be deselected.

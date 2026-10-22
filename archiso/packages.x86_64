@@ -942,7 +942,9 @@ peek
 shortwave
 variety
 vlc
-vlc-plugins-all
+vlc-plugins-base
+vlc-plugins-extra
+vlc-plugins-video-output
 xcolor
 
 ###  PRODUCTIVITY / EDITORS
@@ -1008,7 +1010,6 @@ system-config-printer
 timeshift
 
 ###  PACKAGE / SYSTEM TOOLS
-appstream
 devtools
 downgrade
 expac

@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### Leaner default media and system tools: vlc plugins split, appstream dropped
+
+**What Changed.** A KIB Cinnamon build summary showed 156 packages pulled in beyond the core, and 114 of them came from two TIER 3 lines. `vlc-plugins-all` (102 packages: DVB, firewire, JACK, Chromecast, UPnP, LIRC, projectM visualisations and more) is replaced by `vlc-plugins-base`, `vlc-plugins-extra` and `vlc-plugins-video-output`, which cover normal audio and video playback. `appstream` (12 packages: libvips, hdf5, cfitsio...) is dropped: it is an app-store library and does nothing on its own.
+
+**Technical Details.** `vlc-plugins-all` depends on those three plus the niche plugins (firewire, fluidsynth, gstreamer, jack, libsecret, lua, notify, pulse, smb, svg, x264, x265) and `vlc-plugins-visualization`; those are what is left out. `appstream` still arrives whenever flatpak, pamac or gimp is ticked, since they depend on it. Both lines are TIER 3, so this applies to every edition. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### lxappearance moves from the core to the tiling WM editions
 
 **What Changed.** `lxappearance` was in TIER 2, so every ISO shipped it, including Plasma, GNOME, Cinnamon, MATE, Budgie and XFCE, which all have their own appearance settings. It now ships only with the tiling WM editions that use it. This is the first step of the TIER 2 audit: packages only some editions need move out of the core and into the edition blocks.

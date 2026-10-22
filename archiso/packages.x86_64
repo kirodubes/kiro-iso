@@ -277,6 +277,14 @@ sddm-git
 #vicious
 #volctl
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK awesome <<<
 ### >>> EDITION-BLOCK bspwm >>>
 #alacritty
@@ -302,6 +310,14 @@ sddm-git
 #ttf-hack
 #volctl
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK bspwm <<<
 ### >>> EDITION-BLOCK budgie >>>
 ## group: budgie
@@ -339,6 +355,14 @@ sddm-git
 #xfce4-settings
 #xfce4-taskmanager
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK chadwm <<<
 ### >>> EDITION-BLOCK cinnamon >>>
 #cinnamon
@@ -374,6 +398,14 @@ sddm-git
 #xfce4-settings
 #xfce4-taskmanager
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK dusk <<<
 ### >>> EDITION-BLOCK gnome >>>
 #gnome-tweaks
@@ -466,6 +498,14 @@ sddm-git
 #xfce4-settings
 #xfce4-taskmanager
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK hlwm <<<
 ### >>> EDITION-BLOCK i3 >>>
 #alacritty
@@ -490,6 +530,14 @@ sddm-git
 #ttf-hack
 #volctl
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK i3 <<<
 ### >>> EDITION-BLOCK leftwm >>>
 #alacritty
@@ -522,6 +570,14 @@ sddm-git
 #xfce4-screenshooter
 #xfce4-taskmanager
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK leftwm <<<
 ### >>> EDITION-BLOCK mate >>>
 #kiro-mate
@@ -584,6 +640,14 @@ sddm-git
 #xautolock
 #xclip
 #xorg-xsetroot
+#kiro-xfce
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK ohmychadwm <<<
 ### >>> EDITION-BLOCK plasma >>>
 #kde-system-meta
@@ -682,6 +746,14 @@ sddm-git
 #ttf-hack
 #volctl
 #xfce4-terminal
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ### <<< EDITION-BLOCK qtile <<<
 ### >>> EDITION-BLOCK xfce >>>
 ## group: xfce4
@@ -689,7 +761,6 @@ sddm-git
 #garcon
 #thunar
 #thunar-volman
-#tumbler
 #xfce4-appfinder
 #xfce4-panel
 #xfce4-power-manager
@@ -699,6 +770,15 @@ sddm-git
 #xfconf
 #xfdesktop
 #xfwm4
+#kiro-xfce
+#dracula-colors-xfce4-terminal
+## thumbnails for Thunar — keep together
+#tumbler
+#ffmpegthumbnailer
+#libgepub
+#libgsf
+#libopenraw
+#poppler-glib
 ## group: xfce4-goodies
 #xfce4-pulseaudio-plugin
 #xfce4-whiskermenu-plugin
@@ -795,14 +875,8 @@ udisks2
 xdg-user-dirs
 
 ###  THUMBNAILS — tumbler + thumbnailers
-ffmpegthumbnailer
 freetype2
-libgepub
-libgsf
-libopenraw
-poppler-glib
 poppler-qt5
-tumbler
 
 ###  DESKTOP INTEGRATION — polkit / portals / keyring
 gnome-keyring
@@ -839,7 +913,6 @@ yay-git
 
 ###  SHELL / TERMINAL ENV
 bash-completion
-dracula-colors-xfce4-terminal
 fastfetch-git
 fish
 lolcat
@@ -879,7 +952,6 @@ kiro-shells
 kiro-starship
 kiro-system-files
 kiro-variety-config
-kiro-xfce
 kiro-zsh-config
 sparklines-git
 

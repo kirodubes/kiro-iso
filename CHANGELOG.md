@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### XFCE packages and the Thunar thumbnailers leave the core
+
+**What Changed.** A KIB Cinnamon build shipped `xfce4-terminal`, `libxfce4ui`, `libxfce4util`, `xfconf`, `tumbler` and the XFCE configuration, none of which Cinnamon uses. They came from TIER 2: `kiro-xfce`, `dracula-colors-xfce4-terminal` and `tumbler`. Those three and tumbler's helpers (`ffmpegthumbnailer`, `libgepub`, `libgsf`, `libopenraw`, `poppler-glib`) now ship only with the editions that use Thunar or xfce4-terminal: xfce, ohmychadwm and the 8 tiling WMs. Desktop editions (Plasma, GNOME, Cinnamon, MATE, Budgie) no longer get them.
+
+**Technical Details.** The six thumbnail packages go into each of those 10 blocks as one unit under a `## thumbnails for Thunar — keep together` comment; `##` lines survive the build's uncomment step and KIB's block parser ignores them. The xfce block gets the unit in its fixed `xfce4` group (its old lone `#tumbler` line is replaced) plus `#kiro-xfce`, which it never listed before; it only got its own configuration through the core. The 8 tiling WM blocks get `#dracula-colors-xfce4-terminal` and the unit (`#kiro-xfce` was already there). ohmychadwm gets `#kiro-xfce` and the unit, not the Dracula colours, since it uses alacritty. `freetype2` and `poppler-qt5` stay in the TIER 2 thumbnails section. Checked with KIB's `_shipped_names()` per edition. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### Leaner default media and system tools: vlc plugins split, appstream dropped
 
 **What Changed.** A KIB Cinnamon build summary showed 156 packages pulled in beyond the core, and 114 of them came from two TIER 3 lines. `vlc-plugins-all` (102 packages: DVB, firewire, JACK, Chromecast, UPnP, LIRC, projectM visualisations and more) is replaced by `vlc-plugins-base`, `vlc-plugins-extra` and `vlc-plugins-video-output`, which cover normal audio and video playback. `appstream` (12 packages: libvips, hdf5, cfitsio...) is dropped: it is an app-store library and does nothing on its own.

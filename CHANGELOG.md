@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### TIER 2 thumbnails header corrected
+
+**What Changed.** The `THUMBNAILS — tumbler + thumbnailers` header no longer matched its section: tumbler and its thumbnailers moved to the Thunar editions this morning, and poppler-qt5 was dropped, so only `freetype2` is left. The header now says so. Comment only; nothing ships differently.
+
+**Technical Details.** One comment line. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### poppler-qt5 and mtpfs dropped
 
 **What Changed.** Two packages shipped on the ISO that nothing used. `poppler-qt5` is the Qt 5 PDF library: no package depends on it and no config calls it; Plasma's PDF previews (okular, kdegraphics-thumbnailers) use `poppler-qt6`, so nothing looks different. `mtpfs` is a FUSE tool for mounting phones by hand: nothing depends on it either, and file managers mount phones through `gvfs-mtp`, which stays.

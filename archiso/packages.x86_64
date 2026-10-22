@@ -896,7 +896,7 @@ libmtp
 udisks2
 xdg-user-dirs
 
-###  THUMBNAILS — tumbler + thumbnailers
+###  THUMBNAILS — font previews (tumbler + its thumbnailers ship with the Thunar editions)
 freetype2
 
 ###  DESKTOP INTEGRATION — polkit / portals / keyring

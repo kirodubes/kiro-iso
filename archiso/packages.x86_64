@@ -883,7 +883,6 @@ gvfs-nfs
 gvfs-smb
 libmtp
 mtpfs
-udiskie
 udisks2
 xdg-user-dirs
 

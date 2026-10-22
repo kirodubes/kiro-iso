@@ -106,7 +106,7 @@ kiro-iso/
 
 #### File Management
 - **Virtual Filesystems**: `gvfs` with SMB, NFS, MTP, AFC support
-- **Disk Management**: `udisks2`, `udiskie` (automounting)
+- **Disk Management**: `udisks2`
 - **Archive Tools**: `p7zip`, `unrar`, `unace`, `file-roller`
 
 ### 4. **Customization & Configuration**

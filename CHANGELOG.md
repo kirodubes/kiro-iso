@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### udiskie dropped
+
+**What Changed.** `udiskie` shipped on the ISO but never ran. It is an automount daemon that only works when something starts it, and nothing does: it has no autostart file or systemd unit, no edition config launches it, and no package requires it. gvfs with thunar-volman, or the desktop's own file manager, already does the mounting. Installed systems keep it; anyone who wants it can install it with pacman.
+
+**Technical Details.** Removed the `udiskie` line between `mtpfs` and `udisks2`; `udisks2` stays. The OVERVIEW's Disk Management line now lists only `udisks2`. Part of the TIER 2 core audit. Same change in kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`, `docs/OVERVIEW.md`
+
 ### kiro-powermenu moves to the X11 tiling WMs
 
 **What Changed.** `kiro-powermenu` was in TIER 2, so Plasma, GNOME, Cinnamon, MATE, Budgie and XFCE ISOs shipped a tiling WM power menu they never call. It now ships only with the 9 X11 tiling WMs, whose keybindings run it.

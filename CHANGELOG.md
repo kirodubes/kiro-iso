@@ -4,6 +4,14 @@
 
 ## 2026.10.22
 
+### poppler-qt5 and mtpfs dropped
+
+**What Changed.** Two packages shipped on the ISO that nothing used. `poppler-qt5` is the Qt 5 PDF library: no package depends on it and no config calls it; Plasma's PDF previews (okular, kdegraphics-thumbnailers) use `poppler-qt6`, so nothing looks different. `mtpfs` is a FUSE tool for mounting phones by hand: nothing depends on it either, and file managers mount phones through `gvfs-mtp`, which stays.
+
+**Technical Details.** Removed both lines. Checked against the nemesis_repo depends, `pacman -Qi` (no Required By / Optional For) and every Kiro config and ATT. Part of the TIER 2 core audit; xclip, pavucontrol, kiro-keybindings and sparklines-git were checked in the same pass and stay. Same change in kiro-iso-next and the 7 KIROTUX ISOs.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ### pamixer and the bar icon fonts leave the core
 
 **What Changed.** `pamixer`, `ttf-font-awesome` and `ttf-material-design-iconic-font` were in TIER 2, so Plasma, GNOME, Cinnamon, MATE and Budgie ISOs shipped a volume CLI and two bar icon fonts they never use. They now ship only with the editions whose configs call them.

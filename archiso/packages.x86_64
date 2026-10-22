@@ -893,13 +893,11 @@ gvfs-mtp
 gvfs-nfs
 gvfs-smb
 libmtp
-mtpfs
 udisks2
 xdg-user-dirs
 
 ###  THUMBNAILS — tumbler + thumbnailers
 freetype2
-poppler-qt5
 
 ###  DESKTOP INTEGRATION — polkit / portals / keyring
 gnome-keyring

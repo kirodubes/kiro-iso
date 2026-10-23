@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.23
+
+### python-pywal replaced by python-pywal16
+
+**What Changed.** The ISO now ships `python-pywal16` instead of `python-pywal`. The X11 editions (ohmychadwm, chadwm, i3, leftwm, bspwm, awesome) recolour from the wallpaper with `wal -i` on their Variety keys. pywal 3.3 was archived upstream in 2024 and exits with an error on flat wallpapers with few colours, so about 1 in 25 wallpapers did not recolour. The pywal16 fork handles them, and `wal` keeps the same command line.
+
+**Technical Details.** One TIER 3 line in `archiso/packages.x86_64`. `python-pywal16` is built in nemesis_repo from KIRO-PKG-BUILD-3PARTY and provides/conflicts `python-pywal`, so installed systems swap over on the next update. The X11 editions have no pywal depends and rely on this line, so it stays on the ISO. The KIROTUX Wayland ISOs dropped pywal the same day: their pywal editions depend on pywal16 themselves. ATT's generated streamline list follows. Same change in kiro-iso and kiro-iso-next.
+
+**Files Modified.** `archiso/packages.x86_64`
+
 ## 2026.10.22
 
 ### OVERVIEW aligned between kiro-iso and kiro-iso-next

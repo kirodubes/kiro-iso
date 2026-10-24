@@ -4,7 +4,7 @@
 
 ## 2026.10.24
 
-### v26.10.24 release candidate built and tested
+### v26.10.24 test build built and tested
 
 **What Changed.** v26.10.24 is the first ISO since v26.10.18 and the first to carry the 2026-10-22 TIER 2 slimming: XFCE, Thunar thumbnailers, rofi, kiro-powermenu, lxappearance, pamixer and the bar icon fonts left the shared core for the editions that use them, and udiskie, poppler-qt5, mtpfs and standalone appstream were dropped because nothing used them. It also ships `python-pywal16` in place of `python-pywal` (2026-10-23) and offers the 470xx NVIDIA driver choice for Kepler cards (2026-10-18). A leaner core means a smaller default install and fewer packages that do nothing on the XFCE + ohmychadwm ISO.
 

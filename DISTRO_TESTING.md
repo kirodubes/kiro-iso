@@ -6,7 +6,7 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
-## 2026-10-24 (build 12:19) — v26.10.24, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **release candidate**, **kiro-audit 132 / 0 / 0**
+## 2026-10-24 (build 12:19) — v26.10.24, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **test build**, **kiro-audit 132 / 0 / 0**
 
 First full install test since the v26.10.18 edition split. It covers the TIER 2 slimming of 2026-10-22, the
 `python-pywal16` swap and the 470xx driver option (build default stays `open`). `ISO_BUILD` 12:11:08, image

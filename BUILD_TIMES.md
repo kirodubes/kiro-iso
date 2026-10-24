@@ -135,7 +135,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
-| 2026-10-24 12:28 | v26.10.24 | vm | 4m29s | 2 | Production v26.10.24 script build, VB VM live session. UEFI, systemd-boot, erase disk, btrfs (@ subvolumes) + swap partition, zram. 43 jobs, completion succeeded. Timed from live session.log (installed-side not yet booted) |
+| 2026-10-24 12:28 | v26.10.24 | vm | 4m29s | 2 | Production v26.10.24 script build, VB VM live session. UEFI, systemd-boot, erase disk, btrfs (@ subvolumes) + swap partition, zram. 43 jobs, completion succeeded. Timed from live session.log. kiro-audit 132 PASS / 0 WARN / 0 FAIL |
 | 2026-10-18 12:31 | v26.10.18 | vm | 2m36s | 2 | VB VM, production KIB build (i3 + xfce, lean selection), default ext4, UEFI |
 | 2026-10-18 11:25 | v26.10.18 | vm | 4m0s | 2 | Production v26.10.18 script build (xfce+ohmychadwm, default xfce): first ISO with the edition split + SDDM preselect promoted from -next. UEFI, systemd-boot, erase disk, ext4, zram swap, kernel linux primary. kiro-audit 131 PASS / 0 FAIL |
 | 2026-10-18 10:57 | v26.10.18 | vm | 2m45s | 2 | -next v26.10.18 KIB-nemesis lean test (xfce+qtile, default xfce, apps deselected). UEFI, systemd-boot, erase disk, ext4, zram swap, driver=free, kernel linux primary. kiro-audit 122 PASS / 3 FAIL (bluetooth, ananicy-cpp: deselected, expected) |

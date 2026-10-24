@@ -6,6 +6,25 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-10-24 (build 12:19) — v26.10.24, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **release candidate**, **kiro-audit 132 / 0 / 0**
+
+First full install test since the v26.10.18 edition split. It covers the TIER 2 slimming of 2026-10-22, the
+`python-pywal16` swap and the 470xx driver option (build default stays `open`). `ISO_BUILD` 12:11:08, image
+written 12:19 (8m52s), `kiro-calamares-config` 26.10-11, `kiro-system-files` 26.10-12.
+
+| Target (VirtualBox) | FS / encryption | Bootloader | Result |
+|---------------------|-----------------|------------|--------|
+| Kiro default (XFCE) | btrfs (`@` subvolumes) + swap partition, unencrypted | UEFI / systemd-boot | Clean install in 4m29s (43 jobs); **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units, boot ~16 s |
+
+- 1517 packages on the ISO, 1462 after install; `linux` 7.2.11 booted, `linux-lts` 6.18.58 alongside;
+  `intel-ucode 20260925-1` / `amd-ucode 20260916-1`.
+- `/kiro-check`: source-to-VM integrity CLEAN (no live-session survivors, sysctl, udev, `/usr/local/bin` and
+  `system.conf.d` / `sysctl.d` all match source).
+- `journalctl -b -p err`: only VirtualBox noise (vboxvideo, TDX) and the known `gkr-pam` line. The live session
+  showed the known harmless `systemd-loop@…sr0` failure.
+
+---
+
 ## 2026-10-03 (build 06:23) — v26.10.03, **`linux` + `linux-lts`**, bare metal **UEFI**, **live session only**: modern NVIDIA (RTX 3070) on boot entries 1 and 2
 
 First real **Ampere** NVIDIA test. metal-D is a Ryzen 7 3700X / B550 desktop with a **GeForce RTX 3070 (GA104)** driving

@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.24
+
+### v26.10.24 release candidate built and tested
+
+**What Changed.** v26.10.24 is the first ISO since v26.10.18 and the first to carry the 2026-10-22 TIER 2 slimming: XFCE, Thunar thumbnailers, rofi, kiro-powermenu, lxappearance, pamixer and the bar icon fonts left the shared core for the editions that use them, and udiskie, poppler-qt5, mtpfs and standalone appstream were dropped because nothing used them. It also ships `python-pywal16` in place of `python-pywal` (2026-10-23) and offers the 470xx NVIDIA driver choice for Kepler cards (2026-10-18). A leaner core means a smaller default install and fewer packages that do nothing on the XFCE + ohmychadwm ISO.
+
+**Technical Details.** Built 12:19 with `linux` 7.2.11 + `linux-lts` 6.18.58 (8m52s, 6.4G). Installed in VirtualBox (UEFI, systemd-boot, btrfs) in 4m29s; `kiro-audit` 132 PASS / 0 WARN / 0 FAIL and `/kiro-check` clean. Build and install times are in `BUILD_TIMES.md`, the test in `DISTRO_TESTING.md`.
+
+**Files Modified.** `archiso/airootfs/etc/dev-rel`, `archiso/profiledef.sh`, `build-scripts/build-the-iso.sh` (version bump), `BUILD_TIMES.md`, `DISTRO_TESTING.md`
+
 ## 2026.10.23
 
 ### python-pywal replaced by python-pywal16

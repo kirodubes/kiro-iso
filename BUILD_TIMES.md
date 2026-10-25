@@ -10,6 +10,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-10-25 06:12 | v26.10.25 | linux linux-lts | zstd L3 -b 1M | 8m33s | 6.4G | |
 | 2026-10-24 12:19 | v26.10.24 | linux linux-lts | zstd L3 -b 1M | 8m52s | 6.4G | |
 | 2026-10-18 11:19 | v26.10.18 | linux linux-lts | zstd L3 -b 1M | 8m21s | 6.4G | |
 | 2026-10-09 13:46 | v26.10.09 | linux linux-lts | zstd L3 -b 1M | 8m21s | 6.4G | |
@@ -135,6 +136,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-10-25 06:26 | v26.10.25 | metal-B | 4m06s | 2 | Production v26.10.25 script build, release dry run on real metal (i7-7700K, HD 630, SATA SSD). UEFI, systemd-boot, erase disk, ext4 + swapfile, zram. 42 jobs, all exit 0. Timed from Calamares.log. kiro-audit 131 PASS / 0 WARN / 0 FAIL |
 | 2026-10-24 12:28 | v26.10.24 | vm | 4m29s | 2 | Production v26.10.24 script build, VB VM live session. UEFI, systemd-boot, erase disk, btrfs (@ subvolumes) + swap partition, zram. 43 jobs, completion succeeded. Timed from live session.log. kiro-audit 132 PASS / 0 WARN / 0 FAIL |
 | 2026-10-18 12:31 | v26.10.18 | vm | 2m36s | 2 | VB VM, production KIB build (i3 + xfce, lean selection), default ext4, UEFI |
 | 2026-10-18 11:25 | v26.10.18 | vm | 4m0s | 2 | Production v26.10.18 script build (xfce+ohmychadwm, default xfce): first ISO with the edition split + SDDM preselect promoted from -next. UEFI, systemd-boot, erase disk, ext4, zram swap, kernel linux primary. kiro-audit 131 PASS / 0 FAIL |

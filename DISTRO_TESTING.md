@@ -6,6 +6,28 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-10-25 (build 06:12) — v26.10.25, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B): **release dry run**, **kiro-audit 131 / 0 / 0**
+
+Real-metal install of the v26.10.25 rebuild, used as a release dry run. Nothing that ships changed since v26.10.24:
+the only commit since that test is its version bump. So this repeats the 2026-10-24 VM pass on real Intel hardware.
+`ISO_BUILD` 06:03:49, image written 06:12 (8m33s), `kiro-system-files` 26.10-12, `kiro-calamares-config` 26.10-11.
+metal-B is an i7-7700K with Intel HD 630 and 16 GB RAM, installed to a 250 GB SATA SSD.
+
+| Target (metal-B) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11) | erase disk, ext4 + 8 GB swapfile, zram, unencrypted | UEFI / systemd-boot 262.1 | Clean install in 4m06s (42 jobs, every job exit 0); **kiro-audit 131 PASS / 0 WARN / 0 FAIL**, zero failed units (system + user), boot 21.8 s (2.7 s userspace) |
+
+- 1462 packages installed; `linux` 7.2.11 booted, `linux-lts` 6.18.58 alongside, both with boot entries;
+  `intel-ucode 20260925-1`. `calamares` and `kiro-calamares-config` removed; "Remove installation files: SUCCESS".
+- 131 rather than 132 checks: ext4 skips the btrfs/snapper check, the same as the 2026-09-12 metal-B run.
+- `journalctl -b -p err`: only hardware noise (SGX off in BIOS, TDX, a USB descriptor `-71`) and the known `gkr-pam`
+  line.
+- Box state, not an ISO issue: the firmware still held a `LoaderEntryDefault` EFI variable from an old install
+  (`…-6.6.7-arch1-1.conf`). The entry no longer exists, so systemd-boot fell back to the `loader.conf` default
+  and booted 7.2.11. `bootctl set-default ""` clears it.
+
+---
+
 ## 2026-10-24 (build 12:19) — v26.10.24, **`linux` + `linux-lts`**, VirtualBox **UEFI / systemd-boot**: **test build**, **kiro-audit 132 / 0 / 0**
 
 First full install test since the v26.10.18 edition split. It covers the TIER 2 slimming of 2026-10-22, the

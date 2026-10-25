@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.25
+
+### v26.10.25 rebuild tested on real metal (release dry run)
+
+**What Changed.** v26.10.25 is a rebuild of v26.10.24 with no source change: the only commit in between is the version bump. It was installed on real Intel hardware (metal-B) as a release dry run, to confirm on bare metal what the 2026-10-24 VirtualBox test showed. It passed: clean install, `kiro-audit` 131 PASS / 0 WARN / 0 FAIL, and no failed units.
+
+**Technical Details.** Built 06:12 with `linux` 7.2.11 + `linux-lts` 6.18.58 (8m33s, 6.4G). Installed on UEFI / systemd-boot, erase disk, ext4 + swapfile, in 4m06s (42 jobs). One check fewer than the VM run because ext4 has no btrfs/snapper check. The test is logged in `DISTRO_TESTING.md`, the build and install times in `BUILD_TIMES.md`.
+
+**Files Modified.** `archiso/airootfs/etc/dev-rel`, `archiso/profiledef.sh`, `build-scripts/build-the-iso.sh` (version bump), `BUILD_TIMES.md`, `DISTRO_TESTING.md`
+
 ## 2026.10.24
 
 ### v26.10.24 test build built and tested

@@ -6,6 +6,30 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **BIOS / GRUB** (metal-C, legacy NVIDIA Optimus laptop, entry 1 `driver=free`): **release candidate**, **kiro-audit 131 / 2 / 0**
+
+The same November build on the oldest box: a 2011 Sandy Bridge Optimus laptop booting **legacy BIOS**, the only
+GRUB install of this round. metal-C is an i5-2430M with 8 GB RAM, **Intel HD 3000** (`i915`, drives the 1600x900
+panel) + **NVIDIA GeForce GT 620M** (GF108M, Fermi), installed to a 256 GB SATA SSD over Wi-Fi.
+
+| Target (metal-C) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), entry 1 `driver=free` | erase disk (MBR), ext4, no swap (zram only), unencrypted | BIOS / GRUB 2.16 on `/dev/sda` | Clean install in ~5m50s (41 jobs, none failed); **kiro-audit 131 PASS / 2 WARN / 0 FAIL**, zero failed units (system + user), boot 9.1 s (3.8 s userspace) |
+
+- `kiro_remove_nvidia` removed `libva-nvidia-driver`, `nvidia-open-dkms`, `nvidia-settings` and `nvidia-utils`;
+  chwd skipped as designed on `driver=free`; no nouveau udev rule survived. 1466 packages installed, `linux` 7.2.11
+  booted with `linux-lts` 6.18.58 alongside, `kiro-bootloader-grub` and `kiro-grub-theme` present.
+- GT 620M on **nouveau**, HD 3000 on `i915`. `glxinfo -B` → Mesa Intel HD Graphics 3000 (direct rendering);
+  `DRI_PRIME=1` → nouveau `NVC1`. No Vulkan device, which is right: neither Sandy Bridge nor Fermi has a Vulkan
+  driver. Kernel taint 0.
+- **The 2 WARNs are the same kiro-audit false positive as on the MSI**: it expects `nvidia-open-dkms` and
+  `nvidia-utils` on any NVIDIA GPU, even after a `driver=free` install.
+- `journalctl -b -p err`: `nouveau: failed to create ce channel, -22` (a known Fermi copy-engine message; nouveau
+  falls back and the GPU works), NetworkManager can't reach auditd (the GRUB command line carries `audit=0`), the
+  Wi-Fi `wpa_supplicant` multicast lines and the known `gkr-pam` line.
+
+---
+
 ## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, NVIDIA Optimus laptop, entry 1 `driver=free`): **release candidate**, **kiro-audit 130 / 2 / 0**
 
 The same November build on a Pascal Optimus laptop, installed from the **default boot entry** (`driver=free`). This

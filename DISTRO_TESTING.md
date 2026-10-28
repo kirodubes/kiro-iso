@@ -2,17 +2,17 @@
 
 Results of boot and install testing for kiro-iso builds. Newest first.
 
-> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `metal-E` (hybrid laptop, UEFI, Intel HD 620 + AMD Radeon R5 M330), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `Yoga` (Lenovo Yoga hybrid laptop, UEFI, Intel HD 620 + AMD Radeon R5 M330), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
 
 ---
 
-## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-E, Intel + AMD hybrid laptop): **release candidate**, **kiro-audit 132 / 0 / 0**
+## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (Yoga, Intel + AMD hybrid laptop): **release candidate**, **kiro-audit 132 / 0 / 0**
 
-The same November build on Kiro's only test machine with an AMD GPU. metal-E is an i5-7200U laptop with 8 GB RAM,
+The same November build on Kiro's only test machine with an AMD GPU. The Yoga is an i5-7200U laptop with 8 GB RAM,
 hybrid **Intel HD 620** (`i915`, drives the panel) + **AMD Radeon R5 M330** (Hainan, Southern Islands, on
 `amdgpu`), installed to a 256 GB SATA SSD over Wi-Fi.
 
-| Target (metal-E) | FS / encryption | Bootloader | Result |
+| Target (Yoga) | FS / encryption | Bootloader | Result |
 |------------------|-----------------|------------|--------|
 | Kiro default (XFCE, X11) | erase disk, ext4, no swap (zram only), unencrypted | UEFI / systemd-boot 262.1 | Clean install in ~7m30s (42 jobs, none failed); **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units (system + user), boot 20.0 s (3.9 s userspace) |
 

@@ -4,6 +4,12 @@
 
 ## 2026.10.28
 
+### v26.11.01 is released
+
+**What Changed.** The v26.11.01 ISO is on SourceForge (`files/latest/download` now serves it) and the website points at it. **RELEASES.md** marks it as the current release: the intro line names **v26.11.01** as current, its heading loses "upcoming — not yet released", and v26.10.01 loses its "(current)" tag, so the release notes match what users can download.
+
+**Files Modified.** `RELEASES.md`, `CHANGELOG.md`
+
 ### v26.11.01 release build tested on real metal
 
 **What Changed.** v26.11.01 is the build for the 1 November release. It carries everything collected since v26.10.01, listed for users in `RELEASES.md`: the TIER 2 slimming, `python-pywal16`, the 470xx NVIDIA option, the NVIDIA free-entry fix and the theming work. No shipped source changed since the v26.10.25 dry run; the only commits are the version bumps. It was installed on two real machines and passed on both. On Intel (metal-B), this time on **xfs**: clean install, `kiro-audit` 131 PASS / 0 WARN / 0 FAIL, no failed units. On an **RTX 2060** (metal-A), from the NVIDIA boot entry onto btrfs: `kiro-audit` 132 / 0 / 0, with the open NVIDIA driver driving both monitors, OpenGL, Vulkan and VA-API video decode on the GPU. That is the first installed test of the open driver on a modern NVIDIA card; the earlier RTX 3070 box can only run the live ISO. On an **Intel + AMD hybrid laptop** (Yoga): `kiro-audit` 132 / 0 / 0, both Vulkan drivers kept and working, and kernel taint 0, which confirms on real AMD hardware that OverDrive is now opt-in. On an **NVIDIA Optimus laptop** (MSI, GTX 1050 Ti) from the default free entry: `kiro_remove_nvidia` removed the whole NVIDIA stack including `libva-nvidia-driver`, the card runs on nouveau with Vulkan on NVK, and `kiro-audit` shows 130 / 2 / 0; the two warnings are the audit not knowing the free entry was chosen. On a 2011 **legacy-BIOS / GRUB** Optimus laptop (Medion, GT 620M Fermi), also from the free entry: the same clean NVIDIA removal, nouveau on the dGPU, `kiro-audit` 131 / 2 / 0 with the same two false warnings. Together they give the November ISO a bare-metal GO.

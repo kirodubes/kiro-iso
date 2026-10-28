@@ -2,7 +2,35 @@
 
 Results of boot and install testing for kiro-iso builds. Newest first.
 
-> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `Yoga` (Lenovo Yoga hybrid laptop, UEFI, Intel HD 620 + AMD Radeon R5 M330), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `Yoga` (Lenovo Yoga hybrid laptop, UEFI, Intel HD 620 + AMD Radeon R5 M330), `MSI` (MSI GP73 Optimus laptop, UEFI, Intel UHD 630 + NVIDIA GTX 1050 Ti Mobile), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+
+---
+
+## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, NVIDIA Optimus laptop, entry 1 `driver=free`): **release candidate**, **kiro-audit 130 / 2 / 0**
+
+The same November build on a Pascal Optimus laptop, installed from the **default boot entry** (`driver=free`). This
+is the first installed test of line 1 on NVIDIA hardware since the free-entry/VA-API port of 2026-10-03. The MSI is
+an i7-8750H with 16 GB RAM, **Intel UHD 630** (`i915`, drives the panel) + **NVIDIA GTX 1050 Ti Mobile** (GP107),
+installed to a SATA SSD over Wi-Fi.
+
+| Target (MSI) | FS / encryption | Bootloader | Result |
+|--------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), entry 1 `driver=free` | erase disk, ext4, no swap (zram only), unencrypted | UEFI / systemd-boot 262.1 | Clean install in ~5m35s (42 jobs, none failed); **kiro-audit 130 PASS / 2 WARN / 0 FAIL**, zero failed units (system + user), boot 26.7 s (3.2 s userspace) |
+
+- `kiro_remove_nvidia` removed `libva-nvidia-driver`, `nvidia-open-dkms`, `nvidia-settings` and `nvidia-utils` in one
+  transaction, and no `99-kiro-free-nouveau.rules` survived the install. 1462 packages installed.
+- GTX 1050 Ti on **nouveau**, UHD 630 on `i915`, no `nvidia` module. `glxinfo -B` → Mesa Intel UHD 630 (direct
+  rendering); `DRI_PRIME=1` → nouveau `NV137`. Vulkan lists the UHD 630 (Mesa Intel) and the GTX 1050 Ti on **NVK**.
+  `vulkan-intel` kept and `vulkan-radeon` removed, as they should be. Kernel taint 0.
+- **The 2 WARNs are a kiro-audit false positive:** "NVIDIA GPU present but nvidia-open-dkms not installed" and
+  "nvidia-utils not installed". On a `driver=free` install that is the intended result; the audit doesn't know which
+  entry was chosen.
+- `/etc/modprobe.d/nvidia.conf` (from `kiro-system-files`) stays, with `options nvidia …` lines only. Harmless: the
+  `nvidia` module isn't installed.
+- `journalctl -b -p err`: the Intel Wireless-AC 9560 firmware (`9000-pu-b0-jf-b0-46`) crashed and restarted 7 times
+  ("Microcode SW error … Device error - SW reset"), then stayed up: `wlan0` kept its address and carried the
+  install and the SSH test session. It is hardware/firmware, not Kiro's: the 2026-10-04 live test on this laptop saw
+  the same card fail its first firmware load.
 
 ---
 

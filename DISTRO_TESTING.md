@@ -6,6 +6,30 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **release candidate, NVIDIA entry**, **kiro-audit 132 / 0 / 0**
+
+The same November build, installed from the **NVIDIA (`driver=nonfree`) boot entry** on a Turing card. This is the
+first install of the open NVIDIA driver on a modern NVIDIA GPU: metal-D (RTX 3070, 2026-10-03) could only run the
+live ISO. metal-A is an i7-7700K (Intel iGPU not in use) with a **GeForce RTX 2060 (TU106)** driving two 1080p
+monitors (HDMI + DVI-D).
+
+| Target (metal-A) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), entry 2 `driver=nonfree` | erase disk, btrfs (`@` subvolumes) + swap partition, unencrypted | UEFI / systemd-boot | Clean install in ~4m (43 jobs, none failed); **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units (system + user), boot 33.5 s (5.4 s userspace) |
+
+- `nvidia-open-dkms` 615.78.08: DKMS modules built for `7.2.11-arch1-1` and `6.18.58-1-lts`; `nvidia-drm` modeset=Y
+  and fbdev=Y; nouveau not loaded. chwd skipped as designed (it only runs on `nonfreechwd`), and no
+  `99-kiro-free-nouveau.rules` survived the install. 1469 packages installed.
+- Xorg on `nvidia_drv`, both monitors at 1920x1080 side by side; OpenGL `NVIDIA GeForce RTX 2060` with direct
+  rendering; Vulkan on the NVIDIA driver; `vainfo` on the NVDEC backend of `libva-nvidia-driver` (H.264 and HEVC
+  decode). This closes the installed half of the 2026-10-03 modern-NVIDIA gap for the `nonfree` entry.
+- `journalctl -b -p err`: one kernel `WARNING` at `drm_sysfs_connector_property_event` from `nvidia-modeset`
+  (`nv_drm_connector_update_topology_property`), once at boot. It is a driver-side warning in NVIDIA 615 on kernel
+  7.2; the display is unaffected. Also the RTX 2060's USB-C controller (`ucsi_ccg` i2c timeout, no USB-C device) and
+  the known `gkr-pam` line. None are Kiro issues.
+
+---
+
 ## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B): **release candidate for 1 November**, **kiro-audit 131 / 0 / 0**
 
 The November release build, installed on real Intel hardware. No shipped source changed since the v26.10.25 test:

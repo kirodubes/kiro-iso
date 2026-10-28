@@ -4,7 +4,7 @@ Tracks wall-clock for ISO builds (auto-appended by [`build-scripts/build-the-iso
 
 Useful for spotting cost regressions when changing squashfs compression, kernel set, package list, or Calamares modules.
 
-> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `Medion` (bare metal, BIOS / grub, legacy NVIDIA), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
 
 ## ISO Builds
 
@@ -147,18 +147,18 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 | 2026-09-29 09:03 | v26.10.01 | vm | 4m43s | 2 | kvm-vm (VirtualBox) — UEFI/systemd-boot, erase disk, JFS root unencrypted + zram swap, driver=free; live-booted linux-lts → primary-kernel linux-lts (sort-key kiro-0, default entry), linux + linux-lts installed |
 | 2026-09-19 07:15 | v26.09.19 | vm | 3m28s | 2 | kvm-vm (VirtualBox) — test build, UEFI/GRUB (grub-install x86_64-efi, bootloader-id kiro; BootCurrent = kiro on the ESP), no systemd-boot loader entries; grub.cfg lists linux + linux-lts, ext4 unencrypted |
 | 2026-09-13 07:51 | v26.09.13 | vm | 3m55s | 2 | kvm-vm (VirtualBox) — BIOS/GRUB, ext4 unencrypted, linux-lts + linux-cachyos; kiro-audit 133/0/0 |
-| 2026-06-09 21:52 | v26.06.09 | metal-C | 5m58s | 2 | metal-C — real metal BIOS/grub; new kiro_bootloader GRUB branch ran (grub-install i386-pc -> /dev/sda, SUCCESS); Fermi on nouveau |
+| 2026-06-09 21:52 | v26.06.09 | Medion | 5m58s | 2 | Medion — real metal BIOS/grub; new kiro_bootloader GRUB branch ran (grub-install i386-pc -> /dev/sda, SUCCESS); Fermi on nouveau |
 | 2026-06-09 21:48 | v26.06.09 | metal-A | 3m21s | 2 | metal-A — real metal UEFI/systemd-boot; new Calamares modules ran; kiro-audit 135/0/0 |
 | 2026-06-09 21:48 | v26.06.09 | metal-B | 4m21s | 2 | metal-B — real metal UEFI/systemd-boot; new Calamares modules ran; kiro-audit 139/0/0 |
 | 2026-06-08 16:44 | v26.06.08 | metal-B | 3m19s | 2 | metal-B — real metal (UEFI/systemd-boot); grub + kiro-bootloader-grub + spice all stripped, kiro-audit 135/0/0 |
 | 2026-06-08 16:31 | v26.06.08 | metal-A | 3m20s | 2 | metal-A — real metal (UEFI/systemd-boot); grub + kiro-bootloader-grub + spice all stripped, kiro-audit 135/0/0 |
-| 2026-06-08 16:16 | v26.06.08 | metal-C | 5m54s | 2 | metal-C — real metal (BIOS/grub); kiro-audit GRUB boot-safety PASS |
+| 2026-06-08 16:16 | v26.06.08 | Medion | 5m54s | 2 | Medion — real metal (BIOS/grub); kiro-audit GRUB boot-safety PASS |
 | 2026-06-08 15:34 | v26.06.08 | kvm-vm | 2m27s | 2 | KVM (BIOS/grub) |
 | 2026-06-07 21:00 | v26.06.07 | metal-B | 3m16s | 2 | line 2 nonfree (nvidia kept), Intel HD630, v26.06.07 19:40/cfg26.06-08 release ISO |
 | 2026-06-07 20:47 | v26.06.07 | metal-A | 3m30s | 2 | line 1 free, Intel HD630, v26.06.07 19:40/cfg26.06-08 release ISO |
 | 2026-06-01 07:45 | v26.06.01 | metal-A | 3m47s | 2 | bare-metal install |
 | 2026-06-01 07:27 | v26.06.01 | metal-B | 6m1s | 2 | metal-B reinstall test |
-| 2026-06-01 07:23 | v26.06.01 | metal-C | 5m53s | 2 | MEDION P7624, BIOS, nouveau |
+| 2026-06-01 07:23 | v26.06.01 | Medion | 5m53s | 2 | MEDION P7624, BIOS, nouveau |
 | 2026-05-28 19:27 | v26.05.28 | metal-A (bare metal) | 3m11s | 2 | fresh install — kiro-audit 130/0/0 |
 | 2026-05-28 15:57 | v26.05.28 | metal-B (bare metal) | 3m12s | 2 | post-ppd-pin fix |
 | 2026-05-28 10:55 | v26.05.28 | metal-B (bare metal) | 123m28s* | 2 | second physical machine; *duration includes wizard-UI time (mkinitcpio pass count is the relevant install-execution metric — 2 passes, identical to post-fix VM) |

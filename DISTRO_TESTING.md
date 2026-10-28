@@ -6,6 +6,29 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B): **release candidate for 1 November**, **kiro-audit 131 / 0 / 0**
+
+The November release build, installed on real Intel hardware. No shipped source changed since the v26.10.25 test:
+the only differences are the version bump files. This run also covers **xfs**, which the earlier metal-B and VM runs
+did not. `ISO_BUILD` 05:44:03, image written 05:52 (8m28s), `kiro-system-files` 26.10-12, `kiro-calamares-config`
+26.10-11. metal-B is an i7-7700K with Intel HD 630 and 16 GB RAM, installed to a 250 GB SATA SSD.
+
+| Target (metal-B) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11) | erase disk, xfs + swap partition, zram, unencrypted | UEFI / systemd-boot 262.1 | Clean install in ~4m15s (43 jobs, none failed); **kiro-audit 131 PASS / 0 WARN / 0 FAIL**, zero failed units (system + user), boot 22.3 s (2.8 s userspace) |
+
+- 1462 packages installed; `linux` 7.2.11 booted, `linux-lts` 6.18.58 alongside; `intel-ucode 20260925-1`.
+  "Remove installation files: SUCCESS".
+- `journalctl -b -p err`: hardware noise (SGX off in BIOS, TDX), the known `gkr-pam` line, and one xfs-only line:
+  `systemd-fsck: fsck failed with exit status 8 … Ignoring error`. The initramfs `fsck` hook runs `fsck.xfs`, a
+  `#!/bin/sh` script, and the systemd initramfs has no `/bin/sh` ("execute failed: No such file or directory").
+  Harmless: xfs does no boot-time check anyway, and the kernel logs "Ending clean mount". Cosmetic follow-up: fsck
+  pass `0` for xfs root in fstab would silence it.
+- The fstab `logbsize=256k` for the xfs root does not take effect (mounted with `logbsize=32k`): root is mounted by
+  the initramfs with default options and xfs can't change `logbsize` on remount. Cosmetic, not a failure.
+
+---
+
 ## 2026-10-25 (build 06:12) — v26.10.25, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B): **release dry run**, **kiro-audit 131 / 0 / 0**
 
 Real-metal install of the v26.10.25 rebuild, used as a release dry run. Nothing that ships changed since v26.10.24:

@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.28
+
+### v26.11.01 release build tested on real metal
+
+**What Changed.** v26.11.01 is the build for the 1 November release. It carries everything collected since v26.10.01, listed for users in `RELEASES.md`: the TIER 2 slimming, `python-pywal16`, the 470xx NVIDIA option, the NVIDIA free-entry fix and the theming work. No shipped source changed since the v26.10.25 dry run; the only commits are the version bumps. It was installed on real Intel hardware (metal-B), this time on **xfs**, and passed: clean install, `kiro-audit` 131 PASS / 0 WARN / 0 FAIL, no failed units. That gives the November ISO a bare-metal GO.
+
+**Technical Details.** Built 05:52 with `linux` 7.2.11 + `linux-lts` 6.18.58 (8m28s, 6.4G), after a v26.10.28 build at 05:39 the same morning. Installed on UEFI / systemd-boot, erase disk, xfs + swap partition, in about 4m15s (43 jobs). The xfs run logs one harmless line: the initramfs `fsck` hook can't run the `fsck.xfs` shell script without `/bin/sh` and systemd ignores the error. The test is logged in `DISTRO_TESTING.md`, the build times in `BUILD_TIMES.md`.
+
+**Files Modified.** `archiso/airootfs/etc/dev-rel`, `archiso/profiledef.sh`, `build-scripts/build-the-iso.sh` (version bump), `BUILD_TIMES.md`, `DISTRO_TESTING.md`, `RELEASES.md`
+
 ## 2026.10.25
 
 ### v26.10.25 rebuild tested on real metal (release dry run)

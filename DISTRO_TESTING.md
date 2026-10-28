@@ -2,7 +2,28 @@
 
 Results of boot and install testing for kiro-iso builds. Newest first.
 
-> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+> **Test machines** are recorded under generic labels — `metal-A` / `metal-B` (bare metal, UEFI / systemd-boot), `metal-C` (bare metal, BIOS / grub, legacy NVIDIA), `metal-D` (bare-metal desktop, UEFI, modern NVIDIA RTX 3070; **live ISO only, never installed on**), `metal-E` (hybrid laptop, UEFI, Intel HD 620 + AMD Radeon R5 M330), `kvm-vm` and `<vm-host>` (virtual machines). Real hostnames and network addresses are deliberately not recorded in this repo; use the same labels for new entries.
+
+---
+
+## 2026-10-28 (build 05:52) — v26.11.01, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-E, Intel + AMD hybrid laptop): **release candidate**, **kiro-audit 132 / 0 / 0**
+
+The same November build on Kiro's only test machine with an AMD GPU. metal-E is an i5-7200U laptop with 8 GB RAM,
+hybrid **Intel HD 620** (`i915`, drives the panel) + **AMD Radeon R5 M330** (Hainan, Southern Islands, on
+`amdgpu`), installed to a 256 GB SATA SSD over Wi-Fi.
+
+| Target (metal-E) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11) | erase disk, ext4, no swap (zram only), unencrypted | UEFI / systemd-boot 262.1 | Clean install in ~7m30s (42 jobs, none failed); **kiro-audit 132 PASS / 0 WARN / 0 FAIL**, zero failed units (system + user), boot 20.0 s (3.9 s userspace) |
+
+- 1463 packages installed; `linux` 7.2.11 booted, `linux-lts` 6.18.58 alongside; `intel-ucode 20260925-1`.
+  "Remove installation files: SUCCESS". The slower install is the laptop's SATA SSD and Wi-Fi.
+- Both `vulkan-intel` and `vulkan-radeon` kept, as they should be on Intel + AMD hardware. Vulkan lists the HD 620
+  (Mesa Intel) and the R5 M330 (RADV); OpenGL (`eglinfo -p surfaceless`) on `radeonsi` with ACO.
+- **Kernel taint 0:** the AMD OverDrive change (opt-in since this cycle) is confirmed on real AMD hardware. On the
+  2026-10-01 install the same laptop was tainted `S` (CPU_OUT_OF_SPEC) by the old `ppfeaturemask`.
+- `journalctl -b -p err`: only firmware noise (VMX/SGX off in BIOS, TDX), the Intel AC 3165 `wpa_supplicant`
+  multicast lines, and the known `gkr-pam` line.
 
 ---
 

@@ -2,6 +2,14 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.10.30
+
+### BYOI guide shows the real default kernels
+
+**What Changed.** The settings example in `build-scripts/BYOI.md` showed `kernel="linux-cachyos linux-zen"` as the default, but `build.conf.defaults` has carried `kernel="linux linux-lts"` since the October release. Someone building their own ISO now sees the pair they actually get.
+
+**Files Modified.** `build-scripts/BYOI.md`, `CHANGELOG.md`
+
 ## 2026.10.28
 
 ### v26.11.01 is released

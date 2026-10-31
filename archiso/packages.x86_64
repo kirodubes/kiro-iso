@@ -76,7 +76,6 @@ less
 libfido2
 libusb-compat
 linux-cachyos
-linux-atm
 linux-firmware
 linux-firmware-marvell
 #livecd-sounds

@@ -225,7 +225,6 @@ sdl2-compat
 
 ###  INSTALLER / CALAMARES — the installer and its install-time helpers
 calamares
-chwd
 hwdetect
 kiro-bootloader-grub
 kiro-grub-theme

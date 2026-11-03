@@ -2,6 +2,16 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.03
+
+### Drop chwd from the ISO
+
+**What Changed.** `chwd` is gone from the package list. The installer's NVIDIA step (kiro-calamares-config, Calamares module `chwd`) now pulls `kiro-hwd` from nemesis_repo into the target and runs `kiro-hwd install`, so nothing on the ISO calls chwd any more. Tested on a live session with a Pascal laptop: `kiro-hwd detect` picks `nvidia-580xx + prime`.
+
+**Technical Details.** The Calamares module keeps its old name `chwd`; only the package is dropped. kiro-hwd is not added to the ISO either, because the module installs it into the target with `pacman -S --needed kiro-hwd`.
+
+**Files Modified.** `archiso/packages.x86_64`, `CHANGELOG.md`
+
 ## 2026.10.30
 
 ### BYOI guide shows the real default kernels

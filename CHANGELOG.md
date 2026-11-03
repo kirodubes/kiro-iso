@@ -4,6 +4,14 @@
 
 ## 2026.11.03
 
+### kiro-hwd ships on the ISO, in the core
+
+**What Changed.** `kiro-hwd`, Kiro's NVIDIA driver picker, is now on the ISO and stays on every installed system, also on AMD and Intel machines (Erik's call). The installer no longer depends on reaching nemesis_repo to fetch it, and users can run `kiro-hwd detect` or `sudo kiro-hwd install` later without installing it first. It sits in TIER 2 (KIRO CORE, under SYSTEM TUNING / SERVICES), so the kiro-iso-builder packages page never offers it for removal; only TIER 3 packages can be unticked there.
+
+**Technical Details.** Reverses this morning's "kiro-hwd is not added to the ISO" below. The installer's `pacman -S --needed kiro-hwd` stays as a safety net and is now a no-op. Checked with kiro-iso-builder's own parser: `read_core()` lists `kiro-hwd`, `read_tier3()` does not. KiroTux ISOs already carried it through `kirotux-sddm-simplicity`'s `depends`.
+
+**Files Modified.** `archiso/packages.x86_64`, `CHANGELOG.md`.
+
 ### Drop chwd from the ISO
 
 **What Changed.** `chwd` is gone from the package list. The installer's NVIDIA step (kiro-calamares-config, Calamares module `chwd`) now pulls `kiro-hwd` from nemesis_repo into the target and runs `kiro-hwd install`, so nothing on the ISO calls chwd any more. Tested on a live session with a Pascal laptop: `kiro-hwd detect` picks `nvidia-580xx + prime`.

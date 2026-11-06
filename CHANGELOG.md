@@ -2,6 +2,19 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.06
+
+### What Changed
+- **Surfn Kiro is the default icon theme.** The ISO installs `surfn-kiro-icons-git` instead of `surfn-icons-git`, and the live session uses Surfn-Kiro.
+
+### Technical Details
+- `packages.x86_64`: `surfn-icons-git` → `surfn-kiro-icons-git` (Surfn stays installable via ATT; the opt-in Surfn Plasma extras stay as options). `airootfs/root/.config/gtk-3.0` and `gtk-4.0` `settings.ini` → Surfn-Kiro. Same change in kiro-iso-next on the same day, on Erik's call (not first build-tested there).
+
+### Files Modified
+- `archiso/packages.x86_64`
+- `archiso/airootfs/root/.config/gtk-3.0/settings.ini`, `gtk-4.0/settings.ini`
+- `CHANGELOG.md`
+
 ## 2026.11.03
 
 ### kiro-hwd ships on the ISO, in the core

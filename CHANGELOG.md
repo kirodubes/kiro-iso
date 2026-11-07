@@ -2,6 +2,18 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.07
+
+### What Changed
+- **`resources` removed from the ISO.** The GTK system monitor no longer ships in the SYSTEM INFO / DIAGNOSTICS group; it stays installable from the repos on demand.
+
+### Technical Details
+- `packages.x86_64`: dropped the `resources` line. Same change in kiro-iso and kiro-iso-next on the same day. ATT still lists `resources` in `data/streamline_packages.txt` (a removal list), which needs no change.
+
+### Files Modified
+- `archiso/packages.x86_64`
+- `CHANGELOG.md`
+
 ## 2026.11.06
 
 ### What Changed

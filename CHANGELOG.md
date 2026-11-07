@@ -8,7 +8,7 @@
 - **`resources` removed from the ISO.** The GTK system monitor no longer ships in the SYSTEM INFO / DIAGNOSTICS group; it stays installable from the repos on demand.
 
 ### Technical Details
-- `packages.x86_64`: dropped the `resources` line. Same change in kiro-iso and kiro-iso-next on the same day. ATT still lists `resources` in `data/streamline_packages.txt` (a removal list), which needs no change.
+- `packages.x86_64`: dropped the `resources` line. Same change in kiro-iso and kiro-iso-next on the same day. ATT's `data/streamline_packages.txt` (the Streamline page, generated from this TIER 3 list by `gen-streamline-list.py` in ATT's `up.sh`) drops `resources` on ATT's next push.
 
 ### Files Modified
 - `archiso/packages.x86_64`

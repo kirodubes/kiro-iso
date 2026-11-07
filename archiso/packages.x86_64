@@ -971,9 +971,7 @@ kiro-zsh-config
 sparklines-git
 
 ###  ICONS / CURSORS / THEMES — default Kiro look
-beautyline
 bibata-cursor-theme
-candy-icons-git
 capitaine-cursors
 neo-candy-icons-git
 numix-circle-icon-theme-git

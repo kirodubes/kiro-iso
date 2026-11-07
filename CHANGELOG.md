@@ -6,9 +6,16 @@
 
 ### What Changed
 - **`resources` removed from the ISO.** The GTK system monitor no longer ships in the SYSTEM INFO / DIAGNOSTICS group; it stays installable from the repos on demand.
+- **`beautyline` and `candy-icons-git` removed from the ISO.** Both were only fallbacks for **neo-candy-icons**, and both showed up as two extra icon themes in XFCE's Appearance list next to neo-candy, which confused the choice. neo-candy now carries the icons it used from them:
+  - It already shipped an exact copy of upstream Candy.
+  - It now also ships the 522 icon names that only Garuda's BeautyLine fork had, in a new hidden theme `or-beautyline-garuda`.
+  - A comparison of 14,087 icon names showed every one resolves to a byte-identical file without the two packages.
+  
+  The benefit: a cleaner Appearance list and two packages fewer on the ISO, with no visible change. Same change in **kiro-iso-next** on the same day (Erik's call).
 
 ### Technical Details
 - `packages.x86_64`: dropped the `resources` line. Same change in kiro-iso and kiro-iso-next on the same day. ATT's `data/streamline_packages.txt` (the Streamline page, generated from this TIER 3 list by `gen-streamline-list.py` in ATT's `up.sh`) drops `resources` on ATT's next push.
+- `packages.x86_64` (TIER 2, icons block): dropped the `beautyline` and `candy-icons-git` lines. ATT does not install them. They need **neo-candy-icons-git r66 or newer**: there `Inherits=` names `or-beautyline-garuda` instead of `BeautyLine` / `candy-icons`, and the PKGBUILD no longer lists them as optdepends.
 
 ### Files Modified
 - `archiso/packages.x86_64`

@@ -1031,6 +1031,8 @@ xcolor
 ## variety + its Kiro config — keep together (kiro-variety-config depends on variety)
 variety
 kiro-variety-config
+## Kiro Atelier paintings — promote KA; Variety rotates them (variety.conf src15)
+kiro-atelier-wallpapers
 
 ###  PRODUCTIVITY / EDITORS
 baobab

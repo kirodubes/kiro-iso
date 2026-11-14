@@ -2,6 +2,18 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.14
+
+### What Changed
+- **`kiro-atelier-wallpapers` added to the ISO.** 22 wallpapers painted by Kiro Atelier (one picture in 22 styles) land in `/usr/share/backgrounds/kiro-atelier/`, with a README that points to Kiro Atelier. Variety rotates them for new users (kiro-variety-config `src15`), so every Kiro install shows what Kiro Atelier can do. About 9 MB. Same change in kiro-iso-next on the same day.
+
+### Technical Details
+- `packages.x86_64`, WALLPAPER block: `kiro-atelier-wallpapers` after `kiro-variety-config`, with its own comment so the variety pair stays together. Package from `nemesis_repo`.
+
+### Files Modified
+- `archiso/packages.x86_64`
+- `CHANGELOG.md`
+
 ## 2026.11.07
 
 ### What Changed

@@ -1012,7 +1012,6 @@ apply_kernel() {
         for f in \
             "${buildFolder}"/archiso/efiboot/loader/entries/*.conf \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-            "${buildFolder}"/archiso/syslinux/archiso_pxe-linux.cfg \
             "${buildFolder}"/archiso/grub/loopback.cfg \
             "${buildFolder}"/archiso/airootfs/etc/mkinitcpio.d/kiro \
             "${buildFolder}"/archiso/airootfs/etc/mkinitcpio.d/linux.preset; do

@@ -44,3 +44,6 @@ clean_pacman_cache=no         # yes | no
 parallel_downloads="10"       # minimum pacman ParallelDownloads for the ISO install; only raised, never lowered
 remove_build_folder=yes       # yes | no — clean up the build folder after the build (next build recreates it)
 build_location=home           # home | local — home = build in $HOME; local = build beside the cloned repo
+maintainer_host="hq"          # hostname of the Kiro maintainer's build machine. Only there: wait for the online
+                              # repos, refresh skel .bashrc from the local kiro-bash-config, record BUILD_TIMES.md.
+                              # Empty = never. Anyone else building the ISO skips these steps automatically.

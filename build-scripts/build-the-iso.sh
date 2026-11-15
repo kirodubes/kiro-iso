@@ -220,6 +220,11 @@ Fix the files above, or set bump_version=yes to re-stamp them, then re-run."
     log_info "Version files in sync: ${expected}"
 }
 
+on_maintainer_host() {
+    # One place for the maintainer-only gate: maintainer_host comes from build.conf(.defaults).
+    [[ -n "${maintainer_host:-}" && "${HOSTNAME}" == "${maintainer_host}" ]]
+}
+
 check_not_root() {
     if [[ "${EUID}" -eq 0 ]]; then
         log_error "Do not run this script as root. Run as a normal user — sudo is called internally where needed."
@@ -287,10 +292,10 @@ wait_for_online_repos() {
     log_section "Checking the online repos match local"
     # GitHub Pages serves a freshly pushed repo db a few minutes late; a build started in
     # that window silently ships the old packages (2026-10-05). Wait until the online db
-    # matches the local one. Only Erik's build machine (hq) publishes these repos, and a
-    # build started from the Kiro ISO Builder (KIB) app is never held up.
-    if [[ "$(cat /etc/hostname 2>/dev/null)" != "hq" ]]; then
-        log_info "Not on hq - skipping the online repo check"
+    # matches the local one. Only the maintainer's build machine (maintainer_host) publishes
+    # these repos, and a build started from the Kiro ISO Builder (KIB) app is never held up.
+    if ! on_maintainer_host; then
+        log_info "Not on the maintainer host - skipping the online repo check"
         return 0
     fi
     if [[ "${SUDO_PROMPT:-}" == "kiro-iso-builder: password required" ]]; then
@@ -407,7 +412,7 @@ refresh_skel_bashrc() {
     # Maintainer-only: on the build host, refresh skel's .bashrc from the local
     # kiro-bash-config checkout so the ISO always ships the current shell. No-op (and
     # no phase number) everywhere else.
-    [[ "${HOSTNAME}" == "hq" ]] || return 0
+    on_maintainer_host || return 0
 
     log_section "Refreshing skel .bashrc from kiro-bash-config (maintainer host only)"
     local skel_dir="${REPO_DIR}/archiso/airootfs/etc/skel"
@@ -1082,14 +1087,10 @@ record_build_time() {
     # duration, kernel(s), live squashfs setting, and ISO size. Non-fatal —
     # failure here logs a warning but doesn't abort the build.
     #
-    # Hostname gate: only run on Erik's dev box ('hq'). End users who clone
-    # kiro-iso and run build-the-iso.sh shouldn't end up with a dirty
-    # working tree from a row they don't care about — they hit this early
-    # return silently. Erik's machine is the only one that ever builds the
-    # canonical ISO, so this is a safe identity check.
-    if [[ "${HOSTNAME}" != "hq" ]]; then
-        return 0
-    fi
+    # Maintainer-only (maintainer_host): end users who clone kiro-iso and run
+    # build-the-iso.sh shouldn't end up with a dirty working tree from a row
+    # they don't care about — they hit this early return silently.
+    on_maintainer_host || return 0
 
     [[ -z "${build_start_epoch:-}" ]] && { log_warn "record_build_time: build_start_epoch unset — skipping"; return 0; }
 

@@ -426,7 +426,6 @@ refresh_skel_bashrc() {
 check_required_packages() {
     log_section "Phase 4 — Checking required packages"
     ensure_package archiso
-    ensure_package grub
     check_archiso_version
 }
 
@@ -650,14 +649,13 @@ inject_nvidia_packages() {
             # NVIDIA entries boot with nouveau.modeset=0 + nouveau blacklisted, expecting the
             # proprietary driver to take over. On a none ISO nothing does, so NVIDIA hardware
             # gets a black screen in the live session. Remove the entries they can no longer
-            # deliver — UEFI entries are files of their own, syslinux/grub carry marker blocks.
+            # deliver — UEFI entries are files of their own, syslinux/loopback.cfg carry marker blocks.
             log_info "Stripping the NVIDIA entries from the boot menus (nvidia_driver=none)"
             rm -f "${buildFolder}"/archiso/efiboot/loader/entries/02-nvidianouveau.conf \
                   "${buildFolder}"/archiso/efiboot/loader/entries/02b-nvidiachwd.conf
             local nv
             for nv in \
                 "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-                "${buildFolder}"/archiso/grub/grub.cfg \
                 "${buildFolder}"/archiso/grub/loopback.cfg; do
                 [[ -f "${nv}" ]] && sed -i '/KIRO_NVIDIA_BEGIN/,/KIRO_NVIDIA_END/d' "${nv}"
             done
@@ -1015,7 +1013,6 @@ apply_kernel() {
             "${buildFolder}"/archiso/efiboot/loader/entries/*.conf \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
             "${buildFolder}"/archiso/syslinux/archiso_pxe-linux.cfg \
-            "${buildFolder}"/archiso/grub/grub.cfg \
             "${buildFolder}"/archiso/grub/loopback.cfg \
             "${buildFolder}"/archiso/airootfs/etc/mkinitcpio.d/kiro \
             "${buildFolder}"/archiso/airootfs/etc/mkinitcpio.d/linux.preset; do
@@ -1025,11 +1022,11 @@ apply_kernel() {
 
     # ── Fallback boot entry ───────────────────────────────────────────────
     # The live menus carry a second "fallback kernel" entry (04-fallback.conf for
-    # UEFI, the KIRO_FALLBACK marker block for syslinux/grub). The repo's tree
+    # UEFI, the KIRO_FALLBACK marker block for syslinux/loopback.cfg). The repo's tree
     # ships it pointing at ${CANONICAL_FALLBACK}; retarget it to whichever kernel
     # the user picked as secondary, or strip it when only one kernel is selected.
     #
-    # The syslinux/grub substitution is confined to the marker range so it can
+    # The syslinux/loopback.cfg substitution is confined to the marker range so it can
     # never reach a main menu entry — needed because the primary rewrite above may
     # already have put the same token there (build with PRIMARY_KERNEL=linux-zen).
     # The UEFI entry is a file of its own, so a plain substitution is safe there.
@@ -1045,7 +1042,6 @@ apply_kernel() {
         rm -f "${fallback_uefi}"
         for fb in \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-            "${buildFolder}"/archiso/grub/grub.cfg \
             "${buildFolder}"/archiso/grub/loopback.cfg; do
             [[ -f "${fb}" ]] && sed -i '/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/d' "${fb}"
         done
@@ -1054,7 +1050,6 @@ apply_kernel() {
         [[ -f "${fallback_uefi}" ]] && sed -i "s/${CANONICAL_FALLBACK}/${fallback_kernel}/g" "${fallback_uefi}"
         for fb in \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-            "${buildFolder}"/archiso/grub/grub.cfg \
             "${buildFolder}"/archiso/grub/loopback.cfg; do
             [[ -f "${fb}" ]] && sed -i \
                 "/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/s/${CANONICAL_FALLBACK}/${fallback_kernel}/g" "${fb}"

@@ -12,7 +12,7 @@
 #   no main(). It makes the build self-contained on any Arch-based
 #   host (Arch, Kiro, EndeavourOS, CachyOS, Garuda) by ensuring the
 #   extra repositories mkarchiso needs are present before the build:
-#     - archiso/grub             (ensure_package)
+#     - archiso                  (ensure_package)
 #     - chaotic-aur keyring+mirrorlist
 #     - cachyos keyring+mirrorlist   (linux-cachyos lives here)
 #

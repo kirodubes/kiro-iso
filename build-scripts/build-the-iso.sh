@@ -1180,6 +1180,10 @@ sign_iso() {
     # from Kiro (a checksum alone only proves it arrived intact). Maintainer host only, and never
     # fatal: no key, no terminal (KIB) or a cancelled passphrase prompt just skip it.
     # Runs last in main(), after record_build_time, so a passphrase wait never counts as build time.
+    local iso="${outFolder}/${isoLabel}"
+    # An older .sig of the same version must never stay next to a new, unsigned ISO: the
+    # SourceForge upload would publish a signature that doesn't match.
+    rm -f "${iso}.sig"
     on_maintainer_host || return 0
     local key="${iso_signing_key:-}"
     [[ -n "${key}" ]] || return 0
@@ -1192,9 +1196,7 @@ sign_iso() {
   gpg --local-user ${key} --detach-sign ${outFolder}/${isoLabel}"
         return 0
     fi
-    local iso="${outFolder}/${isoLabel}"
     log_section "Signing the ISO with the Kiro Signing Key"
-    rm -f "${iso}.sig"
     # loopback makes gpg prompt on the tty instead of launching a GUI pinentry. KIB runs the
     # build in a pty that cannot answer that prompt, so there gpg must not ask: --batch with
     # pinentry-mode error signs with a passphrase gpg-agent has cached, else fails at once.

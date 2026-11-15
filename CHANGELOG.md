@@ -6,7 +6,7 @@
 
 ### kiro-iso audit fixes, promoted from kiro-iso-next
 
-The 2026-11-15 kiro-iso audit (offline in Kiro-HQ, `STUDIES/KIRO-AUDIT.md`) found eleven things to improve, none of them build-breaking. Ten were made and tested in kiro-iso-next first: a v26.11.15 -next ISO booted on VirtualBox (UEFI, installed, kiro-audit 138 PASS / 0 WARN / 0 FAIL), on riker (UEFI, RTX 2060: open drivers and the NVIDIA entry) and on the Medion (BIOS: syslinux menu, open drivers, fallback kernel and the NVIDIA entry), plus one KIB-nemesis build. The same commits land here one by one. The eleventh item, a squashfs zstd level 6 trial, stays in -next until its numbers are decided (6.4G / ~9m15s at L6 against 6.6G / ~8m30s at L3); production keeps level 3.
+The 2026-11-15 kiro-iso audit (offline in Kiro-HQ, `STUDIES/KIRO-AUDIT.md`) found eleven things to improve, none of them build-breaking. Ten were made and tested in kiro-iso-next first: a v26.11.15 -next ISO booted on VirtualBox (UEFI, installed, kiro-audit 138 PASS / 0 WARN / 0 FAIL), on riker (UEFI, RTX 2060: open drivers and the NVIDIA entry) and on the Medion (BIOS: syslinux menu, open drivers, fallback kernel and the NVIDIA entry), plus one KIB-nemesis build. The same commits land here one by one. The eleventh item, a squashfs zstd level 6 trial, ran in -next first (6.4G / ~9m15s at L6 against 6.6G / ~8m30s at L3); Erik then took level 6 for production too.
 
 ### What Changed
 - **The GRUB loopback menu is a Kiro menu.** Booting the ISO file straight from disk with GRUB's `loopback` (GLIM, Super GRUB2 Disk, your own grub.cfg entry) used to show the stock Arch menu: "Arch Linux install medium", a speakup entry that could never work (no `espeakup`/`brltty` on the ISO), and no `driver=` choice. It now has the same five entries as the other boot menus, and its "Run Memtest86+" entry finds the renamed UEFI binary of archiso 92 (`memtest86x64.efi`). Ventoy, also in its GRUB2 mode, ignores this file and builds its own menu.
@@ -17,14 +17,15 @@ The 2026-11-15 kiro-iso audit (offline in Kiro-HQ, `STUDIES/KIRO-AUDIT.md`) foun
 - **No partial upgrade on the build host.** The bare `sudo pacman -Sy` is gone; installs are full `-Syu --needed`; the read-only repo checks read a private, freshly synced database.
 - **New build settings always arrive.** The scripts read `build.conf.defaults` first and the live `build.conf` on top.
 - **One `maintainer_host` setting** (default `hq`) replaces three hostname checks.
+- **Squashfs zstd level 6 (audit item 11, decided).** After the -next trial (v26.11.15: 6.4G in 9m21s terminal / 9m10s KIB, against 6.6G in ~8m30s at level 3) Erik chose level 6 for production too: about 0.2G smaller ISO for about 45 s more build time. `profiledef.sh` now carries the same line and comment in both repos.
 - **The group check stops crying wolf about xfce4.** `check_group_drift` warned at every build that eight xfce4 "members" were gone and "the build fails". They were Kiro's own additions (`kiro-xfce`, `pamixer`, `dracula-colors-xfce4-terminal`, the Thunar thumbnailers) listed inside the xfce4 group section. They now sit under their own `## Kiro additions …` header, any plain `##` header ends a group section in the check, and `tumbler` (a real xfce4 member) moved up into the group list. Tested in both repos: every group reports "matches Arch", and the edition package list for `xfce ohmychadwm` is identical to before (468 packages; 467 with `mousepad` unticked, so KIB's optional handling is unchanged).
 - **MATE extras:** `pluma-plugins` added (Arch added it to `mate-extra`).
 - **CLAUDE.md drift fixed** (a security file not in this repo, the removed `audit.sh`, the old `github.com-edu` alias, missing `[cachyos]` / `kiro-mirrorlist`), and today's changes documented.
 - **archiso records:** production gets `docs/ARCHISO_HISTORY.md` and `docs/ARCHISO_CHANGES.md` from -next and its baseline moves to `archiso 92-1` (the 92 sync's only package change, `linux-atm`, was already gone here).
 
 ### Technical Details
-- Promoted commit by commit from kiro-iso-next (`6bc2e33` … `ba7fe96`, 15 commits; the zstd trial `25fc65b` and the -next build-time row stay there). Each production commit names its -next original.
-- After the promotion every touched file equals kiro-iso-next except the expected lines: `kiro` vs `kiro-next` names, the pinned version, and zstd level 3 in `profiledef.sh`.
+- Promoted commit by commit from kiro-iso-next (`6bc2e33` … `ba7fe96`, 15 commits; the -next build-time row stays there, zstd level 6 followed as a separate decision). Each production commit names its -next original.
+- After the promotion every touched file equals kiro-iso-next except the expected lines: `kiro` vs `kiro-next` names and the pinned version.
 - Checks on this repo: `bash -n` and `shellcheck -S warning` (no new warnings), `grub-script-check` on `loopback.cfg`, and the real `inject_nvidia_packages` + `apply_kernel` run on copies of `archiso/` for `open`/`none` × `linux linux-lts`/`linux`: correct entries per menu, only the chosen kernels.
 - Full detail per change: kiro-iso-next CHANGELOG, 2026.11.15.
 
@@ -35,6 +36,17 @@ The 2026-11-15 kiro-iso audit (offline in Kiro-HQ, `STUDIES/KIRO-AUDIT.md`) foun
 - `build-scripts/build-the-iso.sh`, `build.conf.defaults`, `host-prep.sh`, `host-prep-run.sh`, `unmount-build.sh`, `list-kernels.sh`, `get-pacman-repos-keys-and-mirrors.sh`
 - `docs/ARCHISO_BASELINE`, `docs/ARCHISO_HISTORY.md` (new), `docs/ARCHISO_CHANGES.md` (new)
 - `CLAUDE.md`, `CHANGELOG.md`
+
+### oomd policy moves out of the airootfs into kiro-system-files
+
+A kiro-check on the Medion found three systemd-oomd files from this overlay on the installed system, owned by no package and overlapping with **kiro-system-files**' own oomd drop-ins. **`system.slice.d/oomd.conf`** was fully redundant (kiro-system-files sets the same slice at 80%), and **`/etc/systemd/oomd.conf`** only repeated the systemd default limit (60%) and the 20s duration kiro-system-files already sets, while overwriting a file the `systemd` package owns. **`user.slice.d/oomd.conf`** was the only file putting `/user.slice` under oomd, so it moves to **kiro-system-files** (26.11-12, `system/user.slice.d/10-kiro-oomd-per-slice.conf`) instead of being dropped. The whole oomd policy now lives in one package, and the live session gets it too, since kiro-system-files is installed there.
+
+Behaviour is unchanged: system.slice 80%, user.slice 60%, app.slice 80% (`oomctl` on the Medion). The same three files leave kiro-iso-next the same day. Build the ISO only after kiro-system-files 26.11-12 is in the repo, or a fresh install loses the `user.slice` policy until its first update.
+
+### Files Modified
+- `archiso/airootfs/etc/systemd/oomd.conf` (deleted)
+- `archiso/airootfs/etc/systemd/system/system.slice.d/oomd.conf` (deleted)
+- `archiso/airootfs/etc/systemd/system/user.slice.d/oomd.conf` (deleted)
 
 ## 2026.11.14
 

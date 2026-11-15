@@ -17,7 +17,10 @@ airootfs_image_type="squashfs"
 #airootfs_image_tool_options=('-comp' 'xz' '-Xbcj' 'x86' '-b' '1M' '-Xdict-size' '1M')
 #airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '6')
 #airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '6' '-b' '1M')
-airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '3' '-b' '1M')
+# zstd level 6 since 2026-11-15 (kiro-iso audit item 11, Erik's decision after the -next trial):
+# 6.4G / ~9m15s build against 6.6G / ~8m30s at level 3.
+#airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '3' '-b' '1M')
+airootfs_image_tool_options=('-comp' 'zstd' '-Xcompression-level' '6' '-b' '1M')
 bootstrap_tarball_compression=(zstd -19)
 file_permissions=(
   ["/etc/gshadow"]="0:0:400"

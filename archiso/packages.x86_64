@@ -783,6 +783,7 @@ sddm-git
 #garcon
 #thunar
 #thunar-volman
+#tumbler
 #xfce4-appfinder
 #xfce4-panel
 #xfce4-power-manager
@@ -792,11 +793,11 @@ sddm-git
 #xfconf
 #xfdesktop
 #xfwm4
+## Kiro additions to the XFCE edition (not members of Arch's xfce4 group)
 #kiro-xfce
 #pamixer
 #dracula-colors-xfce4-terminal
-## thumbnails for Thunar — keep together
-#tumbler
+## thumbnails for Thunar — keep together (tumbler itself is in the xfce4 group above)
 #ffmpegthumbnailer
 #libgepub
 #libgsf

@@ -801,7 +801,8 @@ check_group_drift() {
     # inside an edition block) so single members can be left out. Warn when Arch
     # changed a group since: a new member is missing from the ISO, a dropped one
     # fails the build. Only [extra] counts — chaotic-aur adds its own members
-    # (xfce4-panel-compiz) that must never land on the ISO.
+    # (xfce4-panel-compiz) that must never land on the ISO. Any other "## " header ends the
+    # group's member list, so Kiro's own additions after it ("## Kiro additions …") don't count.
     local src="${REPO_DIR}/archiso/packages.x86_64"
     local extra group listed online added removed
     extra="$(qpacman -Slq extra | sort -u)"
@@ -809,6 +810,7 @@ check_group_drift() {
         listed="$(awk -v g="${group}" '
             /^###/ { on=0 }
             /^## group: / { on=($3==g); next }
+            /^## / { on=0; next }
             on && /^#?[^# \t]/ { sub(/^#/,""); print $1 }
         ' "${src}" | sort -u)"
         online="$(comm -12 <(qpacman -Sgq "${group}" 2>/dev/null | sort -u) <(echo "${extra}"))"

@@ -113,6 +113,9 @@ if [[ ! -f "${SCRIPT_DIR}/build.conf" ]]; then
         exit 1
     fi
 fi
+# Defaults first, the live copy on top: a knob added to build.conf.defaults later
+# still reaches an older live build.conf (seeded once, then only edited in place).
+[[ -f "${SCRIPT_DIR}/build.conf.defaults" ]] && source "${SCRIPT_DIR}/build.conf.defaults"
 source "${SCRIPT_DIR}/build.conf"
 
 if [[ "${build_location}" == "local" ]]; then

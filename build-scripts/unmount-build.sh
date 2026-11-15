@@ -49,6 +49,7 @@ fi
 # whether work sits next to the clone or under $HOME). Default matches the
 # canonical build.conf.defaults in case the gitignored build.conf is absent.
 build_location="home"
+[[ -f "${SCRIPT_DIR}/build.conf.defaults" ]] && source "${SCRIPT_DIR}/build.conf.defaults"
 [[ -f "${SCRIPT_DIR}/build.conf" ]] && source "${SCRIPT_DIR}/build.conf"
 if [[ "${build_location}" == "local" ]]; then
     buildFolder="$(cd -- "${REPO_DIR}/.." && pwd)/kiro-build"

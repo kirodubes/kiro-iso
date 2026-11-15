@@ -48,7 +48,9 @@ log_success() { echo "[ok] $*"; }
 status_ok()   { echo "[ok] $*"; }
 status_nok()  { echo "[!!] $*"; }
 
-# chaoticsrepo (setup_chaotic reads it) and the other knobs come from build.conf.
+# chaoticsrepo (setup_chaotic reads it) and the other knobs come from build.conf,
+# layered over build.conf.defaults like build-the-iso.sh does.
+[[ -f "${SCRIPT_DIR}/build.conf.defaults" ]] && source "${SCRIPT_DIR}/build.conf.defaults"
 [[ -f "${SCRIPT_DIR}/build.conf" ]] && source "${SCRIPT_DIR}/build.conf"
 
 source "${SCRIPT_DIR}/host-prep.sh"

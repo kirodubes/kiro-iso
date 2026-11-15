@@ -27,7 +27,7 @@ cd build-scripts && ./build-the-iso.sh
 - The script bumps the version (`vYY.MM.DD`) as its **Phase 2**, before the build, gated by the `bump_version` flag in the config block (default `yes`). Set `bump_version="no"` for a same-day rebuild of the currently-pinned version.
 - Build output lands in `~/kiro-Out/`
 - Build working directory is `~/kiro-build/` (deleted/recreated each run)
-- Checksums (sha1, sha256, md5) and a pkglist are auto-generated alongside the ISO
+- Checksums (sha1, sha256, md5) and a pkglist are auto-generated alongside the ISO; on the maintainer host the ISO also gets a detached GPG signature (`<iso>.sig`, Kiro Signing Key, see `iso_signing_key`). The SourceForge upload scripts (Kiro-HQ) upload the `.sig` after verifying it
 
 **Do not run `build-the-iso.sh` as root.**
 
@@ -45,7 +45,7 @@ For a same-day rebuild that keeps the currently-pinned version, set `bump_versio
 
 ## Build Config — `build.conf`
 
-The user-editable build knobs (`bump_version`, `nvidia_driver`, `kernel`, `picker`, `chaoticsrepo`, `clean_pacman_cache`, `parallel_downloads`, `remove_build_folder`, `build_location`, `desktop`, `editions`, `default_session`) live in **`build-scripts/build.conf`**, which `build-the-iso.sh` sources. This is the single source of truth the `kiro-iso-builder` GUI reads and writes too. Edit them there — not in `build-the-iso.sh`. `kiroVersion` is the one exception: it stays in `build-the-iso.sh` because `apply_version_bump` seds it and `verify_version_sync` greps it.
+The user-editable build knobs (`bump_version`, `nvidia_driver`, `kernel`, `picker`, `chaoticsrepo`, `clean_pacman_cache`, `parallel_downloads`, `remove_build_folder`, `build_location`, `maintainer_host`, `iso_signing_key`, `desktop`, `editions`, `default_session`) live in **`build-scripts/build.conf`**, which `build-the-iso.sh` sources on top of the tracked **`build.conf.defaults`** (defaults first, so a knob added later still reaches an older live copy; `host-prep-run.sh` and `unmount-build.sh` load them the same way). This is the single source of truth the `kiro-iso-builder` GUI reads and writes too. `maintainer_host` (default `hq`) gates the maintainer-only steps: waiting for the online repos, refreshing skel `.bashrc` from the local kiro-bash-config, signing the ISO and the BUILD_TIMES.md row. Edit them there — not in `build-the-iso.sh`. `kiroVersion` is the one exception: it stays in `build-the-iso.sh` because `apply_version_bump` seds it and `verify_version_sync` greps it.
 
 ## Desktop/WM Editions & Add-Apps
 
@@ -70,7 +70,7 @@ The script manipulates `packages.x86_64` in the build folder to inject the chose
 
 `none` additionally strips the two NVIDIA entries from the boot menus — they blacklist nouveau
 expecting the proprietary driver to take over, which a `none` ISO does not ship. The UEFI entries are
-removed as files; syslinux and grub carry `KIRO_NVIDIA_BEGIN/END` marker blocks, stripped the same
+removed as files; syslinux and loopback.cfg carry `KIRO_NVIDIA_BEGIN/END` marker blocks, stripped the same
 way the `KIRO_FALLBACK` block is when a single kernel is selected.
 
 ## Architecture
@@ -93,8 +93,9 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 
 - `[core]` / `[extra]` / `[multilib]` — standard Arch mirrors
 - `[kiro_repo]` — `https://kirodubes.github.io/$repo/$arch` (signed; inherits global `SigLevel = Required DatabaseOptional`)
-- `[nemesis_repo]` — `https://erikdubois.github.io/$repo/$arch` (signed; inherits global `SigLevel = Required DatabaseOptional`)
-- `[chaotic-aur]` — requires `chaotic-keyring` + `chaotic-mirrorlist` on the build host
+- `[nemesis_repo]` — `Include = /etc/pacman.d/kiro-mirrorlist` (servers incl. `https://erikdubois.github.io/$repo/$arch`; `setup_kiro_mirrorlist` writes it on the build host; signed, inherits global `SigLevel = Required DatabaseOptional`)
+- `[chaotic-aur]` — requires `chaotic-keyring` + `chaotic-mirrorlist` on the build host (`get-pacman-repos-keys-and-mirrors.sh` installs them only after their `.sig` verifies against the pinned Chaotic-AUR key)
+- `[cachyos]` — `Include = /etc/pacman.d/cachyos-mirrorlist`; `setup_cachyos` trusts its key and installs `cachyos-keyring` + `cachyos-mirrorlist`
 - `[personal_repo]` — optional local repo, commented out by default (see in-file comment for path)
 
 ## Key Files
@@ -104,10 +105,11 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 - `archiso/profiledef.sh` — ArchISO profile: name, label, version, bootmodes, compression
 - `archiso/pacman.conf` — pacman config used inside the ISO build
 - `archiso/efiboot/loader/entries/` — UEFI boot entries (kernel + initrd paths; must match kernel in packages.x86_64)
+- `archiso/syslinux/archiso_sys-linux.cfg` — BIOS boot entries; `archiso/grub/loopback.cfg` — the menu GRUB `loopback` booting shows (Ventoy does not use it; it builds its own menu). All three menus carry the same kernel arguments per entry. There is no `grub/grub.cfg` (no grub bootmode) and no PXE (removed 2026-11-15)
+- `docs/ARCHISO_BASELINE` / `ARCHISO_HISTORY.md` / `ARCHISO_CHANGES.md` — the upstream archiso version Kiro is synced to and every decision per upstream change (`/kiro-archiso`)
 - `build-scripts/build-the-iso.sh` — full build pipeline (includes `apply_version_bump()` as Phase 2)
 - `build-scripts/get-pacman-repos-keys-and-mirrors.sh` — installs chaotic-keyring/mirrorlist if missing
 - `up.sh` — git pull → `git add --all` + commit `"update"` + push; quick-push only, not for structured commits
-- `audit.sh` — installed system health checker; run on a freshly installed Kiro VM to verify all Calamares modules ran correctly
 
 ## isoLabel Must Match profiledef.sh
 
@@ -115,7 +117,7 @@ Defined in `archiso/pacman.conf` (used during ISO build) and `build-scripts/pacm
 
 ## Security Baseline
 
-A full Arch vs Kiro security comparison was run 2026-05-19 — results in **`ARCH-VS-KIRO-SECURITY.md`**. All action items resolved:
+A full Arch vs Kiro security comparison was run 2026-05-19 — the write-up is kept offline in Kiro-HQ (`STUDIES/KIRO-VS-ARCH.md`), not in this repo. All action items resolved:
 
 - `archiso/airootfs/etc/ssh/sshd_config.d/10-archiso.conf` — **kept intentionally**. The `sshd_config.d/` directory must have at least one file or archiso won't create it on the live ISO, causing errors. The file enables root SSH for the live session; `kiro_final` removes it from the installed system. Confirmed absent post-install.
 - `archiso/airootfs/etc/tmpfiles.d/cups-permissions.conf` — **added**. Enforces `600 root:cups` on CUPS config files at boot via `systemd-tmpfiles`.
@@ -197,4 +199,4 @@ Semantic commit messages are in use:
 - Project was originally based on ArcoLinux — references to `arcolinux-*` are being replaced with `edu-*` or `kiro-*` equivalents
 - Desktop environments: XFCE4 (primary), ohmychadwm
 - Package repos: Chaotic-AUR + optional local `personal_repo`
-- Git remote uses SSH alias `github.com-edu` (configured by `setup.sh`)
+- Git remote uses SSH alias `github.com-kiro` (`git@github.com-kiro:kirodubes/kiro-iso`, configured by `setup.sh`)

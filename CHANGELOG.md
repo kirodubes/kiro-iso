@@ -2,6 +2,39 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.15
+
+### kiro-iso audit fixes, promoted from kiro-iso-next
+
+The 2026-11-15 kiro-iso audit (offline in Kiro-HQ, `STUDIES/KIRO-AUDIT.md`) found eleven things to improve, none of them build-breaking. Ten were made and tested in kiro-iso-next first: a v26.11.15 -next ISO booted on VirtualBox (UEFI, installed, kiro-audit 138 PASS / 0 WARN / 0 FAIL), on riker (UEFI, RTX 2060: open drivers and the NVIDIA entry) and on the Medion (BIOS: syslinux menu, open drivers, fallback kernel and the NVIDIA entry), plus one KIB-nemesis build. The same commits land here one by one. The eleventh item, a squashfs zstd level 6 trial, stays in -next until its numbers are decided (6.4G / ~9m15s at L6 against 6.6G / ~8m30s at L3); production keeps level 3.
+
+### What Changed
+- **The GRUB loopback menu is a Kiro menu.** Booting the ISO file straight from disk with GRUB's `loopback` (GLIM, Super GRUB2 Disk, your own grub.cfg entry) used to show the stock Arch menu: "Arch Linux install medium", a speakup entry that could never work (no `espeakup`/`brltty` on the ISO), and no `driver=` choice. It now has the same five entries as the other boot menus, and its "Run Memtest86+" entry finds the renamed UEFI binary of archiso 92 (`memtest86x64.efi`). Ventoy, also in its GRUB2 mode, ignores this file and builds its own menu.
+- **The same kernel arguments on BIOS, UEFI and loopback.** The BIOS NVIDIA entries now also block `nouveau` next to the proprietary driver (UEFI has since 2025-09), and every quiet entry gets `loglevel=3`. On the Medion (Fermi GT 620M, which nvidia-open doesn't support) the NVIDIA entry still gives a desktop through the Intel graphics.
+- **No unused `grub.cfg`, no PXE network boot.** mkarchiso never puts `grub/grub.cfg` on this ISO (syslinux + systemd-boot only), so the file and its build code are gone. Kiro does not network-boot; the `archiso_pxe_*` mkinitcpio hooks and the PXE syslinux menus are removed (`archiso_loop_mnt` and `memdisk` stay for loopback booting).
+- **The ISO is signed.** On the maintainer host the build writes a detached GPG signature `<iso>.sig` with the Kiro Signing Key, after the build time is recorded so a passphrase wait never counts. It is never fatal: no key, no terminal or a cancelled prompt skip it with the command to sign by hand; under KIB it signs only with a passphrase gpg-agent has cached and never waits. An older `.sig` of the same version is always removed first, so it can't end up next to an ISO it doesn't match. sha1/md5/sha256 stay until the website moves to SHA256 + signature.
+- **The Chaotic-AUR keyring is verified before it is installed.** The build-host bootstrap now trusts Chaotic's key (full fingerprint pinned), downloads the stable `cdn-mirror` names and installs only when each `.sig` verifies.
+- **No partial upgrade on the build host.** The bare `sudo pacman -Sy` is gone; installs are full `-Syu --needed`; the read-only repo checks read a private, freshly synced database.
+- **New build settings always arrive.** The scripts read `build.conf.defaults` first and the live `build.conf` on top.
+- **One `maintainer_host` setting** (default `hq`) replaces three hostname checks.
+- **MATE extras:** `pluma-plugins` added (Arch added it to `mate-extra`).
+- **CLAUDE.md drift fixed** (a security file not in this repo, the removed `audit.sh`, the old `github.com-edu` alias, missing `[cachyos]` / `kiro-mirrorlist`), and today's changes documented.
+- **archiso records:** production gets `docs/ARCHISO_HISTORY.md` and `docs/ARCHISO_CHANGES.md` from -next and its baseline moves to `archiso 92-1` (the 92 sync's only package change, `linux-atm`, was already gone here).
+
+### Technical Details
+- Promoted commit by commit from kiro-iso-next (`6bc2e33` … `ba7fe96`, 15 commits; the zstd trial `25fc65b` and the -next build-time row stay there). Each production commit names its -next original.
+- After the promotion every touched file equals kiro-iso-next except the expected lines: `kiro` vs `kiro-next` names, the pinned version, and zstd level 3 in `profiledef.sh`.
+- Checks on this repo: `bash -n` and `shellcheck -S warning` (no new warnings), `grub-script-check` on `loopback.cfg`, and the real `inject_nvidia_packages` + `apply_kernel` run on copies of `archiso/` for `open`/`none` × `linux linux-lts`/`linux`: correct entries per menu, only the chosen kernels.
+- Full detail per change: kiro-iso-next CHANGELOG, 2026.11.15.
+
+### Files Modified
+- `archiso/grub/loopback.cfg`, `archiso/grub/grub.cfg` (deleted)
+- `archiso/syslinux/archiso_sys-linux.cfg`, `archiso/syslinux/syslinux.cfg`, `archiso/syslinux/archiso_pxe.cfg` + `archiso_pxe-linux.cfg` (deleted)
+- `archiso/airootfs/etc/mkinitcpio.conf`, `archiso/packages.x86_64`
+- `build-scripts/build-the-iso.sh`, `build.conf.defaults`, `host-prep.sh`, `host-prep-run.sh`, `unmount-build.sh`, `list-kernels.sh`, `get-pacman-repos-keys-and-mirrors.sh`
+- `docs/ARCHISO_BASELINE`, `docs/ARCHISO_HISTORY.md` (new), `docs/ARCHISO_CHANGES.md` (new)
+- `CLAUDE.md`, `CHANGELOG.md`
+
 ## 2026.11.14
 
 ### What Changed

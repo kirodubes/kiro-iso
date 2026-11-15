@@ -38,8 +38,8 @@ HOST_PREP_SH_LOADED=1
 ensure_package() {
     local pkg="$1"
     if ! pacman -Qi "${pkg}" &>/dev/null; then
-        log_warn "${pkg} not installed — installing now"
-        sudo pacman -S --noconfirm "${pkg}"
+        log_warn "${pkg} not installed — installing now (with a full upgrade, never a partial one)"
+        sudo pacman -Syu --needed --noconfirm "${pkg}"
     fi
     if ! pacman -Qi "${pkg}" &>/dev/null; then
         log_error "${pkg} could not be installed — aborting"
@@ -107,7 +107,7 @@ EOF_CACHYOS
     fi
 
     log_info "Installing cachyos-keyring and cachyos-mirrorlist from the geo-mirror"
-    sudo pacman -Sy --needed --noconfirm cachyos-keyring cachyos-mirrorlist
+    sudo pacman -Syu --needed --noconfirm cachyos-keyring cachyos-mirrorlist
 
     log_success "cachyos-keyring and cachyos-mirrorlist installed"
 }
@@ -122,7 +122,7 @@ setup_kiro_keyring() {
         return 0
     fi
     log_warn "Installing kiro-keyring"
-    sudo pacman -Sy --needed --noconfirm kiro-keyring
+    sudo pacman -Syu --needed --noconfirm kiro-keyring
     log_success "kiro-keyring installed"
 }
 
@@ -174,8 +174,8 @@ enable_cachyos() {
         setup_cachyos
     fi
 
-    log_info "Syncing package databases"
-    sudo pacman -Sy --noconfirm
+    log_info "Syncing package databases (full upgrade, never a partial one)"
+    sudo pacman -Syu --noconfirm
     log_success "[cachyos] repo enabled"
 }
 
@@ -229,7 +229,7 @@ _write_curated_list() {
     } | sudo tee "${file}" >/dev/null
 }
 
-# ensure_arch_mirrors — must run BEFORE the host `pacman -Sy`, since mkarchiso
+# ensure_arch_mirrors — must run BEFORE any host-side sync, since mkarchiso
 # and every host-side pacman call resolve [core]/[extra] against this file.
 ensure_arch_mirrors() {
     local ml="/etc/pacman.d/mirrorlist"

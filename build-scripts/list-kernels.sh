@@ -28,7 +28,8 @@ set -euo pipefail
 #   --with-repo each line is "<repo><TAB><kernel>" instead (the GUI
 #   uses this to group kernels by source; the build never passes it).
 #   Read-only: a single `pacman -Sl` against the already-synced DBs,
-#   never root.
+#   never root. When KIRO_QUERY_DBPATH is set (build-the-iso.sh exports its
+#   private query DB), that DB is read instead of the host's.
 #
 #   NOTE: off-template on purpose (stdout must stay machine-readable).
 #   See Kiro-HQ/TEMPLATE_EXCLUSIONS.md.
@@ -49,7 +50,7 @@ main() {
     while read -r rname pname rest; do
         exists["${pname}"]=1
         [[ -n "${repo_of[${pname}]+x}" ]] || repo_of["${pname}"]="${rname}"
-    done < <(pacman -Sl 2>/dev/null || true)
+    done < <(pacman ${KIRO_QUERY_DBPATH:+--dbpath "${KIRO_QUERY_DBPATH}"} -Sl 2>/dev/null || true)
 
     local name
     local -a names=()

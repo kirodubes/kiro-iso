@@ -274,18 +274,34 @@ packages and fetch the latest .bashrc. Check your network and re-run."
         status_ok "Reachable: ${host}"
     done
 
-    # Arch mirror fallback must run BEFORE `pacman -Sy`: the sync below (and
-    # every later host-side pacman call, plus mkarchiso) pulls [core]/[extra]
-    # through the host mirrorlist. Prefer the user's PC mirrors; if they're all
-    # down, swap in our curated geo-CDN set so the build still completes.
+    # Arch mirror fallback must run BEFORE any sync: every host-side pacman call,
+    # the query DB below and mkarchiso pull [core]/[extra] through the host
+    # mirrorlist. Prefer the user's PC mirrors; if they're all down, swap in our
+    # curated geo-CDN set so the build still completes.
     ensure_arch_mirrors
 
-    # Refresh pacman sync databases before any repo-dependent step. On a fresh
-    # host (e.g. a just-installed CachyOS) the sync DBs may not be populated yet,
-    # which breaks the later keyring/package installs. Runs on every host since
-    # setup_cachyos short-circuits where the cachyos repo is already present.
-    log_info "Refreshing pacman databases"
-    sudo pacman -Sy
+    # No bare `pacman -Sy` here: syncing the host DBs without upgrading leaves the
+    # host half-synced (a partial upgrade). Installs go through ensure_package
+    # (-Syu --needed, which also covers a fresh host with empty sync DBs) and the
+    # read-only repo queries use a private DB (make_query_db).
+}
+
+QUERY_DB=""
+make_query_db() {
+    # A private, freshly synced copy of the sync DBs for read-only queries (kernel list,
+    # group drift, pacman -Si), the way checkupdates does it: the host's own sync DBs
+    # are never touched. Runs after the repo setup so newly added repos are included.
+    log_section "Syncing a private package database for the repo checks"
+    ensure_package fakeroot
+    QUERY_DB="$(mktemp -d "${TMPDIR:-/tmp}/kiro-query-db.XXXXXX")"
+    ln -s /var/lib/pacman/local "${QUERY_DB}/local"
+    fakeroot -- pacman -Sy --dbpath "${QUERY_DB}" --logfile /dev/null >/dev/null
+    export KIRO_QUERY_DBPATH="${QUERY_DB}"
+    status_ok "Private package database ready"
+}
+
+qpacman() {
+    pacman --dbpath "${QUERY_DB}" "$@"
 }
 
 wait_for_online_repos() {
@@ -375,7 +391,12 @@ cleanup_on_interrupt() {
 # so findmnt finds nothing) but always unmounts a half-finished one. The INT/TERM
 # traps add the log line and a correct exit code on top. Registered here, after
 # buildFolder is set, so the trap never references it unbound under `set -u`.
-trap unmount_stale_build_mounts EXIT
+cleanup_on_exit() {
+    unmount_stale_build_mounts
+    [[ -n "${QUERY_DB}" && -d "${QUERY_DB}" ]] && rm -rf -- "${QUERY_DB}"
+    return 0
+}
+trap cleanup_on_exit EXIT
 trap 'cleanup_on_interrupt; exit 130' INT
 trap 'cleanup_on_interrupt; exit 143' TERM
 
@@ -783,14 +804,14 @@ check_group_drift() {
     # (xfce4-panel-compiz) that must never land on the ISO.
     local src="${REPO_DIR}/archiso/packages.x86_64"
     local extra group listed online added removed
-    extra="$(pacman -Slq extra | sort -u)"
+    extra="$(qpacman -Slq extra | sort -u)"
     while IFS= read -r group; do
         listed="$(awk -v g="${group}" '
             /^###/ { on=0 }
             /^## group: / { on=($3==g); next }
             on && /^#?[^# \t]/ { sub(/^#/,""); print $1 }
         ' "${src}" | sort -u)"
-        online="$(comm -12 <(pacman -Sgq "${group}" 2>/dev/null | sort -u) <(echo "${extra}"))"
+        online="$(comm -12 <(qpacman -Sgq "${group}" 2>/dev/null | sort -u) <(echo "${extra}"))"
         added="$(comm -13 <(echo "${listed}") <(echo "${online}") | xargs)"
         removed="$(comm -23 <(echo "${listed}") <(echo "${online}") | xargs)"
         [[ -n "${added}" ]] && log_warn "Group ${group} has new members in Arch - add them to packages.x86_64: ${added}"
@@ -898,7 +919,7 @@ select_kernels() {
         read -ra SELECTED_KERNELS <<< "${kernel}"
         local bad
         for bad in "${SELECTED_KERNELS[@]}"; do
-            if ! pacman -Si "${bad}" &>/dev/null || ! pacman -Si "${bad}-headers" &>/dev/null; then
+            if ! qpacman -Si "${bad}" &>/dev/null || ! qpacman -Si "${bad}-headers" &>/dev/null; then
                 detect_available_kernels   # only on a bad name, to suggest valid ones
                 log_error "Unknown kernel '${bad}' — no '${bad}' + '${bad}-headers' in the enabled repos.
 Use kernel=\"ask\" to pick interactively, or one of these:
@@ -968,7 +989,7 @@ _select_kernels_dialog() {
 
     local items=() k ver state
     for k in "${AVAILABLE_KERNELS[@]}"; do
-        ver="$(pacman -Si "${k}" 2>/dev/null | awk -F': *' '/^Version/{print $2; exit}')"
+        ver="$(qpacman -Si "${k}" 2>/dev/null | awk -F': *' '/^Version/{print $2; exit}')"
         state="off"; [[ "${k}" == "${CANONICAL_KERNEL}" ]] && state="on"
         items+=("${k}" "${ver}" "${state}")
     done
@@ -1173,6 +1194,7 @@ main() {
     # "All green" gate — confirm every repo the build/install depends on is
     # reachable (after the host->curated fallbacks above) before mkarchiso runs.
     mirror_health_report
+    make_query_db
 
     apply_version_bump
     verify_version_sync

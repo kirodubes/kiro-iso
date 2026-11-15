@@ -1173,14 +1173,13 @@ create_checksums() {
 
     echo "Copying pkglist..."
     cp "${buildFolder}/iso/arch/pkglist.x86_64.txt" "${outFolder}/${isoLabel}.pkglist.txt"
-
-    sign_iso
 }
 
 sign_iso() {
     # Detached GPG signature next to the ISO, so users can verify the download really comes
     # from Kiro (a checksum alone only proves it arrived intact). Maintainer host only, and never
     # fatal: no key, no terminal (KIB) or a cancelled passphrase prompt just skip it.
+    # Runs last in main(), after record_build_time, so a passphrase wait never counts as build time.
     on_maintainer_host || return 0
     local key="${iso_signing_key:-}"
     [[ -n "${key}" ]] || return 0
@@ -1193,14 +1192,15 @@ sign_iso() {
   gpg --local-user ${key} --detach-sign ${outFolder}/${isoLabel}"
         return 0
     fi
-    echo "Signing ${isoLabel} with ${key}..."
-    rm -f "${isoLabel}.sig"
+    local iso="${outFolder}/${isoLabel}"
+    log_section "Signing the ISO with the Kiro Signing Key"
+    rm -f "${iso}.sig"
     # loopback makes gpg prompt on the tty instead of launching a GUI pinentry
-    if gpg --pinentry-mode loopback --local-user "${key}" --detach-sign --output "${isoLabel}.sig" "${isoLabel}" \
-        && gpg --verify "${isoLabel}.sig" "${isoLabel}" 2>/dev/null; then
-        status_ok "Signed: ${isoLabel}.sig"
+    if gpg --pinentry-mode loopback --local-user "${key}" --detach-sign --output "${iso}.sig" "${iso}" \
+        && gpg --verify "${iso}.sig" "${iso}" 2>/dev/null; then
+        status_ok "Signed: ${iso}.sig"
     else
-        rm -f "${isoLabel}.sig"
+        rm -f "${iso}.sig"
         log_warn "ISO not signed: gpg failed or was cancelled. Sign it by hand:
   gpg --local-user ${key} --detach-sign ${outFolder}/${isoLabel}"
     fi
@@ -1247,6 +1247,7 @@ main() {
     create_checksums
     remove_buildfolder "${remove_build_folder}"
     record_build_time
+    sign_iso
     log_success "$(basename "$0") done — ISO is in ${outFolder}"
 }
 

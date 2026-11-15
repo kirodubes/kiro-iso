@@ -1195,8 +1195,12 @@ sign_iso() {
     local iso="${outFolder}/${isoLabel}"
     log_section "Signing the ISO with the Kiro Signing Key"
     rm -f "${iso}.sig"
-    # loopback makes gpg prompt on the tty instead of launching a GUI pinentry
-    if gpg --pinentry-mode loopback --local-user "${key}" --detach-sign --output "${iso}.sig" "${iso}" \
+    # loopback makes gpg prompt on the tty instead of launching a GUI pinentry. KIB runs the
+    # build in a pty that cannot answer that prompt, so there gpg must not ask: --batch with
+    # pinentry-mode error signs with a passphrase gpg-agent has cached, else fails at once.
+    local -a pin=(--pinentry-mode loopback)
+    [[ "${SUDO_PROMPT:-}" == "kiro-iso-builder: password required" ]] && pin=(--batch --pinentry-mode error)
+    if gpg "${pin[@]}" --local-user "${key}" --detach-sign --output "${iso}.sig" "${iso}" \
         && gpg --verify "${iso}.sig" "${iso}" 2>/dev/null; then
         status_ok "Signed: ${iso}.sig"
     else

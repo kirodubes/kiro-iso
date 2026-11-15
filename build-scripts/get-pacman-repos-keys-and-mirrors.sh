@@ -86,37 +86,45 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Functions
 #####################################################################
 install_chaotic_packages() {
-    local base_url="https://geo-mirror.chaotic.cx/chaotic-aur/x86_64/"
+    # Stable names from Chaotic-AUR's own install guide (no index scraping).
+    local base_url="https://cdn-mirror.chaotic.cx/chaotic-aur"
+    # Full fingerprint of Chaotic-AUR's primary key (Pedro Henrique Lara Campos). Packages are signed
+    # by a subkey; gpg reports the primary in the last field of VALIDSIG, which is what we compare.
+    local chaotic_key="EF925EA60F33D0CB85C44AD13056513887B78AEB"
 
     log_section "Installing chaotic-keyring and chaotic-mirrorlist"
 
     log_info "Updating system and installing required tools"
-    sudo pacman -Syu --needed --noconfirm wget jq curl
+    sudo pacman -Syu --needed --noconfirm wget curl
 
-    log_info "Fetching latest package URLs from Chaotic-AUR"
+    log_info "Trusting the Chaotic-AUR signing key"
+    sudo pacman-key --recv-keys "${chaotic_key}" --keyserver keyserver.ubuntu.com
+    sudo pacman-key --lsign-key "${chaotic_key}"
 
-    local keyring_pkg mirrorlist_pkg
-    # -L: the geo-mirror 303-redirects to a regional mirror; without it curl
-    # returns an empty body and the filename parse silently comes back empty.
-    keyring_pkg=$(curl -sL "${base_url}" | grep -oP "chaotic-keyring-[0-9][^\"]+\.pkg\.tar\.zst" | sort -V | tail -n 1)
-    mirrorlist_pkg=$(curl -sL "${base_url}" | grep -oP "chaotic-mirrorlist-[0-9][^\"]+\.pkg\.tar\.zst" | sort -V | tail -n 1)
-
-    if [[ -z "${keyring_pkg}" || -z "${mirrorlist_pkg}" ]]; then
-        log_error "Failed to resolve one or more package filenames from ${base_url}"
-        exit 1
-    fi
-
-    local keyring_url="${base_url}${keyring_pkg}"
-    local mirrorlist_url="${base_url}${mirrorlist_pkg}"
-
-    log_info "Downloading packages"
-    wget -q "${keyring_url}"    -O chaotic-keyring.pkg.tar.zst
-    wget -q "${mirrorlist_url}" -O chaotic-mirrorlist.pkg.tar.zst
+    # pacman -U on a local file does not check signatures (LocalFileSigLevel = Optional,
+    # no .sig beside it), so verify each package against the pinned key before installing.
+    local dl pkg primary
+    dl="$(mktemp -d)"
+    for pkg in chaotic-keyring chaotic-mirrorlist; do
+        log_info "Downloading and verifying ${pkg}"
+        wget -q "${base_url}/${pkg}.pkg.tar.zst"     -O "${dl}/${pkg}.pkg.tar.zst"
+        wget -q "${base_url}/${pkg}.pkg.tar.zst.sig" -O "${dl}/${pkg}.pkg.tar.zst.sig"
+        primary="$(gpg --homedir /etc/pacman.d/gnupg --status-fd 1 \
+            --verify "${dl}/${pkg}.pkg.tar.zst.sig" "${dl}/${pkg}.pkg.tar.zst" 2>/dev/null \
+            | awk '$2 == "VALIDSIG" {print $NF}')" || true
+        if [[ "${primary}" != "${chaotic_key}" ]]; then
+            log_error "${pkg}: signature does not verify against the Chaotic-AUR key ${chaotic_key}
+(got: '${primary:-no valid signature}'). Not installing it."
+            rm -rf "${dl}"
+            exit 1
+        fi
+        echo "${pkg}: signature OK (${chaotic_key})"
+    done
 
     log_info "Installing keyring and mirrorlist"
-    sudo pacman -U --noconfirm --needed chaotic-keyring.pkg.tar.zst chaotic-mirrorlist.pkg.tar.zst
+    sudo pacman -U --noconfirm --needed "${dl}/chaotic-keyring.pkg.tar.zst" "${dl}/chaotic-mirrorlist.pkg.tar.zst"
 
-    rm -f chaotic-keyring.pkg.tar.zst chaotic-mirrorlist.pkg.tar.zst
+    rm -rf "${dl}"
     log_success "chaotic-keyring and chaotic-mirrorlist installed"
 }
 

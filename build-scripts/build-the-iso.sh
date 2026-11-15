@@ -657,7 +657,8 @@ inject_nvidia_packages() {
             local nv
             for nv in \
                 "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-                "${buildFolder}"/archiso/grub/grub.cfg; do
+                "${buildFolder}"/archiso/grub/grub.cfg \
+                "${buildFolder}"/archiso/grub/loopback.cfg; do
                 [[ -f "${nv}" ]] && sed -i '/KIRO_NVIDIA_BEGIN/,/KIRO_NVIDIA_END/d' "${nv}"
             done
 
@@ -1044,7 +1045,8 @@ apply_kernel() {
         rm -f "${fallback_uefi}"
         for fb in \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-            "${buildFolder}"/archiso/grub/grub.cfg; do
+            "${buildFolder}"/archiso/grub/grub.cfg \
+            "${buildFolder}"/archiso/grub/loopback.cfg; do
             [[ -f "${fb}" ]] && sed -i '/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/d' "${fb}"
         done
     elif [[ "${fallback_kernel}" != "${CANONICAL_FALLBACK}" ]]; then
@@ -1052,7 +1054,8 @@ apply_kernel() {
         [[ -f "${fallback_uefi}" ]] && sed -i "s/${CANONICAL_FALLBACK}/${fallback_kernel}/g" "${fallback_uefi}"
         for fb in \
             "${buildFolder}"/archiso/syslinux/archiso_sys-linux.cfg \
-            "${buildFolder}"/archiso/grub/grub.cfg; do
+            "${buildFolder}"/archiso/grub/grub.cfg \
+            "${buildFolder}"/archiso/grub/loopback.cfg; do
             [[ -f "${fb}" ]] && sed -i \
                 "/KIRO_FALLBACK_BEGIN/,/KIRO_FALLBACK_END/s/${CANONICAL_FALLBACK}/${fallback_kernel}/g" "${fb}"
         done

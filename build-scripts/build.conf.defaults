@@ -47,3 +47,5 @@ build_location=home           # home | local — home = build in $HOME; local = 
 maintainer_host="hq"          # hostname of the Kiro maintainer's build machine. Only there: wait for the online
                               # repos, refresh skel .bashrc from the local kiro-bash-config, record BUILD_TIMES.md.
                               # Empty = never. Anyone else building the ISO skips these steps automatically.
+iso_signing_key="D9658D546AD48015CABC612B149ABD0C3A0563EE"   # Kiro Signing Key: on maintainer_host the ISO
+                              # gets a detached <iso>.sig. Skipped (warning only) without the secret key or a terminal.

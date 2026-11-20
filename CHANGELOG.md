@@ -2,6 +2,22 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.20
+
+### What Changed
+- **snixembed joins the chadwm, dusk, ohmychadwm and qtile edition blocks**, next to volctl. volctl 1.x only offers
+  a StatusNotifierItem tray icon, and these sessions have an XEmbed systray; their autostart now starts snixembed
+  to bridge the two. Without it the volume icon is invisible.
+
+### Technical Details
+- `archiso/packages.x86_64`: `#snixembed` added after `#volctl` in those four `EDITION-BLOCK`s, so
+  `apply_editions()` uncomments it together with volctl. snixembed ships no autostart file, so it does nothing in
+  other sessions.
+
+### Files Modified
+- `archiso/packages.x86_64`
+- `CHANGELOG.md`
+
 ## 2026.11.15
 
 ### kiro-iso audit fixes, promoted from kiro-iso-next

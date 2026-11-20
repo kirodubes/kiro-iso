@@ -115,7 +115,7 @@ ls -lh ~/kiro-Out/
 ```
 
 - `kiro-vYY.MM.DD-x86_64.iso` — your ISO
-- `.sha1`, `.sha256`, `.md5` — checksums (proof the file isn't corrupted)
+- `.sha256` — checksum (proof the file isn't corrupted)
 - `.pkglist.txt` — the full list of packages that went in
 
 ---

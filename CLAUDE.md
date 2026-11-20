@@ -27,7 +27,7 @@ cd build-scripts && ./build-the-iso.sh
 - The script bumps the version (`vYY.MM.DD`) as its **Phase 2**, before the build, gated by the `bump_version` flag in the config block (default `yes`). Set `bump_version="no"` for a same-day rebuild of the currently-pinned version.
 - Build output lands in `~/kiro-Out/`
 - Build working directory is `~/kiro-build/` (deleted/recreated each run)
-- Checksums (sha1, sha256, md5) and a pkglist are auto-generated alongside the ISO; on the maintainer host the ISO also gets a detached GPG signature (`<iso>.sig`, Kiro Signing Key, see `iso_signing_key`). The SourceForge upload scripts (Kiro-HQ) upload the `.sig` after verifying it
+- A SHA256 checksum (no md5/sha1 since 2026-11-20) and a pkglist are auto-generated alongside the ISO; on the maintainer host the ISO also gets a detached GPG signature (`<iso>.sig`, Kiro Signing Key, see `iso_signing_key`). The SourceForge upload scripts (Kiro-HQ) upload the `.sig` after verifying it
 
 **Do not run `build-the-iso.sh` as root.**
 

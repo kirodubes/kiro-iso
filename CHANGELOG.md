@@ -5,16 +5,25 @@
 ## 2026.11.20
 
 ### What Changed
+- **The build writes only a SHA256 checksum now, no more `.md5` and `.sha1`.** MD5 and SHA1 are broken hashes
+  (someone can craft a different file that matches them), and SHA256 already proves the download isn't corrupted.
+  Proof that the ISO really comes from Kiro is the job of the `.sig` signature. Fewer files, and no doubt about
+  which one to check.
 - **snixembed joins the chadwm, dusk, ohmychadwm and qtile edition blocks**, next to volctl. volctl 1.x only offers
   a StatusNotifierItem tray icon, and these sessions have an XEmbed systray; their autostart now starts snixembed
   to bridge the two. Without it the volume icon is invisible.
 
 ### Technical Details
+- `create_checksums()` in `build-scripts/build-the-iso.sh`: sha1sum/md5sum calls removed; it also deletes an older
+  `.sha1`/`.md5` of the same version, so a rebuild never leaves a stale hash next to the new ISO (same idea as the
+  `.sig` cleanup in `sign_iso()`). Same change in KIB (both repos) and the 9 KiroTux ISO folders. The website still
+  shows MD5 until its own change lands; `/kiro-website-release` runs `md5sum` itself when the sidecar is missing.
 - `archiso/packages.x86_64`: `#snixembed` added after `#volctl` in those four `EDITION-BLOCK`s, so
   `apply_editions()` uncomments it together with volctl. snixembed ships no autostart file, so it does nothing in
   other sessions.
 
 ### Files Modified
+- `build-scripts/build-the-iso.sh`, `build-scripts/BYOI.md`, `CLAUDE.md`
 - `archiso/packages.x86_64`
 - `CHANGELOG.md`
 

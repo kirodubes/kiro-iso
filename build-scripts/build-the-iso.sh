@@ -1166,12 +1166,11 @@ create_checksums() {
     log_section "Phase 12 — Creating checksums and pkglist"
     cd "${outFolder}"
 
-    echo "sha1sum..."
-    sha1sum "${isoLabel}" | tee "${isoLabel}.sha1"
+    # SHA256 only: md5/sha1 are broken hashes, and proof of origin comes from the .sig.
+    # Older sidecars of the same version must not stay next to a rebuilt ISO.
+    rm -f "${isoLabel}.sha1" "${isoLabel}.md5"
     echo "sha256sum..."
     sha256sum "${isoLabel}" | tee "${isoLabel}.sha256"
-    echo "md5sum..."
-    md5sum "${isoLabel}" | tee "${isoLabel}.md5"
 
     echo "Copying pkglist..."
     cp "${buildFolder}/iso/arch/pkglist.x86_64.txt" "${outFolder}/${isoLabel}.pkglist.txt"

@@ -6,6 +6,30 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-21 (build 05:49) — v26.11.21, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **kernel-pair test, NVIDIA entry**, **kiro-audit 140 / 0 / 0**
+
+The first real-metal install of the new kernel pair (`linux-cachyos` main, `linux-lts` fallback), done after the VB VM
+install of the same build (BUILD_TIMES.md, 06:15). metal-A is an i7-7700K with a **GeForce RTX 2060 (TU106)** on two
+monitors (Intel HDMI ports), installed to a 232 GB SATA SSD.
+
+| Target (metal-A) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), NVIDIA entry (NVIDIA packages kept) | erase disk, ext4, no swap partition (zram 8 GB), unencrypted | UEFI / systemd-boot 262.2 | Clean install in 3m46s of jobs (43 jobs, none failed, 2 mkinitcpio passes); **kiro-audit 140 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 27.9 s (3.5 s userspace) |
+
+- Booted **`7.3.5-2-cachyos`** by default, `linux-lts` 6.18.64 alongside; no `linux` package installed. 1471 packages.
+- `nvidia-open-dkms` **620.73.04** built for both `7.3.5-2-cachyos` and `6.18.64-1-lts` (both `-headers` resolve, so
+  the `cachyos/pahole` pin works on a real install); `nvidia` module loaded, XFCE on X11, 0 flip timeouts.
+- `journalctl -b -p err`: the known `drm_sysfs_connector_property_event` kernel `WARNING` from
+  `nv_drm_connector_update_topology_property` once at boot and the HDMI "pixel clock 170000 KHz" warning (both seen
+  on 2026-11-07 too, display unaffected), one transient `xdg-desktop-portal-gtk` start failure (running seconds
+  later), the known `gkr-pam` line.
+- Calamares.log: three `Could not resolve host` lines on the package-database refresh (network not up yet at that
+  step); the install continued and finished.
+- bootctl still shows the stale `LoaderEntryDefault=linux.conf` NVRAM variable from an older install; systemd-boot
+  falls back and boots the cachyos entry. Not from the ISO.
+
+---
+
 ## 2026-11-07 (build 13:07) — v26.11.07, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **test build, NVIDIA entry**, **kiro-audit 131 / 0 / 0**
 
 The second v26.11.07 build, the first ISO without `beautyline`, `candy-icons-git` and the two Numix icon themes,

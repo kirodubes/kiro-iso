@@ -6,6 +6,35 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-21 (build 05:49) — v26.11.21, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **kernel-pair test, `linux-lts` free-driver entry**, **kiro-audit 138 / 0 / 0**
+
+A fresh reinstall of the same build on metal-A, right after the NVIDIA-entry install below. This time the live ISO
+was booted from the **`linux-lts` boot line with the open-source driver** (`driver=free`), so no NVIDIA driver was
+installed.
+
+| Target (metal-A) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), `linux-lts` free-driver entry | erase disk, ext4, unencrypted | UEFI / systemd-boot 262.2 | Clean install in about 3m40s of jobs (43 jobs, none failed, 2 mkinitcpio passes); **kiro-audit 138 PASS / 0 WARN / 0 FAIL** (two fewer checks than the NVIDIA install: no NVIDIA driver to check), zero failed units, boot 28.6 s (3.2 s userspace) |
+
+- The live-booted kernel became the primary one: `bootctl` lists **`6.18.64-1-lts` as default** (sort-key `kiro-0`)
+  and `7.3.5-2-cachyos` second (`kiro-1`). This is by design (`kiro_kernel` + `95-kiro-sort-key.install`), the
+  same as the 2026-09-29 lts VM install. 1462 packages.
+- `driver=free` worked end to end: `kiro_remove_nvidia` removed the NVIDIA packages, the `chwd` job skipped itself,
+  kiro-audit reports "nouveau in use". Calamares also removed `vulkan-intel`, `intel-media-driver` and
+  `vulkan-radeon` (only the RTX 2060 is visible on the PCI bus; the Intel iGPU does not show up). XFCE runs on the Xorg
+  `modesetting` driver over nouveau, both monitors (DVI-D-1 + HDMI-1) at 1920x1080. OpenGL is **zink on NVK**
+  (`vulkan-nouveau`), so it is hardware accelerated, not llvmpipe.
+- `journalctl -b -p err`: `usb 1-1` enumeration errors (-71, one USB port/device), the RTX 2060's USB-C controller
+  `ucsi_ccg` i2c timeout (seen with nouveau on Turing; it does not affect the display), the known `gkr-pam` line.
+  No ethtool/NIC noise, no NetworkManager warnings.
+- Calamares.log: `chcon` not found (no SELinux tools; harmless), the usual BootLoaderModel Qt warnings, and an
+  "EFI but no EFI system partitions found" line from before the erase-disk step. No failed jobs.
+- Services as expected: tuned `throughput-performance` (base `performance`, ppd inactive), firewalld active +
+  enabled (zone `public`), `cups.socket` and `logrotate.timer` enabled. Kiro key trusted, `[cachyos]` commented out.
+- bootctl still shows the stale `LoaderEntryDefault=linux.conf` NVRAM variable (not from the ISO).
+
+---
+
 ## 2026-11-21 (build 05:49) — v26.11.21, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **kernel-pair test, NVIDIA entry**, **kiro-audit 140 / 0 / 0**
 
 The first real-metal install of the new kernel pair (`linux-cachyos` main, `linux-lts` fallback), done after the VB VM

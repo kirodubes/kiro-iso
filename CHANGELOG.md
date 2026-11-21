@@ -31,7 +31,6 @@
   repo that has a same-named package.
 
 ### Files Modified
-- `archiso/packages.x86_64`
 - `build-scripts/build.conf.defaults`, `README.md`, `archiso/packages.x86_64`
 - `CHANGELOG.md`
 

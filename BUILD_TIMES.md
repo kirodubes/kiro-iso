@@ -153,6 +153,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-11-21 07:31 | v26.11.21 | metal-A | 3m46s | 2 | v26.11.21 kernel-pair test (linux-cachyos + linux-lts) on real metal (i7-7700K, RTX 2060, SATA SSD), NVIDIA kept. UEFI, systemd-boot, erase disk, ext4, zram. 43 jobs, none failed. Timed from the first to the last job in Calamares.log (Calamares was open an hour before). kiro-audit 140 PASS / 0 WARN / 0 FAIL |
 | 2026-11-21 06:15 | v26.11.21 | vm | 3m55s | 2 | v26.11.21 kernel-pair test (linux-cachyos + linux-lts), VB VM. UEFI, systemd-boot, ext4. bootctl: cachyos default (sort-key kiro-0), lts kiro-1, timeout 5; vbox modules for both kernels; no failed units. Timed from Calamares.log |
 | 2026-11-07 16:47 | v26.11.07 | metal-A | 3m37s | 2 | v26.11.07 13:07 build, NVIDIA entry (`driver=nonfree`) on real metal (i7-7700K, RTX 2060, SATA SSD). UEFI, systemd-boot, erase disk, ext4, zram. 42 jobs, none failed. Timed from Calamares.log. kiro-audit 131 PASS / 0 WARN / 0 FAIL |
 | 2026-10-25 06:26 | v26.10.25 | metal-B | 4m06s | 2 | Production v26.10.25 script build, release dry run on real metal (i7-7700K, HD 630, SATA SSD). UEFI, systemd-boot, erase disk, ext4 + swapfile, zram. 42 jobs, all exit 0. Timed from Calamares.log. kiro-audit 131 PASS / 0 WARN / 0 FAIL |

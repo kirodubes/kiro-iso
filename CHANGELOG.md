@@ -10,6 +10,9 @@
   fallback is now LTS, not `linux-zen`. Zen tracks the same mainline version as cachyos, so a kernel regression
   could break both boot entries; LTS is on a different release line, so the backup entry still boots when the main
   kernel has a bad release. It's the one pairing of a fast kernel with a long-term one that Kiro hasn't shipped yet.
+- **chadwm, dusk, ohmychadwm and qtile editions take `snixembed-kiro`** (nemesis_repo) instead of stock
+  `snixembed`, so the scroll wheel over the volctl tray icon changes the volume again. Stock snixembed sends
+  `Scroll(0)` for every wheel click (upstream ticket https://todo.sr.ht/~steef/snixembed/19).
 
 ### Technical Details
 - `kernel="linux-cachyos linux-lts"` in `build-scripts/build.conf.defaults` (and the local `build.conf`). The first
@@ -23,8 +26,12 @@
 - `linux-cachyos` resolves from `[chaotic-aur]`, which `archiso/pacman.conf` lists before `[cachyos]`.
 - No build-script changes: the pipeline is kernel-agnostic. Boot the ISO in a VM once to check the preselected
   entry, and re-check the NVIDIA DKMS build against both `-headers` on real hardware.
+- The four edition-block lines in `archiso/packages.x86_64` now read `#snixembed-kiro`, mirrored from kiro-iso-next
+  (4902c65). The package has a new name because `[extra]` sits above `[nemesis_repo]`, and pacman takes the first
+  repo that has a same-named package.
 
 ### Files Modified
+- `archiso/packages.x86_64`
 - `build-scripts/build.conf.defaults`, `README.md`, `archiso/packages.x86_64`
 - `CHANGELOG.md`
 

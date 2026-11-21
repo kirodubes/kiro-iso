@@ -359,7 +359,7 @@ sddm-git
 #ttf-hack
 #ttf-jetbrains-mono-nerd
 #volctl
-#snixembed
+#snixembed-kiro
 #xfce4-notifyd
 #xfce4-power-manager
 #xfce4-screenshooter
@@ -404,7 +404,7 @@ sddm-git
 #ttf-hack
 #ttf-jetbrains-mono-nerd
 #volctl
-#snixembed
+#snixembed-kiro
 #xfce4-notifyd
 #xfce4-power-manager
 #xfce4-screenshooter
@@ -662,7 +662,7 @@ sddm-git
 #scrot
 #sxhkd
 #volctl
-#snixembed
+#snixembed-kiro
 #xautolock
 #xclip
 #xorg-xsetroot
@@ -773,7 +773,7 @@ sddm-git
 #thunar-volman
 #ttf-hack
 #volctl
-#snixembed
+#snixembed-kiro
 #xfce4-terminal
 #dracula-colors-xfce4-terminal
 ## thumbnails for Thunar — keep together

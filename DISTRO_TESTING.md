@@ -30,6 +30,23 @@ monitors (Intel HDMI ports), installed to a 232 GB SATA SSD.
 
 ---
 
+## 2026-11-21 (build 05:49) — v26.11.21, **`linux-cachyos` + `linux-lts`**, VirtualBox VM (`<vm-host>`), **UEFI / systemd-boot**: **kernel-pair test**, kiro-audit not recorded
+
+The first install of the new kernel pair, done in the VB VM right after the 05:49 build, before the metal-A install
+above. It checked the boot menus and the installed boot entries; the NVIDIA side was left for real hardware.
+
+| Target (VM) | FS / encryption | Bootloader | Result |
+|-------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11) | ext4, unencrypted | UEFI / systemd-boot | Clean install in 3m55s (2 mkinitcpio passes); zero failed units |
+
+- Live boot: `linux-cachyos` is the preselected entry and `linux-lts` the fallback, on both the BIOS (syslinux) and
+  the UEFI menus.
+- Installed system: `bootctl` lists the cachyos entry as default (sort-key `kiro-0`) and lts second (`kiro-1`),
+  timeout 5. VirtualBox guest modules built for both kernels.
+- kiro-audit was not recorded for this install; the metal-A install above carries the full audit (140 / 0 / 0).
+
+---
+
 ## 2026-11-07 (build 13:07) — v26.11.07, **`linux` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **test build, NVIDIA entry**, **kiro-audit 131 / 0 / 0**
 
 The second v26.11.07 build, the first ISO without `beautyline`, `candy-icons-git` and the two Numix icon themes,

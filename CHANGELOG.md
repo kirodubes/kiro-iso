@@ -2,6 +2,27 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.21
+
+### What Changed
+- **Next ISO ships `linux-cachyos` + `linux-lts`.** October and November shipped the stock `linux` + `linux-lts`.
+  This brings back the CachyOS kernel (BORE scheduler, tuned build) that Kiro booted from June to September, but the
+  fallback is now LTS, not `linux-zen`. Zen tracks the same mainline version as cachyos, so a kernel regression
+  could break both boot entries; LTS is on a different release line, so the backup entry still boots when the main
+  kernel has a bad release. It's the one pairing of a fast kernel with a long-term one that Kiro hasn't shipped yet.
+
+### Technical Details
+- `kernel="linux-cachyos linux-lts"` in `build-scripts/build.conf.defaults` (and the local `build.conf`). The first
+  entry is the live-boot and installed default; the 2026-09-11 fallback fix keeps `linux-cachyos` the default entry
+  even though `linux-lts` has the lower version number.
+- `linux-cachyos` resolves from `[chaotic-aur]`, which `archiso/pacman.conf` lists before `[cachyos]`.
+- No build-script changes: the pipeline is kernel-agnostic. Boot the ISO in a VM once to check the preselected
+  entry, and re-check the NVIDIA DKMS build against both `-headers` on real hardware.
+
+### Files Modified
+- `build-scripts/build.conf.defaults`, `README.md`
+- `CHANGELOG.md`
+
 ## 2026.11.20
 
 ### What Changed

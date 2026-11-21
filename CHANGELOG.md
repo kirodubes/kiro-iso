@@ -15,12 +15,17 @@
 - `kernel="linux-cachyos linux-lts"` in `build-scripts/build.conf.defaults` (and the local `build.conf`). The first
   entry is the live-boot and installed default; the 2026-09-11 fallback fix keeps `linux-cachyos` the default entry
   even though `linux-lts` has the lower version number.
+- **`cachyos/pahole` pinned in `archiso/packages.x86_64`.** The first build failed with `unable to satisfy dependency
+  'pahole>=1:1.32-2' required by linux-cachyos-headers`. The headers list `pahole` twice, bare and versioned: pacman
+  resolves the bare one to `[extra]`'s `1:1.32-1` (first repo), then can't meet the versioned one from that same
+  package. Naming `cachyos/pahole` as an explicit target puts `1:1.32-2` in the transaction before deps resolve, so
+  both are met. Repo order in `pacman.conf` is unchanged. Drop the pin once `[extra]` ships `1:1.32-2` or newer.
 - `linux-cachyos` resolves from `[chaotic-aur]`, which `archiso/pacman.conf` lists before `[cachyos]`.
 - No build-script changes: the pipeline is kernel-agnostic. Boot the ISO in a VM once to check the preselected
   entry, and re-check the NVIDIA DKMS build against both `-headers` on real hardware.
 
 ### Files Modified
-- `build-scripts/build.conf.defaults`, `README.md`
+- `build-scripts/build.conf.defaults`, `README.md`, `archiso/packages.x86_64`
 - `CHANGELOG.md`
 
 ## 2026.11.20

@@ -10,6 +10,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-11-24 15:09 | v26.11.24 | linux-cachyos linux-lts | zstd L6 -b 1M | 9m39s | 6.4G | |
 | 2026-11-24 08:13 | v26.11.24 | linux-cachyos linux-lts | zstd L6 -b 1M | 9m33s | 6.4G | |
 | 2026-11-24 07:05 | v26.11.24 | linux-cachyos linux-lts | zstd L6 -b 1M | 9m20s | 6.4G | |
 | 2026-11-24 06:36 | v26.11.24 | linux-cachyos linux-lts | zstd L6 -b 1M | 10m44s | 6.4G | |
@@ -157,6 +158,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-11-24 15:56 | v26.11.24 | metal-B | 4m2s | 2 | metal-B — real metal UEFI/systemd-boot, LUKS2 + btrfs + swap file, Dutch (nl_BE, be keyboard), free entry; kiro-audit 144/0/0 |
 | 2026-11-21 08:09 | v26.11.21 | metal-A | 3m40s | 2 | v26.11.21 kernel-pair test, live-booted from the `linux-lts` free-driver line (`driver=free`), no NVIDIA. UEFI, systemd-boot, erase disk, ext4. 43 jobs, none failed. bootctl: lts default (kiro-0), cachyos kiro-1. nouveau + NVK (zink). Timed from Calamares.log. kiro-audit 138 PASS / 0 WARN / 0 FAIL |
 | 2026-11-21 07:31 | v26.11.21 | metal-A | 3m46s | 2 | v26.11.21 kernel-pair test (linux-cachyos + linux-lts) on real metal (i7-7700K, RTX 2060, SATA SSD), NVIDIA kept. UEFI, systemd-boot, erase disk, ext4, zram. 43 jobs, none failed. Timed from the first to the last job in Calamares.log (Calamares was open an hour before). kiro-audit 140 PASS / 0 WARN / 0 FAIL |
 | 2026-11-21 06:15 | v26.11.21 | vm | 3m55s | 2 | v26.11.21 kernel-pair test (linux-cachyos + linux-lts), VB VM. UEFI, systemd-boot, ext4. bootctl: cachyos default (sort-key kiro-0), lts kiro-1, timeout 5; vbox modules for both kernels; no failed units. Timed from Calamares.log |

@@ -6,6 +6,33 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-24 (build 14:59) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B, Intel HD 630): **release pretest 1 of 5 — Dutch, LUKS2 + btrfs + swap file**, **kiro-audit 144 / 0 / 0**
+
+First run of the v26.12.01 pretest matrix (5 PCs, 5 boot lines, every filesystem, encryption on systemd-boot and on
+GRUB). Bootloader and encryption set in the Calamares Tweak Tool, filesystem and swap on Calamares' Erase disk page.
+
+| Target (metal-B) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 1 (open drivers), installed in **Dutch** | erase disk, **btrfs**, **LUKS2**, **swap file** | UEFI / systemd-boot | Clean install, 4m2s, 2 mkinitcpio passes; **kiro-audit 144 PASS / 0 WARN / 0 FAIL** (report in Dutch), zero failed units |
+
+- **Encryption:** LUKS2, `argon2id` (1 GiB memory cost), `aes-xts-plain64`. `sd-encrypt` + `sd-vconsole` +
+  `keyboard` in the hooks; `be-latin1` in `vconsole.conf`, so the passphrase prompt takes the Belgian layout. The
+  passphrase unlocked at first boot (initrd 35.7 s includes typing it). `crypttab` uses `/crypto_keyfile.bin`.
+- **btrfs:** 9 subvolumes (`@`, `@home`, `@root`, `@srv`, `@cache`, `@log`, `@tmp`, `@snapshots`, `@swap`), all
+  `compress=zstd:3,noatime`. Snapshot stack not installed (opt-in via ATT, expected).
+- **Swap:** `/swap/swapfile` 8 G on the `@swap` subvolume, `C` (no copy-on-write) attribute set, active next to
+  8 G zram (priority 100 vs -1). No swap timeout at boot: userspace 5.97 s.
+- **Language:** `LANG=nl_BE.UTF-8`, keymap `be` on console and X11; the SDDM process carries `nl_BE`. The `LC_*`
+  formats are `en_US.UTF-8` (Calamares' Numbers and dates setting).
+- **Boot menu:** `bootctl` lists `7.3.6-1-cachyos` (default) and `6.18.65-1-lts`, both with `rd.luks.uuid`;
+  `loader.conf` carries `timeout 5` and `console-mode max`.
+- **kiro-hwd:** `kiro-hwd detect` → "no NVIDIA GPU found".
+- **Installer log:** the user password appears only as its yescrypt hash (`usermod -p $y$…`), not in plain text.
+- **Journal:** a USB Realtek Bluetooth adapter (`hci1`) times out and resets in a loop (66 times since boot); the
+  first controller works. Hardware-side, not an ISO finding.
+
+---
+
 ## 2026-11-24 (build 08:04) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, Intel UHD 630 + GTX 1050 Ti Mobile): **test build, free-driver entry**, **kiro-audit 139 / 0 / 0**
 
 The same build as the metal-A test below, on the Optimus laptop, booted from the free-driver line.

@@ -22,8 +22,11 @@ GRUB). Bootloader and encryption set in the Calamares Tweak Tool, filesystem and
   `compress=zstd:3,noatime`. Snapshot stack not installed (opt-in via ATT, expected).
 - **Swap:** `/swap/swapfile` 8 G on the `@swap` subvolume, `C` (no copy-on-write) attribute set, active next to
   8 G zram (priority 100 vs -1). No swap timeout at boot: userspace 5.97 s.
-- **Language:** `LANG=nl_BE.UTF-8`, keymap `be` on console and X11; the SDDM process carries `nl_BE`. The `LC_*`
-  formats are `en_US.UTF-8` (Calamares' Numbers and dates setting).
+- **Language:** `LANG=nl_BE.UTF-8`, keymap `be` on console and X11; the SDDM process carries `nl_BE`. **Finding:** the
+  `LC_*` formats are `en_US.UTF-8` although Nederlands was picked on the first screen and Numbers and dates was not
+  touched. `Calamares.log`: GeoIP sets the location (BE) while the installer is still in English and derives the
+  formats from that (`Mapping "en_US.UTF-8" in "BE"`, 15:46:51); picking Nederlands 11 s later updates only the
+  language (`nl_BE`), not the formats. Workaround: change Numbers and dates on the Location page.
 - **On screen:** the Calamares slideshow, the SDDM greeter, ATT and archlinux-logout are in Dutch.
 - **Boot menu:** `bootctl` lists `7.3.6-1-cachyos` (default) and `6.18.65-1-lts`, both with `rd.luks.uuid`;
   `loader.conf` carries `timeout 5` and `console-mode max`. The **lts entry boots** to the desktop after the passphrase:

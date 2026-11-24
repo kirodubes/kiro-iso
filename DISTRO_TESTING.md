@@ -6,6 +6,33 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-24 (build 14:59) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, Intel UHD 630 + GTX 1050 Ti Mobile): **release pretest 2 of 5 — boot line 3 (kiro-hwd) over Wi-Fi, German, xfs + hibernate swap**, **kiro-audit 139 / 0 / 0**
+
+| Target (MSI) | FS / encryption | Bootloader | Result |
+|--------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 3 (`driver=nonfreechwd`), installed in **German** over **Wi-Fi** (no cable) | erase disk, **xfs**, unencrypted, **swap partition with hibernate** (17 G) | UEFI / systemd-boot (default, no Calamares Tweak Tool) | Clean install, 8m03s job time (includes the online `-Syu` and the 580xx DKMS builds), 2 mkinitcpio passes; **kiro-audit 139 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 29.2 s (3.1 s userspace) |
+
+- **kiro-hwd (the open gap from the 08:04 test):** `nvidia-580xx + prime` (1c8c on the 580 list, chassis 10 with an
+  Intel iGPU). Installed `nvidia-580xx-dkms/-utils/-settings`, `opencl-nvidia-580xx`, `nvidia-prime`,
+  `switcheroo-control` (enabled), headers for **both** kernels, and `10-kiro-hwd.conf` (nvidia modules in the
+  initramfs). `nvidia-smi`: GTX 1050 Ti, 580.196.07, P8 at idle; `i915` + `nvidia` loaded; `prime-run` sets the
+  offload variables.
+- **Wi-Fi:** the online step ran over Wi-Fi from the live session; the connection carried over to the install
+  (`wlan0` active after the first boot).
+- **Hibernate swap:** `/dev/sda3` swap 17 G next to zram, `resume=UUID=…` on both boot entries and the `resume` hook
+  in the initramfs.
+- **Language:** `LANG` and every `LC_*` = `de_BE.UTF-8`, keymap `be-latin1`. Here Deutsch was picked **before** the
+  location was applied (`Mapping "de" in "BE"`, 17:17:56), so the formats followed. That narrows the metal-B
+  finding below: the formats go wrong only when the language is picked after GeoIP has set the location.
+- **Boot menu:** cachyos (default) + lts, both with `resume=`.
+- **Finding (cosmetic):** every boot logs `fsck: /usr/bin/fsck.xfs: execute failed: No such file or directory` +
+  `fsck failed with exit status 8. Ignoring error.` Calamares' `initcpiocfg` adds the `fsck` hook for every root
+  filesystem except btrfs; on xfs that puts `fsck.xfs` (a `#!/bin/sh -f` script that does nothing by design) into a
+  systemd initramfs that has no `/bin/sh`. Boot is unaffected. Same code upstream.
+- **Not yet:** `systemctl hibernate` + resume.
+
+---
+
 ## 2026-11-24 (build 14:59) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B, Intel HD 630): **release pretest 1 of 5 — Dutch, LUKS2 + btrfs + swap file**, **kiro-audit 144 / 0 / 0**
 
 First run of the v26.12.01 pretest matrix (5 PCs, 5 boot lines, every filesystem, encryption on systemd-boot and on

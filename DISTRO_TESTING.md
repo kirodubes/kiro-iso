@@ -6,6 +6,23 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-24 (build 08:04) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, Intel UHD 630 + GTX 1050 Ti Mobile): **test build, free-driver entry**, **kiro-audit 139 / 0 / 0**
+
+The same build as the metal-A test below, on the Optimus laptop, booted from the free-driver line.
+
+| Target (MSI) | FS / encryption | Bootloader | Result |
+|--------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), free-driver entry | erase disk, unencrypted | UEFI / systemd-boot 262.2 | Clean install (43 jobs); **kiro-audit 139 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 25.3 s (3.1 s userspace) |
+
+- **Boot menu:** `loader.conf` on the ESP has `console-mode max`, so the new line also reaches a laptop install.
+- **Driver:** `kiro_remove_nvidia` ran; no NVIDIA packages, `nouveau` + `i915` loaded, `vulkan-nouveau` installed.
+- **kiro-hwd 26.11-04:** `kiro-hwd detect` picks `nvidia-580xx + prime` (1c8c on the 580 list, chassis 10 with an
+  Intel iGPU). No `10-kiro-hwd-nvidia.conf` (Pascal is not Turing, correct), and kiro-system-files 26.11-16's
+  `nvidia.conf` no longer carries `NVreg_DynamicPowerManagement`.
+- Not covered: the 580xx + PRIME install from the kiro-hwd boot line, and a Turing laptop.
+
+---
+
 ## 2026-11-24 (build 08:04) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **test build, NVIDIA entry**, **kiro-audit 140 / 0 / 0**
 
 Tests three changes that landed after the 2026-11-21 test: the systemd-boot `console-mode max` line

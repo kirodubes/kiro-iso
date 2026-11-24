@@ -26,7 +26,9 @@ GRUB). Bootloader and encryption set in the Calamares Tweak Tool, filesystem and
   formats are `en_US.UTF-8` (Calamares' Numbers and dates setting).
 - **On screen:** the Calamares slideshow, the SDDM greeter, ATT and archlinux-logout are in Dutch.
 - **Boot menu:** `bootctl` lists `7.3.6-1-cachyos` (default) and `6.18.65-1-lts`, both with `rd.luks.uuid`;
-  `loader.conf` carries `timeout 5` and `console-mode max`. The **lts entry boots** to the desktop after the passphrase.
+  `loader.conf` carries `timeout 5` and `console-mode max`. The **lts entry boots** to the desktop after the passphrase:
+  `6.18.65-1-lts`, boot 32.7 s (5.7 s userspace), zero failed units, swap file active, **kiro-audit 144 / 0 / 0**
+  on lts too.
 - **kiro-hwd:** `kiro-hwd detect` → "no NVIDIA GPU found".
 - **Installer log:** the user password appears only as its yescrypt hash (`usermod -p $y$…`), not in plain text.
 - **Journal:** two identical ASUS USB-BT500 dongles (RTL8761BU) are plugged in. `hci0` works; `hci1` times out and

@@ -29,7 +29,15 @@ Results of boot and install testing for kiro-iso builds. Newest first.
   `fsck failed with exit status 8. Ignoring error.` Calamares' `initcpiocfg` adds the `fsck` hook for every root
   filesystem except btrfs; on xfs that puts `fsck.xfs` (a `#!/bin/sh -f` script that does nothing by design) into a
   systemd initramfs that has no `/bin/sh`. Boot is unaffected. Same code upstream.
-- **Not yet:** `systemctl hibernate` + resume.
+- **Finding: hibernate does not resume** (tried twice, `systemctl hibernate`, cachyos entry). Each time the machine
+  powered off; on power-on the screen stayed black and the network never came up, so a forced power-off followed.
+  The next boot then logs `PM: Image not found (code -22)` and starts fresh. The resume setup is correct
+  (`/sys/power/resume` = 8:3, `resume=UUID` on both entries, `resume` hook, 17 G swap for 15 G RAM,
+  `NVreg_PreserveVideoMemoryAllocations=1`, `nvidia-hibernate/-resume/-suspend` enabled). The journal ends at the
+  Bluetooth suspend notifier (hibernation had started), and the black-screen power-on left no journal at all.
+  Most likely reading: the kernel found the image (which resets the swap signature, hence "Image not found"
+  afterwards) and the restore hung, NVIDIA 580xx + PRIME being the prime suspect. Not proven: the screen of the
+  resuming boot was never seen without `quiet splash`.
 
 ---
 

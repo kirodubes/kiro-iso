@@ -394,10 +394,30 @@ cleanup_on_interrupt() {
 cleanup_on_exit() {
     unmount_stale_build_mounts
     [[ -n "${QUERY_DB}" && -d "${QUERY_DB}" ]] && rm -rf -- "${QUERY_DB}"
+    if [[ -n "${SUDO_KEEPALIVE_PID}" ]]; then
+        kill "${SUDO_KEEPALIVE_PID}" 2>/dev/null || true
+    fi
     return 0
 }
 trap cleanup_on_exit EXIT
 trap 'cleanup_on_interrupt; exit 130' INT
+
+# One password per build: mkarchiso alone outlasts sudo's 5-minute timestamp, so every
+# later sudo (cleanup, signing, unmounts) used to ask again — in kiro-iso-builder that
+# meant a fresh password dialog mid-build. A background `sudo -n -v` every minute keeps
+# the timestamp fresh; it stops by itself when this script ends or sudo refuses (e.g.
+# timestamp_timeout=0), so the worst case is the old behaviour.
+SUDO_KEEPALIVE_PID=""
+start_sudo_keepalive() {
+    log_info "The build needs sudo — enter your password once; it stays valid until the build ends."
+    sudo -v
+    (
+        while kill -0 "$$" 2>/dev/null && sudo -n -v 2>/dev/null; do
+            sleep 60
+        done
+    ) </dev/null >/dev/null 2>&1 &
+    SUDO_KEEPALIVE_PID=$!
+}
 trap 'cleanup_on_interrupt; exit 143' TERM
 
 remove_buildfolder() {
@@ -1222,6 +1242,7 @@ main() {
     build_start_epoch=$(date +%s)
 
     check_not_root
+    start_sudo_keepalive
     preflight_checks
     wait_for_online_repos
     setup_chaotic

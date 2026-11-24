@@ -8,14 +8,22 @@
 - **AV1 video plays smoothly in GStreamer players** (`gst-plugin-dav1d`, Arch `extra`, ~450 KB). GNOME Videos,
   Showtime, Clapper and Parole used `aom`'s slow AV1 decoder on GPUs without AV1 hardware decoding; dav1d is the
   fast one. mpv, VLC and the browsers already used dav1d through ffmpeg or their own code. Seen in CachyOS 2611.
+- **One sudo password per build.** `mkarchiso` runs longer than sudo's 5-minute timestamp, so the cleanup, unmount
+  and signing steps after it asked for the password again. In kiro-iso-builder that meant a new password dialog in
+  the middle of the build. Jacinth Samuel pointed it out in his November KIB review. Promoted from kiro-iso-next after
+  a KIB-nemesis build on hq: one prompt at the start, none after mkarchiso's 8 minutes.
 
 ### Technical Details
 - One line in the AUDIO / GStreamer block, after `gst-libav`. The `dav1d` library was already
   on the ISO; only the GStreamer plugin that uses it was missing. Same line in kiro-iso, kiro-iso-next and the
   KiroTux ISOs.
+- `start_sudo_keepalive` runs right after `check_not_root`: one `sudo -v`, then a background loop runs
+  `sudo -n -v` every 60 s while the script lives. `cleanup_on_exit` kills it after the stale-mount unmount, which
+  still needs sudo. The loop ends by itself when sudo refuses (e.g. `timestamp_timeout=0`), and its stdin/stdout/
+  stderr go to /dev/null so it never holds KIB's PTY open. Identical to kiro-iso-next `3b2f663`.
 
 ### Files Modified
-- `archiso/packages.x86_64`, `CHANGELOG.md`
+- `archiso/packages.x86_64`, `build-scripts/build-the-iso.sh`, `CHANGELOG.md`
 
 ## 2026.11.21
 

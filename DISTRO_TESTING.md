@@ -17,8 +17,8 @@ The same build as the metal-A test below, on the Optimus laptop, booted from the
 - **Boot menu:** `loader.conf` on the ESP has `console-mode max`, so the new line also reaches a laptop install.
 - **Driver:** `kiro_remove_nvidia` ran; no NVIDIA packages, `nouveau` + `i915` loaded, `vulkan-nouveau` installed.
 - **kiro-hwd 26.11-04:** `kiro-hwd detect` picks `nvidia-580xx + prime` (1c8c on the 580 list, chassis 10 with an
-  Intel iGPU). No `10-kiro-hwd-nvidia.conf` (Pascal is not Turing, correct), and kiro-system-files 26.11-16's
-  `nvidia.conf` no longer carries `NVreg_DynamicPowerManagement`.
+  Intel iGPU). On a free-driver install the kiro-hwd job doesn't run, so the absence of `10-kiro-hwd-nvidia.conf`
+  proves nothing here. kiro-system-files 26.11-16's `nvidia.conf` no longer carries `NVreg_DynamicPowerManagement`.
 - Not covered: the 580xx + PRIME install from the kiro-hwd boot line, and a Turing laptop.
 
 ---
@@ -35,9 +35,15 @@ kiro-system-files 26.11-16) and `gst-plugin-dav1d`.
 
 - **Boot menu:** `loader.conf` on the ESP has `console-mode max`. On the monitor the menu text looks sharper and
   smaller than with `keep`, still readable. The VirtualBox -next test earlier the same day showed it centered.
-- **kiro-hwd on a Turing desktop:** no `/etc/modprobe.d/10-kiro-hwd-nvidia.conf` written (correct: only Turing
-  laptops get it), and the global 0x02 is gone from `nvidia.conf`. The driver (620.73.04) reports
-  `DynamicPowerManagement: 3`, the driver default. A Turing laptop is still untested (none among the test boxes).
+- **NVIDIA power setting:** the global 0x02 is gone from `nvidia.conf` and the driver (620.73.04) reports
+  `DynamicPowerManagement: 3`, the driver default. The NVIDIA entry (`driver=nonfree`) skips the kiro-hwd job, so
+  kiro-hwd made no decision at install time. **Gap found:** a Turing laptop installed from this entry gets no 0x02
+  at all now (see the upgrade test below).
+- **Upgrade test, same install (afternoon):** downgraded to kiro-system-files 26.11-15 (global 0x02) + initramfs
+  rebuild + reboot → `DynamicPowerManagement: 2`. Then `pacman -S kiro-system-files kiro-hwd` (26.11-16, kiro-hwd
+  reinstalled): the `post_upgrade` hook printed "not a Turing laptop" and wrote no file. After a reboot **without**
+  an initramfs rebuild: `DynamicPowerManagement: 3`. nvidia isn't in this install's initramfs (`MODULES=()`, no
+  kiro-hwd mkinitcpio drop-ins on the NVIDIA entry), so the module reads `/etc/modprobe.d` from the root filesystem.
 - Installed: kiro-hwd 26.11-04, kiro-system-files 26.11-16, gst-plugin-dav1d 0.15.4-2. Boot entry
   `7.3.6-1-cachyos`.
 

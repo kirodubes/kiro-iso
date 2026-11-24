@@ -2,6 +2,26 @@
 
 Each release entry answers the same three things: why it was worth a new ISO, what functionality it added, and the package moves behind it. Newest first. From **2026/07/01** Kiro switches to **one official ISO per month**; the v26.07.01 ISO was the first, and **v26.11.01** is the current release (there is no August build — July and August are the holiday period).
 
+<!-- DRAFT 2026-11-24 — not built yet (iso_version is still v26.11.24). Open before release:
+     1. ohmychadwm-tweak-tool: new pages (11-20..23) being translated in another session — check msgfmt --statistics before the build
+     2. move "(current)" from v26.11.01 to this heading and update the intro line when it ships -->
+## v26.12.01 — December 1 (draft — not yet released)
+**Why a new ISO:** Kiro speaks your language: the installer slideshow, login screen, tools and scripts now come in 13 languages. This release also brings back the CachyOS kernel, with LTS as the backup, plus Kiro's own NVIDIA driver picker, Surfn Kiro as the new default icon theme, and a signed ISO.
+- **Kiro in 13 languages:** Dutch, German, Spanish, French, Brazilian Portuguese, Russian, Hungarian, Italian, Turkish, Polish, Japanese, Simplified Chinese and Romanian. Every Kiro tool follows your system language and has a language dropdown at the top right: the **Arch Linux Tweak Tool**, the **Ohmychadwm**, **Fish**, **Fastfetch** and **Alacritty Tweak Tools**, **ArchLinux Logout** and **BetterLockScreen**, the **Kiro ISO Builder** and the **Calamares Tweak Tool**. The install slideshow, every word on the login screen, the power menu, Dolphin's right-click entries, the Kiro menu entries and the `kiro-*` system scripts are translated too, and Kiro News shows its items in your language.
+- **The CachyOS kernel is back, with LTS as the backup:** Kiro boots **linux-cachyos** (BORE scheduler, tuned build) again, as it did from June to September. The second boot entry is now **linux-lts** instead of linux-zen. Zen follows the same mainline version as CachyOS, so one bad kernel release could break both entries. LTS is on a separate release line, so the backup still boots. Prefer the stock `linux` + `linux-lts` pair? Pick it in the **Kiro ISO Builder**.
+- **Kiro's own NVIDIA driver picker:** **kiro-hwd** replaces chwd and is part of every install. It picks the open driver for Turing and newer cards, the 580xx driver for Maxwell, Pascal and Volta, and keeps Kepler and older on nouveau. Hybrid laptops also get the GPU-switching tools. When the ISO already carries the right driver, the installer keeps it instead of rebuilding it, which saves about 4 minutes. Turing laptops get finer GPU power saving, and other NVIDIA machines no longer get a setting that did nothing for them. Run `kiro-hwd detect` any time to see what it would choose.
+- **Surfn Kiro is the default icon theme:** more than 1,000 app icons are drawn in Surfn's own flat style, so it no longer borrows from Numix, Papirus or Paper. XFCE gets white tray icons and matching Thunar toolbar icons. Plasma gets Surfn Kiro Light and Dark global themes. The other Kiro icon themes use Surfn Kiro for icons they lack.
+- **Ohmychadwm Tweak Tool grows:** a **Themes** page with 18 one-click looks (wallpaper, bar colours, borders, GTK theme, icons, cursor and optionally the login screen), new **Keyboard**, **App placement** and **Update & News** pages, and a settings search (Ctrl+F). On first login it opens on the **Displays** page, so you can set your screen resolution straight away.
+- **Arch Linux Tweak Tool:** a new **Hybrid graphics** page starts apps on the discrete card of a two-GPU laptop, also on desktops without a "Launch using Discrete Graphics" menu entry. The Locale page gains **Language Packs**, which install the Firefox, Thunderbird, LibreOffice and spell-check translations. The Keyboard tab sets two layouts switched with Alt+Shift, and the System page gains a Solaar row for Logitech devices.
+- **A safer install:** the installer no longer leaves your login password in its install log, where other local accounts could read it. Because root uses the same password by default, this also protects the root password.
+- **A signed ISO:** each ISO now comes with a GPG signature (`.sig`) made with the Kiro Signing Key, next to a SHA256 checksum. The old MD5 and SHA1 files are gone.
+- **Network hardening:** ICMP redirects are ignored (IPv4 and IPv6), and LLMNR name lookups are switched off. `kiro-audit` checks both.
+- **Variety works on XFCE again:** wallpaper changes are no longer cut off by a timeout, and the wallpaper you chose no longer reverts after a reboot. Variety also rotates 22 new paintings from **Kiro Atelier**, and a new Atelier painting is the default wallpaper. Thunar's right-click menu gains "Set as wallpaper Variety".
+- **A volume tray icon that works:** on chadwm, dusk, ohmychadwm and qtile the volume icon now shows in the tray, and the scroll wheel changes the volume.
+- **A sharper boot menu:** systemd-boot draws its menu at your screen's highest text resolution instead of a stretched low one. The GRUB loopback menu, used when you boot the ISO file straight from disk, is now a Kiro menu with the same boot options as the BIOS and UEFI menus.
+- **Smaller fixes you'll notice:** pamac shows app icons again. AV1 video plays smoothly in GNOME Videos and other GStreamer players. Web links open in Firefox by default. XFCE stays on the performance power profile on AC instead of dropping to balanced at every login. The ohmychadwm menu has search. Super+Shift+R no longer kills your tray apps, and the bar's status text is readable in every theme. The polkit password dialog is now fully translated in Dutch.
+- **Packages:** + `linux-cachyos`, `linux-cachyos-headers`, `kiro-hwd`, `surfn-kiro-icons-git`, `kiro-atelier-wallpapers`, `gst-plugin-dav1d`, + `snixembed-kiro` (with chadwm, dusk, ohmychadwm and qtile), + `pluma-plugins` (with MATE); − `linux`, `linux-headers` (`linux-lts` stays), `chwd`, `surfn-icons-git`, `beautyline`, `candy-icons-git`, `numix-icon-theme-git`, `numix-circle-icon-theme-git`, `resources`, `linux-atm`.
+
 ## v26.11.01 — November 1 (current)
 **Why a new ISO:** graphics that work out of the box (Vulkan on Intel and AMD, NVIDIA cards that light up every monitor), a leaner install that only ships what your desktop uses, and a theme you pick that actually applies everywhere.
 - **Every Kiro tool opens once:** starting a tool that is already open now brings its window to the front, instead of opening a second window, or, for ATT, asking for your password again and complaining about a lock file. This covers every tool below.
@@ -244,47 +264,32 @@ And there's a lot you get for free — every Kiro app ships free and open, now g
 
 <!--
 =============================================================================
-HOW THIS FILE IS GENERATED — re-run this each release (e.g. alongside
-/kiro-website-release), then commit + push so the website button shows the
-latest. The commit messages are just "update" (up.sh quick-push), so the
-truth is in the diffs, not the log.
+HOW THIS FILE IS GENERATED (runnable version: the /kiro-release command; keep
+both in sync). Since 2026/07/01 only vYY.MM.01 is a release: ONE section per
+month, never one per mid-month test build.
 
-1. Map each shipped version to the commit that bumped it. The version is set
-   in archiso/profiledef.sh at build time (Phase 2), so its history IS the
-   list of builds:
-       git log -p --since=<start-date> -- archiso/profiledef.sh | grep -E "^commit|iso_version="
+1. Baseline = the commit that built the last documented .01:
+       git log -S'iso_version="vYY.MM.01"' --format='%h %ad' -- archiso/profiledef.sh
+   Its date is the start date for every repo.
 
-2. For each consecutive pair of build commits, stat-diff the WHOLE tree but
-   exclude the per-build noise (version string, mirrorlist, build metrics):
-       git diff --stat <prev> <curr> -- . \
-         ':(exclude)archiso/profiledef.sh' \
-         ':(exclude)archiso/airootfs/etc/dev-rel' \
-         ':(exclude)BUILD_TIMES.md'
-   What's left points you at the files that actually changed — almost always
-   archiso/packages.x86_64 and build-scripts/build-the-iso.sh.
+2. kiro-iso: diff <base>..HEAD minus per-build noise (profiledef.sh, dev-rel,
+   BUILD_TIMES.md); read packages.x86_64 (+/- moves; #pkg in an EDITION-BLOCK
+   = edition-only) and build.conf.defaults (kernel pair). Prose and "why" come
+   from CHANGELOG.md entries since the start date.
 
-3. Read the real line-level changes for those files:
-       git diff <prev> <curr> -- archiso/packages.x86_64        # + / - packages
-       git diff <prev> <curr> -- build-scripts/build-the-iso.sh # kernel knob, repo sources
-   Cross-check DISTRO_TESTING.md for the "why we shipped it" (what was validated)
-   and WHAT-CHANGED-TO-THE-ISO.md for the prose behind a feature wave.
+3. Ecosystem: every Kiro repo with commits since the start date; read its
+   CHANGELOG "What Changed", not the diffs. Skip KIROTUX/* and kiro-atelier
+   (paid/private), -next/-nemesis twins, retired repos. Wayland edition configs
+   (installed via ATT) get one combined line at most.
 
-4. Turn each diff into ONE block per version, answering three things from the
-   END-USER's point of view (not the dev's):
-       - Why a new ISO: the one reason it was worth shipping.
-       - What functionality it added: what the user can now do / notice.
-       - Packages: the + / - moves (but never ONLY packages).
-   Hard-filter: keep what a user FEELS (drivers, kernel, installer, apps).
-   Drop dev/build/brand-internal noise (template conformance, isoLabel fixes,
-   version-sync checks) and validations-that-aren't-changes. A pure
-   version-bump + mirrorlist build gets NO entry — let the filter collapse it.
+4. One section, END-USER view: "Why a new ISO" (one line, 2-4 themes), one
+   bold-lead-in bullet per theme (headlines first), a "Smaller fixes you'll
+   notice" bullet, then Packages (+ adds; − removes, U+2212 minus).
+   Hard-filter: keep what a user notices; drop build-host/pipeline, refactors,
+   docs, tests. No hostnames, paths, usernames or test-box names.
 
-5. Order newest FIRST (most recent build at the top, under the intro).
-
-6. BE CONCISE (Erik's rule, 2026-06-13). Every entry is tight: a one-line
-   "Why a new ISO" plus a few short bullets, never a paragraph per bullet.
-   One feature = one bullet of one or two sentences. A build with one real
-   selling point gets one line. Trim ruthlessly — the user wants the gist,
-   not the full design write-up (that lives in the package CHANGELOGs).
+5. Not built yet? Heading "(draft — not yet released)", open items in an HTML
+   comment above it, (current) stays on the previous release, no commit. On
+   release: move (current), update the intro line, commit, /kiro-website-release.
 =============================================================================
 -->

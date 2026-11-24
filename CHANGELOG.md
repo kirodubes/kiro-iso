@@ -2,9 +2,17 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
-## 2026.11.24
+## 2026.11.24 — v26.11.24
 
 ### What Changed
+- **Sharper boot menu on installed systems.** The installer now writes `console-mode max` to systemd-boot's
+  `loader.conf` instead of `keep` (kiro-calamares-config 26.11-13, `9c725bb`). The firmware then draws the menu at
+  the screen's highest text resolution, instead of whatever mode the firmware left behind. Tested in
+  VirtualBox on kiro-iso-next first, then on the v26.11.24 build on metal-A: sharper, a bit smaller, readable.
+- **NVIDIA power setting only where it helps** (kiro-hwd 26.11-04, kiro-system-files 26.11-16). The
+  `NVreg_DynamicPowerManagement=0x02` option is no longer forced on every NVIDIA machine; kiro-hwd writes it only on
+  Turing laptops. Desktops and newer cards keep the driver default. Same approach as CachyOS chwd. The RTX 2060
+  desktop test showed no file written and the driver default active.
 - **AV1 video plays smoothly in GStreamer players** (`gst-plugin-dav1d`, Arch `extra`, ~450 KB). GNOME Videos,
   Showtime, Clapper and Parole used `aom`'s slow AV1 decoder on GPUs without AV1 hardware decoding; dav1d is the
   fast one. mpv, VLC and the browsers already used dav1d through ffmpeg or their own code. Seen in CachyOS 2611.
@@ -23,7 +31,9 @@
   stderr go to /dev/null so it never holds KIB's PTY open. Identical to kiro-iso-next `3b2f663`.
 
 ### Files Modified
-- `archiso/packages.x86_64`, `build-scripts/build-the-iso.sh`, `CHANGELOG.md`
+- `archiso/packages.x86_64`, `build-scripts/build-the-iso.sh`, `CHANGELOG.md`, `DISTRO_TESTING.md`
+- The boot menu and NVIDIA changes live in the kiro-calamares-config, kiro-hwd and kiro-system-files packages; this
+  ISO picks them up from the repos.
 
 ## 2026.11.21
 

@@ -6,6 +6,26 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-24 (build 08:04) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **test build, NVIDIA entry**, **kiro-audit 140 / 0 / 0**
+
+Tests three changes that landed after the 2026-11-21 test: the systemd-boot `console-mode max` line
+(kiro-calamares-config 26.11-13), the Turing-laptop-only `NVreg_DynamicPowerManagement` (kiro-hwd 26.11-04 +
+kiro-system-files 26.11-16) and `gst-plugin-dav1d`.
+
+| Target (metal-A) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), NVIDIA entry | erase disk, unencrypted | UEFI / systemd-boot 262.2 | Clean install; **kiro-audit 140 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 32.5 s (5.2 s userspace) |
+
+- **Boot menu:** `loader.conf` on the ESP has `console-mode max`. On the monitor the menu text looks sharper and
+  smaller than with `keep`, still readable. The VirtualBox -next test earlier the same day showed it centered.
+- **kiro-hwd on a Turing desktop:** no `/etc/modprobe.d/10-kiro-hwd-nvidia.conf` written (correct: only Turing
+  laptops get it), and the global 0x02 is gone from `nvidia.conf`. The driver (620.73.04) reports
+  `DynamicPowerManagement: 3`, the driver default. A Turing laptop is still untested (none among the test boxes).
+- Installed: kiro-hwd 26.11-04, kiro-system-files 26.11-16, gst-plugin-dav1d 0.15.4-2. Boot entry
+  `7.3.6-1-cachyos`.
+
+---
+
 ## 2026-11-21 (build 05:49) — v26.11.21, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-A, NVIDIA RTX 2060): **kernel-pair test, `linux-lts` free-driver entry**, **kiro-audit 138 / 0 / 0**
 
 A fresh reinstall of the same build on metal-A, right after the NVIDIA-entry install below. This time the live ISO

@@ -2,6 +2,21 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.24
+
+### What Changed
+- **AV1 video plays smoothly in GStreamer players** (`gst-plugin-dav1d`, Arch `extra`, ~450 KB). GNOME Videos,
+  Showtime, Clapper and Parole used `aom`'s slow AV1 decoder on GPUs without AV1 hardware decoding; dav1d is the
+  fast one. mpv, VLC and the browsers already used dav1d through ffmpeg or their own code. Seen in CachyOS 2611.
+
+### Technical Details
+- One line in the AUDIO / GStreamer block, after `gst-libav`. The `dav1d` library was already
+  on the ISO; only the GStreamer plugin that uses it was missing. Same line in kiro-iso, kiro-iso-next and the
+  KiroTux ISOs.
+
+### Files Modified
+- `archiso/packages.x86_64`, `CHANGELOG.md`
+
 ## 2026.11.21
 
 ### What Changed

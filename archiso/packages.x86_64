@@ -862,6 +862,7 @@ alsa-firmware
 alsa-lib
 alsa-plugins
 gst-libav
+gst-plugin-dav1d
 gst-plugin-pipewire
 gst-plugins-bad
 gst-plugins-base

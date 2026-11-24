@@ -158,6 +158,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | ISO        | Target            | Duration | mkinitcpio passes | Notes                                       |
 |------------------|------------|-------------------|----------|---------------------|---------------------------------------------|
+| 2026-11-24 20:28 | v26.11.24 | Medion | 5m30s | 2 | Medion — real metal BIOS/GRUB (Calamares Tweak Tool), boot line 5 (fallback linux-lts), ext4 + hibernate swap, unencrypted, English (encryption + French missed, redo planned); kiro-audit 140/0/0 |
 | 2026-11-24 18:26 | v26.11.24 | MSI | 8m3s | 2 | MSI — real metal UEFI/systemd-boot, boot line 3 (kiro-hwd → nvidia-580xx + prime, online over Wi-Fi), xfs + hibernate swap, German; kiro-audit 139/0/0 |
 | 2026-11-24 15:56 | v26.11.24 | metal-B | 4m2s | 2 | metal-B — real metal UEFI/systemd-boot, LUKS2 + btrfs + swap file, Dutch (nl_BE, be keyboard), free entry; kiro-audit 144/0/0 |
 | 2026-11-21 08:09 | v26.11.21 | metal-A | 3m40s | 2 | v26.11.21 kernel-pair test, live-booted from the `linux-lts` free-driver line (`driver=free`), no NVIDIA. UEFI, systemd-boot, erase disk, ext4. 43 jobs, none failed. bootctl: lts default (kiro-0), cachyos kiro-1. nouveau + NVK (zink). Timed from Calamares.log. kiro-audit 138 PASS / 0 WARN / 0 FAIL |

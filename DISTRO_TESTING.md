@@ -6,6 +6,26 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-24 (build 14:59) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release pretest 3 of 5 — boot line 5 (fallback `linux-lts`), GRUB, ext4**, **kiro-audit 140 / 0 / 0** — partial, redo planned
+
+| Target (Medion) | FS / encryption | Bootloader | Result |
+|-----------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 5 (fallback kernel, `linux-lts`), installed in **English** (French was planned) | erase disk, msdos table, **ext4**, **unencrypted** (LUKS2 was planned), **swap partition with hibernate** (8.8 G; "without hibernate" was planned) | BIOS / GRUB (Calamares Tweak Tool) | Clean install, 5m30s, 2 mkinitcpio passes; **kiro-audit 140 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 9.0 s (4.4 s userspace) |
+
+- **Boot line 5 on BIOS:** the syslinux fallback entry booted the live session on `linux-lts`; the installed system
+  runs `6.18.65-1-lts`.
+- **GRUB on BIOS:** `grub-install --target=i386-pc` succeeded; the menu offers `linux-lts` and `linux-cachyos` under
+  Advanced options. `resume=UUID=…` is on the kernel line and the `resume` hook is in the initramfs.
+- **Not covered, to redo:** the "Encrypt system" box on the Erase disk page was left unticked (log: "There are 0 LUKS
+  partitions"); the swap choice was the hibernate size (Calamares suggested 8 GiB for 8 GB RAM); the language stayed
+  English (`LANG` and every `LC_*` = `en_US.UTF-8`, keyboard `fr`). GRUB unlocking LUKS2 on BIOS is still untested
+  and Medion is the only BIOS box, so a reinstall follows: line 5, French on the first screen, ext4, encryption
+  ticked, swap without hibernate.
+- Journal errors are only the known harmless ones: `nouveau … failed to create ce channel, -22` (Fermi),
+  `gkr-pam: unable to locate daemon control file`, NetworkManager's auditd socket.
+
+---
+
 ## 2026-11-24 (build 14:59) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, Intel UHD 630 + GTX 1050 Ti Mobile): **release pretest 2 of 5 — boot line 3 (kiro-hwd) over Wi-Fi, German, xfs + hibernate swap**, **kiro-audit 139 / 0 / 0**
 
 | Target (MSI) | FS / encryption | Bootloader | Result |

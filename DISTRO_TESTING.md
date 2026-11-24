@@ -28,8 +28,9 @@ GRUB). Bootloader and encryption set in the Calamares Tweak Tool, filesystem and
   `loader.conf` carries `timeout 5` and `console-mode max`.
 - **kiro-hwd:** `kiro-hwd detect` → "no NVIDIA GPU found".
 - **Installer log:** the user password appears only as its yescrypt hash (`usermod -p $y$…`), not in plain text.
-- **Journal:** a USB Realtek Bluetooth adapter (`hci1`) times out and resets in a loop (66 times since boot); the
-  first controller works. Hardware-side, not an ISO finding.
+- **Journal:** two identical ASUS USB-BT500 dongles (RTL8761BU) are plugged in. `hci0` works; `hci1` times out and
+  resets in a loop (133 times in the first hour). Same model, kernel and `linux-firmware-realtek` on both, so it is
+  that dongle or its USB port, not an ISO finding.
 
 ---
 

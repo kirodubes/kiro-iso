@@ -2,6 +2,25 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.26
+
+### What Changed
+- **Web App Manager on the ISO.** **webapp-manager** (Linux Mint's tool, Arch `extra`) now ships in TIER 3 under
+  WEB BROWSERS. It turns any website into a desktop app: a launcher with its own icon that opens the site in its
+  own browser window, without Electron. The idea came from a look at Peppermint OS, whose Kumo tool does the
+  same job.
+
+### Technical Details
+- Cost on the v26.11.24 package set: 5.6 MB installed for webapp-manager plus two new dependencies,
+  **python-tldextract** (0.5 MB) and **python-requests-file** (0.02 MB); everything else it needs (gtk3, xapp,
+  python-pillow, python-requests, python-beautifulsoup4 …) was already on the ISO.
+- TIER 3 on purpose, so it stays removable: the **kiro-iso-builder** Packages screen reads TIER 3 and offers it
+  as an untickable package, and ATT's Streamline page (generated from TIER 3 by `gen-streamline-list.py`) offers
+  it for removal on installed systems.
+
+### Files Modified
+- `archiso/packages.x86_64`
+
 ## 2026.11.24 — v26.11.24
 
 ### What Changed

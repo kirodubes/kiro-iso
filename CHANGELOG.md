@@ -9,6 +9,13 @@
   WEB BROWSERS. It turns any website into a desktop app: a launcher with its own icon that opens the site in its
   own browser window, without Electron. The idea came from a look at Peppermint OS, whose Kumo tool does the
   same job.
+- **AUR check before every AUR build (`cachyos-pi-scan`, TIER 3, PACKAGE / SYSTEM TOOLS).** It is the scanner
+  behind Kiro's new AUR check: paru runs **kiro-aur-check** (kiro-system-files) before every AUR build, and yay
+  does the same through an AURPreInstall hook (**kiro-yay-aur-check**). The check shows the lines worth a look in
+  a PKGBUILD — download-and-run, reading `~/.ssh`, unverified sources — with coloured finding levels, and asks
+  before it builds on a dangerous one. New installs get the check switched on from the kiro-dot-files skel
+  `paru.conf`; ATT's Pacman page has the AUR check switch that turns it on or off for paru and yay. This is
+  promoted from kiro-iso-next (`8cd5324`) on Erik's call.
 
 ### Technical Details
 - Cost on the v26.11.24 package set: 5.6 MB installed for webapp-manager plus two new dependencies,
@@ -17,6 +24,12 @@
 - TIER 3 on purpose, so it stays removable: the **kiro-iso-builder** Packages screen reads TIER 3 and offers it
   as an untickable package, and ATT's Streamline page (generated from TIER 3 by `gen-streamline-list.py`) offers
   it for removal on installed systems.
+- **cachyos-pi-scan** 2.0.1-1 comes from nemesis_repo (built in KIRO-PKG-BUILD-3PARTY). kiro-system-files now
+  lists it in `depends=` (KIRO-PKG-BUILD-APPS `ad5e2b1`), so it would arrive anyway; the TIER 3 line is what lets
+  KIB's Packages screen (`read_tier3()`) and ATT Streamline show it. Without the scanner the check prints one line
+  and paru/yay build as before.
+- Same line, same place as kiro-iso-next. kiro-iso-next still lacks this day's `webapp-manager`; sync
+  kiro-iso → -next before the next -next test.
 
 ### Files Modified
 - `archiso/packages.x86_64`

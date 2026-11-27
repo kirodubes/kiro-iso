@@ -6,6 +6,49 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / GRUB** (metal-A, RTX 2060): **release round 1 — boot line 2 (NVIDIA modern), GRUB on UEFI, Italian, btrfs, no swap**, **kiro-audit 141 / 0 / 0**
+
+First install of the v26.12.01 release candidate. Choices in the order they were made: cable; boot line 2;
+Calamares Tweak Tool bootloader GRUB, encryption off; Welcome page Italiano (picked first); Erase disk, btrfs, no
+swap.
+
+| Target (metal-A) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE + ohmychadwm, X11), boot line 2 (`driver=nonfree`), installed in **Italian** | erase disk, **btrfs**, unencrypted, **no swap** (zram only) | UEFI / **GRUB** (Calamares Tweak Tool) | Clean install; **kiro-audit 141 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 33.6 s (cachyos) / 26.9 s (lts) |
+
+- **GRUB on UEFI:** `\EFI\KIRO\GRUBX64.EFI`; menu = kiro (cachyos), Advanced options with cachyos and lts, UEFI
+  Firmware Settings, Restart, Shutdown. Both kernels boot (`7.3.6-3-cachyos`, `6.18.65-1-lts`; lts via
+  `grub-reboot`).
+- **NVIDIA line 2:** `nvidia-open-dkms` 620.73.04 + `libva-nvidia-driver` kept; `nvidia-smi` RTX 2060 at P8; both
+  monitors (DVI + HDMI) connected; the global `NVreg_DynamicPowerManagement=0x02` is in `/etc/modprobe.d/nvidia.conf`.
+- **btrfs:** 8 subvolumes (no `@swap` without a swap file), `compress=zstd:3,noatime`.
+- **Language:** `LANG` and every `LC_*` = `it_IT.UTF-8` (Italiano picked before the location: the en_US formats bug
+  stays away), keymap `be-latin1`, X11 `be`, console font `eurlatgr`. SDDM, ohmychadwm bar, VLC, Meld and Web App
+  Manager in Italian.
+- **AUR check on a fresh install:** on for paru and yay (skel). `paru -S pfetch-git` and `yay -S pfetch-git` both
+  print the check (`Downloads from: github.com`, `Nothing flagged …`) before building; package removed afterwards.
+  Those two lines are cachyos-pi-scan's own text and stay English on an Italian system; Kiro's lines are
+  translated.
+- **Web App Manager:** a "Kiro Discussions" web app with a fetched icon, launched from the Kiro menu. The first
+  launch is Firefox's first run (tabs, address bar, privacy-notice tab, class `firefox`); from the second launch on
+  it is a real web app (class `WebApp-KiroDiscussions3154`, no toolbar). The panel shows Firefox's icon. Both are
+  upstream Firefox / webapp-manager behaviour.
+- **ohmychadwm:** session up with snixembed, volctl, nm-applet, slstatus; the Ohmychadwm Tweak Tool applied a theme
+  (adw-gtk3, Surfn-Kiro, capitaine-cursors) and backed up the originals first.
+- **Upgrade path (step 1, same day, on the v26.11.24 install before this reinstall):** 88-package `-Syu` to
+  kiro-system-files 26.11-22 / ATT 26.11-39; the AUR check notice printed once during the upgrade and not again on a
+  paru reinstall; the check stayed off for the old user files; switching it on and off (the commands ATT runs)
+  worked for paru and yay. A second box (metal-B, simulated pre-check state) showed the notice in Dutch.
+- **Installer log:** `/var/log/Calamares-install.json` only has `"password": ""`, `reuseRootPassword`,
+  `setRootPassword`: no secret.
+- **Findings (minor):** Super+F7 in ohmychadwm runs `virtualbox`, which the ISO does not ship ("fish: Unknown
+  command"). Journal on cachyos: two `nvidia-drm` "Flip event timeout" lines at the first SDDM start (not on the lts
+  boot). On lts: a kernel `WARNING` in `drm_sysfs_connector_property_event` from `nv_drm_connector_update_topology_property`
+  (nvidia-open 620 on 6.18 LTS, a warning, no crash). Known harmless: `ucsi_ccg` timeout (RTX USB-C chip),
+  `gkr-pam`, USB `error -71` while the stick was pulled.
+
+---
+
 ## 2026-11-24 (build 14:59) — v26.11.24, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release pretest 3 of 5 — boot line 5 (fallback `linux-lts`), GRUB, ext4**, **kiro-audit 140 / 0 / 0** — partial, redo planned
 
 | Target (Medion) | FS / encryption | Bootloader | Result |

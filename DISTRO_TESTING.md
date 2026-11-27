@@ -6,6 +6,28 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release round 1b — reinstall with encryption: boot line 5, GRUB + LUKS2 on BIOS, English, ext4, small swap**
+
+Reinstall of the entry below with "Encrypt system" ticked. Choices in order: Wi-Fi; boot line 5; Calamares Tweak Tool
+GRUB + encryption on; Welcome page English; Erase disk, ext4, Swap (no Hibernate), Encrypt system + passphrase.
+
+| Target (Medion) | FS / encryption | Bootloader | Result |
+|-----------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 5 (`linux-lts`), **English**, Wi-Fi | erase disk, msdos, **ext4 on LUKS2**, **swap on LUKS2** (small, 8.8 G) | BIOS / GRUB (Calamares Tweak Tool) | Clean install; boots after GRUB takes the passphrase; zero failed units, boot 18.2 s (initrd 11.7 s) |
+
+- **LUKS:** `/dev/sda1` (root) and `/dev/sda2` (swap) both LUKS2, `argon2id` (~800 MiB memory cost), `aes-xts-plain64`,
+  two keyslots (passphrase + keyfile).
+- **GRUB on BIOS unlocks LUKS2/argon2id** with `linux-lts` 6.18 (`GRUB_ENABLE_CRYPTODISK=y`), as on 2026-06-05.
+- **No second prompt:** `/crypto_keyfile.bin` (0600) in `FILES=()` and in `crypttab` for both volumes;
+  `systemd-cryptsetup` opened both from it (~8 s of argon2id in the initrd). Kernel line carries `rd.luks.uuid` for
+  both, `rd.luks.key=/crypto_keyfile.bin`, `resume=/dev/mapper/luks-…`.
+- **Passphrase stripped:** every `luksPassphrase` in `/var/log/Calamares-install.json` is `""`.
+- **Note:** `HOOKS` has `sd-encrypt` **and** `openswap` (Calamares' `luksopenswaphookcfg`, a busybox-initramfs hook);
+  in Kiro's systemd initramfs it is inert, `sd-encrypt` opens the swap. Harmless, could be dropped from the config.
+- Journal errors only the known ones (nouveau `ce channel -22`, `gkr-pam`, `wpa_supplicant` multicast).
+
+---
+
 ## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release round 1 — Wi-Fi, boot line 5 (fallback `linux-lts`), French, ext4, small swap**, unencrypted
 
 Choices in the order they were made: Wi-Fi from the live tray; boot line 5; Calamares Tweak Tool bootloader GRUB,

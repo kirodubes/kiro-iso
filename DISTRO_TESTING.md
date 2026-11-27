@@ -6,6 +6,31 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (Yoga, Intel HD 620 + AMD Radeon R5 M330): **release round 2 — Wi-Fi, boot line 4 (nomodeset), English, ext4, swap with hibernate — hibernate resumes**
+
+Choices in order: Wi-Fi from the live tray; boot line 4; no Calamares Tweak Tool; Welcome page English; Erase disk,
+ext4, Swap (with Hibernate).
+
+| Target (Yoga) | FS / encryption | Bootloader | Result |
+|---------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 4 (nomodeset), **English**, **Wi-Fi** | erase disk, GPT, **ext4**, unencrypted, **swap partition with hibernate** (8.8 G for 7.6 G RAM) | UEFI / systemd-boot (default) | Clean install; zero failed units, boot 22.6 s (3.9 s userspace); **hibernate + resume works** |
+
+- **nomodeset stays on the live ISO only:** the installed entries (cachyos default + lts) carry no `nomodeset`;
+  `i915` drives the Intel GPU, `amdgpu` the Hainan dGPU.
+- **Hybrid graphics:** `vulkan-intel` and `vulkan-radeon` both kept; `DRI_PRIME=1 vulkaninfo` lists
+  `AMD Radeon R5 M330 (RADV HAINAN)` and the Intel HD 620.
+- **Hibernate (the open question from the MSI entry):** `resume=UUID` on both entries, `resume` hook, `/sys/power/resume`
+  = 8:3. `systemctl hibernate` → powered off → power button → the session came back: a marker in `/dev/shm` written
+  before hibernating was still there and the boot ID was unchanged; Wi-Fi reconnected. So resume works on cachyos
+  with Intel + AMD; the MSI black screen points at NVIDIA 580xx + PRIME, not at Kiro's resume setup.
+- **After resume:** `irq 16: nobody cared … Disabling IRQ #16` (handlers `idma64.0`, `i2c_designware.0`). That I2C
+  bus only carries `NPCE0388:00` (no driver bound); the touchpad is PS/2 (`SynPS/2 Synaptics TouchPad`) and the
+  touchscreen sits on `i2c_designware.1`, so nothing the user touches is affected.
+- **Language:** `en_US.UTF-8` throughout, keymap `be-latin1`. AUR check on; cachyos-pi-scan and webapp-manager present.
+- Journal otherwise only known lines (`gkr-pam`, `wpa_supplicant` multicast, BIOS VMX/SGX/TDX notices).
+
+---
+
 ## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release round 1b — reinstall with encryption: boot line 5, GRUB + LUKS2 on BIOS, English, ext4, small swap**
 
 Reinstall of the entry below with "Encrypt system" ticked. Choices in order: Wi-Fi; boot line 5; Calamares Tweak Tool

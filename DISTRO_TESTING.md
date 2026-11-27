@@ -6,6 +6,32 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release round 1 — Wi-Fi, boot line 5 (fallback `linux-lts`), French, ext4, small swap**, unencrypted
+
+Choices in the order they were made: Wi-Fi from the live tray; boot line 5; Calamares Tweak Tool bootloader GRUB,
+encryption on; Welcome page Français (picked first); Erase disk, ext4, Swap (no Hibernate); "Encrypt system" left
+unticked (Erik: the box is a bit out of the way and encryption is not a priority for him; GRUB unlocking
+LUKS2/argon2id on BIOS was proven on this machine on 2026-06-05).
+
+| Target (Medion) | FS / encryption | Bootloader | Result |
+|-----------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 5 (fallback kernel, `linux-lts`), installed in **French** over **Wi-Fi** | erase disk, msdos table, **ext4**, unencrypted, **swap partition, small** (8.8 G) | BIOS / GRUB (Calamares Tweak Tool) | Clean install; zero failed units, boot 9.0 s (4.3 s userspace) |
+
+- **Wi-Fi on BIOS:** the live session's Wi-Fi connection carried over; `wlan0` came up on the first boot.
+- **Language:** `LANG` and every `LC_*` = `fr_BE.UTF-8` (Français picked before the location), keymap `be-latin1`,
+  X11 `be`. This is the second en_US-formats test the 11-24 entry asked for: clean when the language is picked first.
+- **Swap:** Calamares' "small" choice is the RAM size up to 8 GiB, so 8 GB RAM gives an 8.8 G partition (with
+  `resume=`). The 11-24 entry read that size as the hibernate choice; the install JSON shows
+  `partitionChoices: {install: erase, swap: small}` both times.
+- **Encryption path armed but not used:** the install JSON has `enableLuksAutomatedPartitioning: true` and
+  `luksFileSystemType: luks2` (the Calamares Tweak Tool did its part); `luksPassphrase` empty, no LUKS partition.
+- **GRUB:** lts and cachyos entries; the UEFI Firmware entry is guarded by `grub_platform = efi`, so it does not
+  show on BIOS. Fermi on nouveau, NVIDIA stack removed. AUR check on; cachyos-pi-scan and webapp-manager present.
+- Journal errors are only the known harmless ones: nouveau `failed to create ce channel, -22`, `gkr-pam`,
+  NetworkManager's auditd socket, `wpa_supplicant` multicast RX registrations.
+
+---
+
 ## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / GRUB** (metal-A, RTX 2060): **release round 1 — boot line 2 (NVIDIA modern), GRUB on UEFI, Italian, btrfs, no swap**, **kiro-audit 141 / 0 / 0**
 
 First install of the v26.12.01 release candidate. Choices in the order they were made: cable; boot line 2;

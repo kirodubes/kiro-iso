@@ -2,6 +2,34 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
+## 2026.11.27 — v26.12.01 release candidate built and tested
+
+### What Changed
+- **The v26.12.01 release ISO is built** (05:54, `version_override=v26.12.01`, `linux-cachyos` + `linux-lts`, open
+  NVIDIA driver, XFCE + ohmychadwm; 6.4 G, 9m14s) and **GPG-signed** with the Kiro Signing Key; `gpg --verify` and
+  `sha256sum -c` pass.
+- **Fresh offline AMD microcode:** before the build, kiro-calamares-config (and -next) moved the bundled
+  `amd-ucode` from 20261019-1 to **20261124-1** (Arch `[core]`, released 2026-11-25), built as kiro-calamares-config
+  26.11-14 at 05:47, so the ISO carries it. Intel stays on 20261110-1. Without it an offline install would have put
+  October microcode on every AMD machine.
+- **Release test round passed** (details in `DISTRO_TESTING.md`): the AUR-check upgrade path on two existing
+  installs, then six bare-metal installs covering all five boot lines, systemd-boot / GRUB on UEFI / GRUB on BIOS
+  (with and without LUKS2), ext4 / btrfs / xfs, all four swap choices, cable / Wi-Fi / offline and both kernels —
+  every `kiro-audit` 0 WARN / 0 FAIL. Hibernate resumes on Intel + AMD, which narrows the MSI black screen to
+  NVIDIA 580xx + PRIME.
+
+### Technical Details
+- The offline install proved the microcode path on metal: `hasInternet: false`, `kiro_ucode` installed the bundled
+  intel-ucode 20261110-1 and removed the unneeded amd-ucode 20261124-1.
+- Minor findings, none blocking (listed in the round summary): ohmychadwm Super+F7 calls `virtualbox`, which the
+  ISO does not ship; cachyos-pi-scan's own lines stay English; an nvidia-open 620 `drm_sysfs` WARNING on 6.18 LTS;
+  the "Encrypt system" checkbox is easy to miss (MASTER_TODO P3).
+- The monthly test plan lives offline in Kiro-HQ and is reused each release.
+
+### Files Modified
+- `BUILD_TIMES.md`, `DISTRO_TESTING.md`, `CHANGELOG.md` (version-bump files `dev-rel`, `profiledef.sh`,
+  `build-the-iso.sh` are written by the build)
+
 ## 2026.11.26 — for release v26.12.01
 
 Everything below lands on the ISO for the **v26.12.01** release. It is the last batch of changes before the

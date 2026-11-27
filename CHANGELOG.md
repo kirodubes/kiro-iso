@@ -2,7 +2,11 @@
 
 > Complete history of the KIRO ISO project — newest first. Each entry explains not just what changed, but why it was done and what benefit it brings. Daily rebuilds (version bump + mirrorlist refresh only) are grouped into a single line.
 
-## 2026.11.26
+## 2026.11.26 — for release v26.12.01
+
+Everything below lands on the ISO for the **v26.12.01** release. It is the last batch of changes before the
+release-candidate build; none of it is in the v26.11.24 build that the 2026-11-24 bare-metal pretests covered, so
+the release round must exercise it (see **Testing still to do** at the end of this entry).
 
 ### What Changed
 - **Web App Manager on the ISO.** **webapp-manager** (Linux Mint's tool, Arch `extra`) now ships in TIER 3 under
@@ -28,11 +32,74 @@
   lists it in `depends=` (KIRO-PKG-BUILD-APPS `ad5e2b1`), so it would arrive anyway; the TIER 3 line is what lets
   KIB's Packages screen (`read_tier3()`) and ATT Streamline show it. Without the scanner the check prints one line
   and paru/yay build as before.
-- Same line, same place as kiro-iso-next. kiro-iso-next still lacks this day's `webapp-manager`; sync
-  kiro-iso → -next before the next -next test.
+- Same line, same place as kiro-iso-next. kiro-iso-next has both lines too (`8cd5324`, `22eb4d3`), so the
+  two package lists differ only by the usual prod ↔ next/nemesis swaps.
+
+### The AUR check in detail (kiro-system-files 26.11-22, kiro-dot-files 26.11-04)
+Arch's AUR is user-submitted: a PKGBUILD can download and run anything, and nothing checks it before paru or yay
+builds it. Kiro now reads it first. The rules are CachyOS's (**cachyos-pi-scan**, the scanner behind their Package
+Installer); the wrapper and the paru/yay wiring are Kiro's own, in **kiro-system-files**.
+- **kiro-aur-check** runs the scanner on the PKGBUILD and its files, adds the package's AUR history, and prints the
+  findings with coloured levels: **[DANGER]** bold red, **[WARNING]** orange (yellow on terminals below 256
+  colours), **[INFO]** blue; plain text when the output is not a terminal. On a DANGER finding it asks before it
+  builds. With no terminal to ask (a GUI front end, a script), it prints one banner and stops instead of building.
+- **On an update it shows what changed:** in the AUR clone paru or yay builds from, it diffs the oldest commit
+  that carries the installed version against HEAD (`.SRCINFO` left out, at most 200 lines). The same method as
+  CachyOS's Package Installer (`aurclient.cpp`). git runs without hooks, external diff, textconv or the package's
+  `.gitattributes`, so a package cannot hide its changes from the diff. Tested on picard: a yay update of pfetch
+  1.10.0 → 1.11.0 shows the diff; a paru clone of a package that is not installed stays quiet. That test also
+  found an ERR-trap bug (a failing pipe inside a command substitution), fixed before the build.
+- **paru:** the check runs as paru's `PreBuildCommand`. **kiro-paru-aur-check** and a pacman path hook put it in
+  `/etc/paru.conf` `[bin]` by default. Every Kiro user also has `~/.config/paru/paru.conf` from skel, which makes
+  paru ignore `/etc/paru.conf`, so kiro-dot-files' skel `paru.conf` carries the line too, and
+  `kiro-paru-aur-check --file` switches a user's own copy (the file keeps its owner).
+- **yay:** yay 13+ runs `init.lua` autocmds. Its `AURPreInstall` event fires once per AUR package base,
+  dependencies included, before menus, downloads and builds; a non-zero exit from kiro-aur-check becomes
+  `yay.abort`. yay has no system-wide config, so the hook lives in `~/.config/yay/init.lua` (new accounts get it
+  from kiro-dot-files skel) and **kiro-yay-aur-check** switches its marked line. Tested on picard with yay-git
+  13.1: banner before the menus, DANGER + n stops, DANGER + y builds, no terminal stops, and yay still starts when
+  the hook file is missing.
+- **Existing installs are told, not changed:** their `~/.config/paru/paru.conf` and `init.lua` predate the check,
+  so for them it is off. **kiro-aur-check-notice** (pacman hook `zz-kiro-aur-check-notice.hook`) prints a few
+  coloured lines when paru or yay is installed or updated, and once when kiro-system-files first brings the
+  check. The lines say Kiro has an AUR check, that it is off, and how to switch it on (ATT, or one command). It
+  shows once per user and stays silent when the check is on or the user switched it off on purpose.
+- **kiro-system-files** moved **cachyos-pi-scan** from `optdepends` to `depends` (KIRO-PKG-BUILD-APPS `ad5e2b1`),
+  so every Kiro system gets the scanner; without it the check prints one line and the helpers build as before.
+
+### Arch Linux Tweak Tool 26.11-39
+- **AUR check switch (Pacman page):** one switch for paru and yay. It shows "on" only when every installed helper
+  has the check on. Toggling it writes `/etc/paru.conf`, the user's `paru.conf` and `init.lua` (created for the
+  user when missing), and an **Install** button fetches cachyos-pi-scan when it is absent. Unit tests, 13
+  languages. Shown on Kiro and KiroTux.
+- **Maintenance gains Repair and History tabs.** Repair scans `pacman -Qkk` (`LC_ALL=C`) and reinstalls packages
+  with missing or changed files. It skips the files Kiro and system services change on purpose, and explains
+  `.desktop` launchers that **hardcode-fixer** rewrote (pacman reports them as changed; a reinstall restores the
+  original). History lists pacman transactions and takes a package back one version from the cache, or says "not
+  in cache" when that is not possible.
+- **Journal tab (Logging page):** `journalctl -o json` in a table with boot, level, service and text filters, to
+  see what happened before a freeze. The terminal buttons moved to a Terminal views tab. Unit tests cover the
+  Repair, History and Journal parsers.
+- **Report a problem:** on Kiro and KiroTux the button runs `kiro-report --copy` (private details removed, report
+  on the clipboard) and opens the Kiro Discussions board; it now also appears when ATT runs through pkexec, whose
+  `PATH` lacks `/usr/local/bin`. On every other Arch-based system ATT makes its own redacted report
+  (`att_report.py`, ported from kiro-report) and opens ATT's GitHub issue page.
+- **Smaller fixes:** dialog buttons (Yes/No/OK/Close) follow ATT's language choice instead of the process locale,
+  in all 17 dialogs, and long titles in the History tab are shortened to fit the window. Streamline lists
+  webapp-manager from TIER 3.
+
+### Testing still to do (release round, MASTER_TODO §1 P1)
+- An AUR build with paru and one with yay on a fresh install: banner and coloured findings, and the DANGER prompt.
+- The ATT AUR-check switch flipped both ways, then paru and yay checked again.
+- The kiro-aur-check notice on an upgraded (pre-check) system.
+- ATT Repair, History and Journal tabs.
+- Web App Manager: make one web app and start it from the menu.
+- The rest of the 5-box round (riker, Medion redo, Yoga) and `gpg --verify` of the ISO's `.sig`.
 
 ### Files Modified
 - `archiso/packages.x86_64`
+- Component repos (built and in the repos since 2026-11-26): **kiro-system-files** 26.11-22 (nemesis_repo),
+  **kiro-dot-files** 26.11-04, **archlinux-tweak-tool** 26.11-39, **cachyos-pi-scan** 2.0.1-1
 
 ## 2026.11.24 — v26.11.24
 

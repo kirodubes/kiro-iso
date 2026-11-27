@@ -6,14 +6,14 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
-## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (Yoga, Intel HD 620 + AMD Radeon R5 M330): **release round 2 — Wi-Fi, boot line 4 (nomodeset), English, ext4, swap with hibernate — hibernate resumes**
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (Yoga, Intel HD 620 + AMD Radeon R5 M330): **release round 2 — Wi-Fi, boot line 4 (nomodeset), English, ext4, swap with hibernate — hibernate resumes**, **kiro-audit 140 / 0 / 0**
 
 Choices in order: Wi-Fi from the live tray; boot line 4; no Calamares Tweak Tool; Welcome page English; Erase disk,
 ext4, Swap (with Hibernate).
 
 | Target (Yoga) | FS / encryption | Bootloader | Result |
 |---------------|-----------------|------------|--------|
-| Kiro default (XFCE, X11), boot line 4 (nomodeset), **English**, **Wi-Fi** | erase disk, GPT, **ext4**, unencrypted, **swap partition with hibernate** (8.8 G for 7.6 G RAM) | UEFI / systemd-boot (default) | Clean install; zero failed units, boot 22.6 s (3.9 s userspace); **hibernate + resume works** |
+| Kiro default (XFCE, X11), boot line 4 (nomodeset), **English**, **Wi-Fi** | erase disk, GPT, **ext4**, unencrypted, **swap partition with hibernate** (8.8 G for 7.6 G RAM) | UEFI / systemd-boot (default) | Clean install; **kiro-audit 140 PASS / 0 WARN / 0 FAIL** (run after the resume), zero failed units, boot 22.6 s (3.9 s userspace); **hibernate + resume works** |
 
 - **nomodeset stays on the live ISO only:** the installed entries (cachyos default + lts) carry no `nomodeset`;
   `i915` drives the Intel GPU, `amdgpu` the Hainan dGPU.
@@ -31,14 +31,14 @@ ext4, Swap (with Hibernate).
 
 ---
 
-## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release round 1b — reinstall with encryption: boot line 5, GRUB + LUKS2 on BIOS, English, ext4, small swap**
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **BIOS / GRUB** (Medion, Intel HD 3000 + GT 620M Fermi): **release round 1b — reinstall with encryption: boot line 5, GRUB + LUKS2 on BIOS, English, ext4, small swap**, **kiro-audit 144 / 0 / 0**
 
 Reinstall of the entry below with "Encrypt system" ticked. Choices in order: Wi-Fi; boot line 5; Calamares Tweak Tool
 GRUB + encryption on; Welcome page English; Erase disk, ext4, Swap (no Hibernate), Encrypt system + passphrase.
 
 | Target (Medion) | FS / encryption | Bootloader | Result |
 |-----------------|-----------------|------------|--------|
-| Kiro default (XFCE, X11), boot line 5 (`linux-lts`), **English**, Wi-Fi | erase disk, msdos, **ext4 on LUKS2**, **swap on LUKS2** (small, 8.8 G) | BIOS / GRUB (Calamares Tweak Tool) | Clean install; boots after GRUB takes the passphrase; zero failed units, boot 18.2 s (initrd 11.7 s) |
+| Kiro default (XFCE, X11), boot line 5 (`linux-lts`), **English**, Wi-Fi | erase disk, msdos, **ext4 on LUKS2**, **swap on LUKS2** (small, 8.8 G) | BIOS / GRUB (Calamares Tweak Tool) | Clean install; boots after GRUB takes the passphrase; **kiro-audit 144 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 18.2 s (initrd 11.7 s) |
 
 - **LUKS:** `/dev/sda1` (root) and `/dev/sda2` (swap) both LUKS2, `argon2id` (~800 MiB memory cost), `aes-xts-plain64`,
   two keyslots (passphrase + keyfile).

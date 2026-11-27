@@ -10,6 +10,7 @@ Useful for spotting cost regressions when changing squashfs compression, kernel 
 
 | When             | Version    | Kernel(s)                  | Squashfs       | Duration | ISO size | Notes                                    |
 |------------------|------------|----------------------------|----------------|----------|----------|------------------------------------------|
+| 2026-11-27 10:16 | v26.11.27 | linux-cachyos linux-lts | zstd L6 -b 1M | 11m24s | 6.8G | KIB 26.11-08 on metal-B, **Plasma only** (default session plasma), NVIDIA open, all 137 optional packages, no Plasma extras; 7 300 866 048 bytes, KIB estimated 7 279 367 683 (−0.3 %); added by hand from KIB's `summary.txt` |
 | 2026-11-27 09:49 | v26.11.27 | linux-cachyos | zstd L6 -b 1M | 3m47s | 3.2G | KIB 26.11-07 on metal-B, **minimal**: ohmychadwm only, 1 kernel, NVIDIA none, 0/111 optional packages; 3 441 524 736 bytes; added by hand from KIB's `summary.txt` |
 | 2026-11-27 09:13 | v26.11.27 | linux-cachyos linux-lts | zstd L6 -b 1M | 12m11s | 6.4G | KIB 26.11-06 on metal-B (standard build, fresh clone + first archiso install); added by hand from KIB's `summary.txt` |
 | 2026-11-27 06:03 | v26.12.01 | linux-cachyos linux-lts | zstd L6 -b 1M | 9m14s | 6.4G | |

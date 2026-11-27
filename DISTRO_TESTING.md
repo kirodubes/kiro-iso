@@ -6,6 +6,34 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B, Intel HD 630): **release round 2 — offline install, boot line 1, Spanish, xfs, swap file**, **kiro-audit 140 / 0 / 0**
+
+Choices in order: cable plugged in but **disconnected in NetworkManager** in the live session; boot line 1; no
+Calamares Tweak Tool; Welcome page Español; Keyboard page (guessed `es`, then changed to `dz`); Erase disk, **xfs**,
+**Swap to file**.
+
+| Target (metal-B) | FS / encryption | Bootloader | Result |
+|------------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 1 (open drivers), **Spanish**, **offline** | erase disk, GPT, **xfs**, unencrypted, **swap file** (8 G `/swapfile`) | UEFI / systemd-boot (default) | Clean install; **kiro-audit 140 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 21.9 s (2.9 s userspace) |
+
+- **Offline path proven:** `hasInternet: false` in the install JSON (`requirement "internet" satisfied? false
+  mandatory? false`), so no online `-Syu`; the pacman sync DBs are the ISO's (01:59).
+- **Bundled microcode (the 6c gate, on metal):** `kiro_ucode` installed **intel-ucode 20261110-1** from the
+  kiro-calamares-config bundle and removed `amd-ucode` (20261124-1, the refreshed bundle) as not needed.
+- **xfs + swap file:** root `xfs` (`noatime,lazytime,inode64`); `/swapfile` 8 G (0600) in fstab, active next to zram.
+  The known cosmetic `fsck.xfs` exit 8 line is in the journal again.
+- **Language:** `LANG` and `LC_*` = `es_ES.UTF-8` (Español picked first). **Keyboard `dz`** (Algerian): Calamares
+  guessed `es` from the language at 07:30:40, the layout was changed to `dz` on the Keyboard page at 07:30:50 (a
+  pick, not a guess). With no console keymap for `dz`, `systemd-vconsole-setup` fails (`loadkeys` exit 1) at boot;
+  harmless, a consequence of the choice.
+- **Minor, cosmetic:** 10 × "Failed to start XFCE notifications service" (`cannot open display`) at 07:42:31,
+  between two sessions: something sent a notification with no X display, D-Bus started xfce4-notifyd, it exited.
+  Same on metal-A at a logout. After login xfce4-notifyd runs normally.
+- systemd-boot entries: cachyos (default) + lts. AUR check on; cachyos-pi-scan and webapp-manager present. The
+  installed system came up on the cable by itself (`Conexión cableada 1`).
+
+---
+
 ## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (Yoga, Intel HD 620 + AMD Radeon R5 M330): **release round 2 — Wi-Fi, boot line 4 (nomodeset), English, ext4, swap with hibernate — hibernate resumes**, **kiro-audit 140 / 0 / 0**
 
 Choices in order: Wi-Fi from the live tray; boot line 4; no Calamares Tweak Tool; Welcome page English; Erase disk,

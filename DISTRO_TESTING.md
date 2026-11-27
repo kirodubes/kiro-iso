@@ -6,6 +6,41 @@ Results of boot and install testing for kiro-iso builds. Newest first.
 
 ---
 
+## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (MSI, Intel UHD 630 + GTX 1050 Ti Mobile): **release round 3 — Wi-Fi, boot line 3 (kiro-hwd), Dutch, btrfs, small swap**, **kiro-audit 140 / 0 / 0** — round complete
+
+Choices in order: Wi-Fi from the live tray; boot line 3 (`driver=nonfreechwd`); no Calamares Tweak Tool; Welcome page
+Nederlands; Erase disk, btrfs, Swap (no Hibernate).
+
+| Target (MSI) | FS / encryption | Bootloader | Result |
+|--------------|-----------------|------------|--------|
+| Kiro default (XFCE, X11), boot line 3, **Dutch**, **Wi-Fi** | erase disk, GPT, **btrfs**, unencrypted, **small swap** (8.8 G) | UEFI / systemd-boot (default) | Clean install (kiro-hwd step 3m26s incl. DKMS); **kiro-audit 140 PASS / 0 WARN / 0 FAIL**, zero failed units, boot 31.6 s (6.0 s userspace) |
+
+- **kiro-hwd on the final build:** `kiro-hwd install` in the chroot picked **`nvidia-580xx + prime`** (1c8c on the 580
+  list; laptop chassis 10 with an Intel iGPU). Installed `nvidia-580xx-dkms/-utils/-settings` 580.196.07,
+  `opencl-nvidia-580xx`, `libva-nvidia-driver`, `nvidia-prime`, `switcheroo-control` (enabled), headers for both
+  kernels, `10-kiro-hwd.conf` in `mkinitcpio.conf.d`. No `10-kiro-hwd-nvidia.conf` (Pascal). Global
+  `NVreg_DynamicPowerManagement=0x02` present; `nvidia-hibernate/-resume/-suspend` enabled.
+- **PRIME offload:** desktop on `Mesa Intel UHD Graphics 630`; `prime-run glxinfo` → `NVIDIA GeForce GTX 1050 Ti`;
+  `prime-run vulkaninfo` lists both GPUs. `nvidia-smi`: 580.196.07, P8 at idle; `i915` + `nvidia` loaded.
+- **btrfs:** 8 subvolumes, `compress=zstd:3,noatime`; small swap partition (RAM size, ≤ 8 GiB) with `resume=`.
+- **Language / network:** `nl_BE.UTF-8`, keymap `be-latin1`; online install over Wi-Fi (`hasInternet: true`), Wi-Fi
+  back on its own after the first boot. AUR check on; cachyos-pi-scan and webapp-manager present.
+- Journal: only known lines (`gkr-pam`, `wpa_supplicant` multicast, BIOS SGX/TDX notices).
+
+**Round summary (v26.12.01, build 05:54):** upgrade path (metal-A real, metal-B simulated) + 6 installs, all
+kiro-audit 0 WARN / 0 FAIL: metal-A line 2 GRUB-UEFI btrfs Italian (141); Medion line 5 BIOS GRUB ext4 French Wi-Fi,
+then with LUKS2 (144); Yoga line 4 hibernate Wi-Fi (140, resume works); metal-B offline xfs swap file Spanish
+(140, bundled intel-ucode); MSI line 3 kiro-hwd 580xx + prime (140). All 5 boot lines, systemd-boot / GRUB-UEFI /
+GRUB-BIOS, ext4 / btrfs / xfs, all 4 swap choices, cable / Wi-Fi / offline, both kernels.
+**ISO verification on hq:** `gpg --verify` → Good signature from "Kiro Signing Key" (primary fingerprint
+`D965 8D54 6AD4 8015 CABC 612B 149A BD0C 3A05 63EE`, signed with subkey `…33B7 61B0 EE5A D4FD`); `sha256sum -c` OK.
+Open minor findings (none blocking): ohmychadwm Super+F7 → `virtualbox` (not on the ISO); cachyos-pi-scan text stays
+English; nvidia-open 620 `drm_sysfs` WARNING on 6.18 LTS (riker); xfce4-notifyd start attempts with no display at a
+logout; the "Encrypt system" box is easy to miss (MASTER_TODO P3); MSI hibernate black screen (11-24) narrowed to
+NVIDIA 580xx + PRIME (Yoga resumes fine).
+
+---
+
 ## 2026-11-27 (build 05:54) — v26.12.01, **`linux-cachyos` + `linux-lts`**, bare metal **UEFI / systemd-boot** (metal-B, Intel HD 630): **release round 2 — offline install, boot line 1, Spanish, xfs, swap file**, **kiro-audit 140 / 0 / 0**
 
 Choices in order: cable plugged in but **disconnected in NetworkManager** in the live session; boot line 1; no
